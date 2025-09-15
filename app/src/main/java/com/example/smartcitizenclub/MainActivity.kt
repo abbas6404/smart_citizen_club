@@ -84,14 +84,14 @@ fun MainActivityPreview() {
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.smart_citizen_logo),
-                            contentDescription = "Smart Citizen Club Logo",
-                            modifier = Modifier.size(120.dp)
+                            contentDescription = "SCC Logo",
+                            modifier = Modifier.size(140.dp)
                         )
                         
                         Spacer(modifier = Modifier.height(8.dp))
                         
                         Text(
-                            text = "Smart Citizen Club",
+                            text = "SCC",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
