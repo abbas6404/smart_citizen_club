@@ -26,18 +26,19 @@ import com.example.smartcitizenclub.ui.theme.SmartCitizenClubTheme
 import java.text.SimpleDateFormat
 import java.util.*
 
-// WhatsApp-style colors
-private object WhatsAppColors {
-    val PrimaryGreen = Color(0xFF075E54)
-    val LightGreen = Color(0xFF128C7E)
-    val AccentGreen = Color(0xFF25D366)
-    val Background = Color(0xFFECE5DD)
-    val ChatBackground = Color(0xFFE5DDD5)
-    val MessageBubble = Color(0xFFDCF8C6)
-    val UnreadBackground = Color(0xFFF0F0F0)
-    val TextPrimary = Color(0xFF303030)
-    val TextSecondary = Color(0xFF757575)
-    val TextTertiary = Color(0xFF9E9E9E)
+// SmartCitizenClub app colors
+private object SmartCitizenColors {
+    val PrimaryOrange = Color(0xFFFF4500)   // Vibrant orange-red from account card
+    val SecondaryGreen = Color(0xFF10B981)  // Accent color
+    val Background = Color(0xFFF8F9FA)     // Light background
+    val ChatBackground = Color(0xFFF3F4F6)  // Slightly darker background
+    val MessageBubble = Color(0xFFE0F2FE)   // Light blue message bubble
+    val UnreadBackground = Color(0xFFF0F9FF) // Very light blue for unread
+    val TextPrimary = Color(0xFF374151)     // Dark gray text
+    val TextSecondary = Color(0xFF6B7280)   // Medium gray text
+    val TextTertiary = Color(0xFF9CA3AF)    // Light gray text
+    val Red = Color(0xFFE53E3E)             // Error/notification color
+    val Gold = Color(0xFFF59E0B)            // Warning color
 }
 
 data class Chat(
@@ -54,7 +55,11 @@ data class Chat(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MessagesScreen(user: User) {
+fun MessagesScreen(
+    user: User,
+    onShowSelectContact: () -> Unit = {},
+    onChatClick: (Chat) -> Unit = {}
+) {
     var searchQuery by remember { mutableStateOf("") }
     var showSearchBar by remember { mutableStateOf(false) }
     
@@ -143,48 +148,48 @@ fun MessagesScreen(user: User) {
         }.sortedWith(compareBy<Chat> { !it.isPinned }.thenByDescending { it.timestamp })
     }
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(WhatsAppColors.Background)
-    ) {
-        // Top Bar
-        WhatsAppTopBar(
-            showSearchBar = showSearchBar,
-            searchQuery = searchQuery,
-            onSearchQueryChange = { searchQuery = it },
-            onSearchToggle = { showSearchBar = !showSearchBar },
-            onMenuClick = { /* TODO: Show menu */ }
-        )
-        
-        // Content
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 56.dp), // Account for top bar height
-            contentPadding = PaddingValues(bottom = 16.dp)
-        ) {
-            if (filteredChats.isEmpty()) {
-                item {
-                    EmptyState()
-                }
-            } else {
-                items(filteredChats) { chat ->
-                    ChatItem(
-                        chat = chat,
-                        onClick = { /* TODO: Open chat */ }
-                    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                WhatsAppTopBar(
+                    showSearchBar = showSearchBar,
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { searchQuery = it },
+                    onSearchToggle = { showSearchBar = !showSearchBar },
+                    onMenuClick = { /* TODO: Show menu */ }
+                )
+            },
+            containerColor = SmartCitizenColors.Background
+        ) { paddingValues ->
+            // Content
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
+                if (filteredChats.isEmpty()) {
+                    item {
+                        EmptyState()
+                    }
+                } else {
+                    items(filteredChats) { chat ->
+                        ChatItem(
+                            chat = chat,
+                            onClick = { onChatClick(chat) }
+                        )
+                    }
                 }
             }
         }
         
         // Floating Action Button
         FloatingActionButton(
-            onClick = { /* TODO: Start new chat */ },
+            onClick = { onShowSelectContact() },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            containerColor = WhatsAppColors.AccentGreen,
+            containerColor = SmartCitizenColors.SecondaryGreen,
             elevation = FloatingActionButtonDefaults.elevation(
                 defaultElevation = 6.dp,
                 pressedElevation = 8.dp
@@ -214,7 +219,7 @@ private fun WhatsAppTopBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(WhatsAppColors.PrimaryGreen)
+                .background(SmartCitizenColors.PrimaryOrange)
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -253,14 +258,14 @@ private fun WhatsAppTopBar(
         TopAppBar(
             title = {
                 Text(
-                    text = "WhatsApp",
+                    text = "Messages",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium
                 )
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = WhatsAppColors.PrimaryGreen
+                containerColor = SmartCitizenColors.PrimaryOrange
             ),
             actions = {
                 IconButton(onClick = onSearchToggle) {
@@ -292,7 +297,7 @@ private fun ChatItem(
             .fillMaxWidth()
             .clickable { onClick() }
             .background(
-                if (chat.isRead) Color.Transparent else WhatsAppColors.UnreadBackground
+                if (chat.isRead) Color.Transparent else SmartCitizenColors.UnreadBackground
             )
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -304,7 +309,7 @@ private fun ChatItem(
                 modifier = Modifier
                     .size(56.dp)
                     .clip(CircleShape)
-                    .background(WhatsAppColors.LightGreen),
+                    .background(SmartCitizenColors.SecondaryGreen),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -321,7 +326,7 @@ private fun ChatItem(
                     modifier = Modifier
                         .size(16.dp)
                         .clip(CircleShape)
-                        .background(WhatsAppColors.AccentGreen)
+                        .background(SmartCitizenColors.SecondaryGreen)
                         .align(Alignment.BottomEnd)
                 )
             }
@@ -342,7 +347,7 @@ private fun ChatItem(
                     text = chat.contactName,
                     fontSize = 16.sp,
                     fontWeight = if (chat.isRead) FontWeight.Normal else FontWeight.Bold,
-                    color = WhatsAppColors.TextPrimary,
+                    color = SmartCitizenColors.TextPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
@@ -355,7 +360,7 @@ private fun ChatItem(
                         Icon(
                             Icons.Default.PushPin,
                             contentDescription = "Pinned",
-                            tint = WhatsAppColors.TextTertiary,
+                            tint = SmartCitizenColors.TextTertiary,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -364,7 +369,7 @@ private fun ChatItem(
                     Text(
                         text = formatTimestamp(chat.timestamp),
                         fontSize = 12.sp,
-                        color = WhatsAppColors.TextTertiary
+                        color = SmartCitizenColors.TextTertiary
                     )
                 }
             }
@@ -379,7 +384,7 @@ private fun ChatItem(
                 Text(
                     text = chat.lastMessage,
                     fontSize = 14.sp,
-                    color = if (chat.isRead) WhatsAppColors.TextSecondary else WhatsAppColors.TextPrimary,
+                    color = if (chat.isRead) SmartCitizenColors.TextSecondary else SmartCitizenColors.TextPrimary,
                     fontWeight = if (chat.isRead) FontWeight.Normal else FontWeight.Medium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -391,7 +396,7 @@ private fun ChatItem(
                         modifier = Modifier
                             .size(20.dp)
                             .clip(CircleShape)
-                            .background(WhatsAppColors.AccentGreen),
+                            .background(SmartCitizenColors.SecondaryGreen),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -419,7 +424,7 @@ private fun EmptyState() {
             Icons.Default.Chat,
             contentDescription = "No Chats",
             modifier = Modifier.size(80.dp),
-            tint = WhatsAppColors.TextTertiary
+            tint = SmartCitizenColors.TextTertiary
         )
         
         Spacer(modifier = Modifier.height(16.dp))
@@ -428,7 +433,7 @@ private fun EmptyState() {
             text = "No chats yet",
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
-            color = WhatsAppColors.TextSecondary
+            color = SmartCitizenColors.TextSecondary
         )
         
         Spacer(modifier = Modifier.height(8.dp))
@@ -436,7 +441,7 @@ private fun EmptyState() {
         Text(
             text = "Start a conversation by tapping the chat button",
             fontSize = 14.sp,
-            color = WhatsAppColors.TextTertiary,
+            color = SmartCitizenColors.TextTertiary,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
     }

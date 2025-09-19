@@ -27,9 +27,14 @@ fun BottomNavigation(
 ) {
     var showChangePassword by remember { mutableStateOf(false) }
     var showKYCSubmit by remember { mutableStateOf(false) }
+    var showSelectContact by remember { mutableStateOf(false) }
+    var showNewGroup by remember { mutableStateOf(false) }
+    var showNewContact by remember { mutableStateOf(false) }
+    var showChatScreen by remember { mutableStateOf(false) }
+    var selectedChat by remember { mutableStateOf<com.example.smartcitizenclub.ui.user.screens.Chat?>(null) }
     Scaffold(
         bottomBar = {
-            if (!showChangePassword && !showKYCSubmit) {
+            if (!showChangePassword && !showKYCSubmit && !showSelectContact && !showNewGroup && !showNewContact && !showChatScreen) {
                 NavigationBar {
                     // Home
                     NavigationBarItem(
@@ -141,11 +146,65 @@ fun BottomNavigation(
                         }
                     )
                 }
+                showSelectContact -> {
+                    com.example.smartcitizenclub.ui.user.screens.messages.SelectContactScreen(
+                        onBackClick = { showSelectContact = false },
+                        onNewGroup = { 
+                            showSelectContact = false
+                            showNewGroup = true
+                        },
+                        onNewContact = { 
+                            showSelectContact = false
+                            showNewContact = true
+                        },
+                        onContactSelected = { contact ->
+                            // TODO: Start chat with selected contact
+                            showSelectContact = false
+                        }
+                    )
+                }
+                showNewGroup -> {
+                    com.example.smartcitizenclub.ui.user.screens.messages.NewGroupScreen(
+                        onBackClick = { showNewGroup = false },
+                        onNextClick = { 
+                            // TODO: Navigate to group setup screen
+                            showNewGroup = false
+                        }
+                    )
+                }
+                showNewContact -> {
+                    com.example.smartcitizenclub.ui.user.screens.messages.NewContactScreen(
+                        onBackClick = { showNewContact = false },
+                        onSaveContact = { firstName, lastName, countryCode, phoneNumber, showQRCode ->
+                            // TODO: Save contact to database
+                            showNewContact = false
+                        }
+                    )
+                }
+                showChatScreen -> {
+                    selectedChat?.let { chat ->
+                        com.example.smartcitizenclub.ui.user.screens.messages.ChatScreen(
+                            chat = chat,
+                            currentUser = user,
+                            onBackClick = { 
+                                showChatScreen = false
+                                selectedChat = null
+                            }
+                        )
+                    }
+                }
                 else -> {
                 when (selectedScreen) {
                     UserScreen.Home -> HomeScreen(user)
                     UserScreen.Transactions -> FinanceScreen(user)
-                    UserScreen.Messages -> MessagesScreen(user)
+                    UserScreen.Messages -> MessagesScreen(
+                        user = user,
+                        onShowSelectContact = { showSelectContact = true },
+                        onChatClick = { chat ->
+                            selectedChat = chat
+                            showChatScreen = true
+                        }
+                    )
                     UserScreen.Account -> AccountScreen(user, onLogout)
                     UserScreen.MySCC -> MySCCScreen(
                         user = user, 

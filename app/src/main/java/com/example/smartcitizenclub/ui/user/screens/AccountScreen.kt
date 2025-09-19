@@ -301,20 +301,20 @@ fun AddAccountDialog(
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                OutlinedTextField(
+                    OutlinedTextField(
                     value = accountName,
                     onValueChange = { accountName = it },
-                    label = { Text("Account Name") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                        label = { Text("Account Name") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                OutlinedTextField(
+                    OutlinedTextField(
                     value = accountNumber,
                     onValueChange = { accountNumber = it },
                     label = { Text("Account / Referral No") },
                     placeholder = { Text("Account/Referral No") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
                 Text(
                     text = "Select Group",
@@ -325,20 +325,21 @@ fun AddAccountDialog(
 
                 // Group Selection - Reusable component
                 GroupSelection(
-                    selectedGroupId = selectedGroupId, onGroupSelected = { selectedGroupId = it })
+                    selectedGroupId = selectedGroupId,
+                    onGroupSelected = { selectedGroupId = it })
             }
         }, confirmButton = {
-            TextButton(
-                onClick = {
+                TextButton(
+                    onClick = {
                     onAdd(accountName, accountNumber.ifBlank { "" }, null, selectedGroupId)
                     onDismiss()
                 }, enabled = accountName.isNotBlank()
-            ) {
+                ) {
                 Text("Add Account")
-            }
+                }
         }, dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                TextButton(onClick = onDismiss) {
+                    Text("Cancel")
             }
         })
     }
@@ -357,24 +358,24 @@ fun AddGroupDialog(
                 text = "Add New Group", fontSize = 18.sp, fontWeight = FontWeight.Bold
             )
         }, text = {
-            OutlinedTextField(
-                value = groupName,
-                onValueChange = { groupName = it },
-                label = { Text("Group Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
+                OutlinedTextField(
+                    value = groupName,
+                    onValueChange = { groupName = it },
+                    label = { Text("Group Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
         }, confirmButton = {
-            TextButton(
-                onClick = {
-                    onAdd(groupName)
+                TextButton(
+                    onClick = {
+                        onAdd(groupName)
                     onDismiss()
                 }, enabled = groupName.isNotBlank()
-            ) {
+                ) {
                 Text("Add Group")
-            }
+                }
         }, dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                TextButton(onClick = onDismiss) {
+                    Text("Cancel")
             }
         })
     }
@@ -436,10 +437,10 @@ fun AccountScreen(
     var showContextMenu by remember { mutableStateOf(false) }
     var selectedAccount by remember { mutableStateOf<SubAccount?>(null) }
     var showChangeGroupDialog by remember { mutableStateOf(false) }
-
+    
     // Use shared account groups data
     val accountGroups = remember { sampleAccountGroups }
-
+    
     val subAccounts = remember {
         listOf(
             SubAccount("1", "Main Account", "ACC-001", 15000.0, null, "REF001"),
@@ -479,8 +480,7 @@ fun AccountScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 4.dp)
-                .padding(bottom = 16.dp), // Minimal bottom padding
+                .padding(horizontal = 16.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp) // Minimal spacing
         ) {
             // Active Account Card (Mastercard Style)
@@ -620,7 +620,7 @@ fun AccountScreen(
                 accountGroups.forEach { group ->
                     val groupAccounts = groupedAccounts[group.id] ?: emptyList()
                     GroupCard(
-                        group = group,
+                            group = group,
                         accounts = groupAccounts,
                         isExpanded = expandedGroups.contains(group.id),
                         onToggleExpanded = {
@@ -673,9 +673,9 @@ fun AccountScreen(
                         // Add Account Option
                         Card(
                             modifier = Modifier.clickable {
-                                showFloatingMenu = false
-                                showAddAccountDialog = true
-                            }, colors = CardDefaults.cardColors(
+                                    showFloatingMenu = false
+                                    showAddAccountDialog = true
+                                }, colors = CardDefaults.cardColors(
                                 containerColor = Color.White
                             ), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                         ) {
@@ -690,7 +690,7 @@ fun AccountScreen(
                                     modifier = Modifier.size(20.dp)
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
-                                Text(
+                    Text(
                                     text = "Add Account",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
@@ -702,24 +702,24 @@ fun AccountScreen(
                         // Add Group Option
                         Card(
                             modifier = Modifier.clickable {
-                                showFloatingMenu = false
-                                showAddGroupDialog = true
-                            }, colors = CardDefaults.cardColors(
+                                    showFloatingMenu = false
+                                    showAddGroupDialog = true
+                                }, colors = CardDefaults.cardColors(
                                 containerColor = Color.White
                             ), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                         ) {
                             Row(
                                 modifier = Modifier.padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
+                        ) {
+                            Icon(
                                     Icons.Default.GroupAdd,
                                     contentDescription = "Add Group",
                                     tint = AccountColors.Green,
                                     modifier = Modifier.size(20.dp)
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
-                                Text(
+                            Text(
                                     text = "Add Group",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
@@ -788,46 +788,48 @@ fun AccountScreen(
                         showChangeGroupDialog = false
                         selectedAccount = null
                     })
-            }
+    }
 
-            // Add Account Dialog
-            if (showAddAccountDialog) {
-                AddAccountDialog(
-                    showDialog = true,
-                    onDismiss = { showAddAccountDialog = false },
-                    onAdd = { name, number, balance, groupId ->
-                        // Handle add account - in real app, this would save to database
-                        println("Adding account: $name, $number, $balance, $groupId")
-                        showAddAccountDialog = false
+    // Add Account Dialog
+    if (showAddAccountDialog) {
+        AddAccountDialog(
+            showDialog = true,
+            onDismiss = { showAddAccountDialog = false },
+            onAdd = { name, number, balance, groupId -> 
+                // Handle add account - in real app, this would save to database
+                println("Adding account: $name, $number, $balance, $groupId")
+                showAddAccountDialog = false
                     })
-            }
-
-            // Add Group Dialog
-            if (showAddGroupDialog) {
-                AddGroupDialog(
-                    showDialog = true,
-                    onDismiss = { showAddGroupDialog = false },
-                    onAdd = { groupName ->
-                        // Handle add group - in real app, this would save to database
-                        println("Adding group: $groupName")
-                        showAddGroupDialog = false
+    }
+    
+    // Add Group Dialog
+    if (showAddGroupDialog) {
+        AddGroupDialog(
+            showDialog = true,
+            onDismiss = { showAddGroupDialog = false },
+            onAdd = { groupName -> 
+                // Handle add group - in real app, this would save to database
+                println("Adding group: $groupName")
+                showAddGroupDialog = false
                     })
-            }
-        }
-
-        @Preview(showBackground = true)
-        @Composable
-        fun AccountScreenPreview() {
-            SmartCitizenClubTheme {
-                AccountScreen(
-                    user = User(
-                        id = "1",
-                        name = "John Doe",
-                        email = "john@example.com",
-                        phone = "01742-184298",
-                        userType = UserType.USER
-                    ), onLogout = {})
-            }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AccountScreenPreview() {
+    SmartCitizenClubTheme {
+        AccountScreen(
+            user = User(
+                id = "1",
+                name = "John Doe",
+                email = "john@example.com",
+                phone = "01742-184298",
+                userType = UserType.USER
+            ),
+            onLogout = {}
+        )
+    }
+}
 }
