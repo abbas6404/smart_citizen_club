@@ -25,11 +25,11 @@ fun BottomNavigation(
     onLogout: () -> Unit,
     onSwitchToSidebar: () -> Unit
 ) {
-    val shouldShowBottomNav = selectedScreen != UserScreen.Messages
-    
+    var showChangePassword by remember { mutableStateOf(false) }
+    var showKYCSubmit by remember { mutableStateOf(false) }
     Scaffold(
         bottomBar = {
-            if (shouldShowBottomNav) {
+            if (!showChangePassword && !showKYCSubmit) {
                 NavigationBar {
                     // Home
                     NavigationBarItem(
@@ -122,12 +122,39 @@ fun BottomNavigation(
                     )
                 )
         ) {
-            when (selectedScreen) {
-                UserScreen.Home -> HomeScreen(user)
-                UserScreen.Transactions -> FinanceScreen(user)
-                UserScreen.Messages -> MessagesScreen(user)
-                UserScreen.Account -> AccountScreen(user, onLogout)
-                UserScreen.MySCC -> MySCCScreen(user, onLogout)
+            when {
+                showChangePassword -> {
+                    com.example.smartcitizenclub.ui.user.screens.myscc.ChangePasswordScreen(
+                        onBackClick = { showChangePassword = false },
+                        onPasswordChanged = { 
+                            showChangePassword = false
+                            // You can add success message or other actions here
+                        }
+                    )
+                }
+                showKYCSubmit -> {
+                    com.example.smartcitizenclub.ui.user.screens.myscc.KYCSubmitScreen(
+                        onBackClick = { showKYCSubmit = false },
+                        onKYCSubmitted = { 
+                            showKYCSubmit = false
+                            // You can add success message or other actions here
+                        }
+                    )
+                }
+                else -> {
+                when (selectedScreen) {
+                    UserScreen.Home -> HomeScreen(user)
+                    UserScreen.Transactions -> FinanceScreen(user)
+                    UserScreen.Messages -> MessagesScreen(user)
+                    UserScreen.Account -> AccountScreen(user, onLogout)
+                    UserScreen.MySCC -> MySCCScreen(
+                        user = user, 
+                        onLogout = onLogout,
+                        onNavigateToChangePassword = { showChangePassword = true },
+                        onNavigateToKYCSubmit = { showKYCSubmit = true }
+                    )
+                }
+                }
             }
         }
     }

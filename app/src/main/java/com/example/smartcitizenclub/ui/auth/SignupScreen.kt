@@ -83,7 +83,7 @@ fun SignupScreen(
         Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "Join our community! Create your account",
+            text = "Join our community",
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -108,17 +108,6 @@ fun SignupScreen(
         Spacer(modifier = Modifier.height(16.dp))
         
         // Mobile Number Field
-        Text(
-            text = "Mobile Number",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            textAlign = TextAlign.Start
-        )
-        
         OutlinedTextField(
             value = mobileNumber,
             onValueChange = { newValue ->
@@ -127,23 +116,15 @@ fun SignupScreen(
                     mobileNumber = newValue
                 }
             },
+            label = { Text("Mobile Number") },
             leadingIcon = {
-                Icon(
-                    Icons.Default.Phone,
-                    contentDescription = "Mobile Number",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+                Icon(Icons.Default.Phone, contentDescription = "Mobile Number")
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             enabled = !isLoading,
-            placeholder = { Text("01XXXXXXXXX (11 digits)") },
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-            )
+            placeholder = { Text("01XXXXXXXXX (11 digits)") }
         )
         
         Spacer(modifier = Modifier.height(16.dp))

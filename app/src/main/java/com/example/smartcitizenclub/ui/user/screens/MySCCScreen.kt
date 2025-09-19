@@ -1,6 +1,10 @@
 package com.example.smartcitizenclub.ui.user.screens
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,6 +27,31 @@ import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.ui.theme.SmartCitizenClubTheme
+import kotlinx.coroutines.delay
+
+// Color constants from logo
+private object Colors {
+    val Red = Color(0xFFE53E3E)
+    val Gold = Color(0xFFF59E0B)
+    val Green = Color(0xFF10B981)
+    val Gray = Color(0xFF666666)
+    val LightGray = Color(0xFF999999)
+    val DarkGray = Color(0xFF374151)
+    val LightGreen = Color(0xFF10B981).copy(alpha = 0.1f)
+    val LightGold = Color(0xFFF59E0B).copy(alpha = 0.2f)
+    val LightRed = Color(0xFFE53E3E).copy(alpha = 0.1f)
+}
+
+// Helper function to open external URLs
+private fun openExternalUrl(context: Context, url: String) {
+    try {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        // Handle error if no app can handle the intent
+        e.printStackTrace()
+    }
+}
 
 data class SettingsItem(
     val title: String,
@@ -35,25 +65,30 @@ data class SettingsItem(
 @Composable
 fun MySCCScreen(
     user: User,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onNavigateToChangePassword: () -> Unit = {},
+    onNavigateToKYCSubmit: () -> Unit = {}
 ) {
-    val settingsItems = remember {
+    val context = LocalContext.current
+    var showLanguageDialog by remember { mutableStateOf(false) }
+    var currentLanguage by remember { mutableStateOf("English") }
+    var showLanguageChangeNotification by remember { mutableStateOf(false) }
+    var showPrivacyPolicy by remember { mutableStateOf(false) }
+    var showFAQ by remember { mutableStateOf(false) }
+    var showAbout by remember { mutableStateOf(false) }
+    val settingsItems = remember(currentLanguage) {
         listOf(
             // General Section
-            SettingsItem("Language", Icons.Default.Language, "English", true, "General"),
-            SettingsItem("Account Type", Icons.Default.Person, "Regular", false, "General"),
-            SettingsItem("I Want Profit", Icons.Default.TrendingUp, "YES", false, "General"),
-            SettingsItem("Change PIN", Icons.Default.Lock, hasAction = true, category = "General"),
-            SettingsItem("Change Mobile Operator", Icons.Default.PhoneAndroid, hasAction = true, category = "General"),
-            SettingsItem("Re-submit KYC", Icons.Default.Description, hasAction = true, category = "General"),
-            SettingsItem("Trusted Merchants", Icons.Default.Store, hasAction = true, category = "General"),
+            SettingsItem("Language", Icons.Default.Language, currentLanguage, true, "General"),
+            SettingsItem("Change Password", Icons.Default.Lock, hasAction = true, category = "General"),
+            SettingsItem("Submit KYC", Icons.Default.Description, hasAction = true, category = "General"),
             
             // More Information Section
             SettingsItem("Privacy Policy", Icons.Default.PrivateConnectivity, hasAction = true, category = "More Information"),
             SettingsItem("FAQ", Icons.Default.Help, hasAction = true, category = "More Information"),
-            SettingsItem("Store Locator", Icons.Default.LocationOn, hasAction = true, category = "More Information"),
             SettingsItem("About", Icons.Default.Info, hasAction = true, category = "More Information"),
-            SettingsItem("SCC Page", Icons.Default.Web, hasAction = true, category = "More Information")
+            SettingsItem("SCC Page", Icons.Default.Web, hasAction = true, category = "More Information"),
+            SettingsItem("Website", Icons.Default.Language, hasAction = true, category = "More Information")
         )
     }
 
@@ -62,12 +97,12 @@ fun MySCCScreen(
             .fillMaxSize()
             .background(Color(0xFFFFFFFF))
     ) {
-        // Header Section with Orange Background (like Nagad)
+        // Header Section with Red Background (from logo)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFFF6B35)) // Orange color similar to Nagad
-                .padding(16.dp)
+                .background(Colors.Red)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Column {
                 // Title
@@ -78,26 +113,34 @@ fun MySCCScreen(
                     color = Color.White
                 )
                 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 
                 // User Profile Section
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Profile Avatar
+                    // Profile Avatar with Gold Border
                     Box(
                         modifier = Modifier
                             .size(60.dp)
                             .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.3f)),
+                            .background(Colors.LightGold),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = "Profile",
-                            modifier = Modifier.size(32.dp),
-                            tint = Color.White
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clip(CircleShape)
+                                .background(Color.White.copy(alpha = 0.9f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = "Profile",
+                                modifier = Modifier.size(28.dp),
+                                tint = Colors.Red
+                            )
+                        }
                     }
                     
                     Spacer(modifier = Modifier.width(16.dp))
@@ -135,7 +178,8 @@ fun MySCCScreen(
         // Settings Content
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp)
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // General Section
             item {
@@ -146,12 +190,19 @@ fun MySCCScreen(
             items(generalItems) { item ->
                 SettingsItemCard(
                     item = item,
-                    onClick = { /* Handle click */ }
+                    onClick = { 
+                        when (item.title) {
+                            "Language" -> showLanguageDialog = true
+                            "Change Password" -> onNavigateToChangePassword()
+                            "Submit KYC" -> onNavigateToKYCSubmit()
+                            // Add other click handlers here as needed
+                        }
+                    }
                 )
             }
             
             item {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 SectionHeader("More Information")
             }
             
@@ -159,20 +210,34 @@ fun MySCCScreen(
             items(moreInfoItems) { item ->
                 SettingsItemCard(
                     item = item,
-                    onClick = { /* Handle click */ }
+                    onClick = { 
+                        when (item.title) {
+                            "Privacy Policy" -> showPrivacyPolicy = true
+                            "FAQ" -> showFAQ = true
+                            "About" -> showAbout = true
+                            "SCC Page" -> {
+                                // Open Facebook page
+                                openExternalUrl(context, "https://facebook.com/smartcitizenclub")
+                            }
+                            "Website" -> {
+                                // Open website
+                                openExternalUrl(context, "https://smartcitizenclub.com")
+                            }
+                        }
+                    }
                 )
             }
             
             // Logout Button
             item {
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(8.dp)),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFFF6B35) // Orange background for logout
+                        containerColor = Colors.Red
                     ),
                     onClick = onLogout
                 ) {
@@ -183,14 +248,14 @@ fun MySCCScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            Icons.Default.Logout,
-                            contentDescription = "Logout",
+                            Icons.Default.ExitToApp,
+                            contentDescription = "Sign out",
                             tint = Color.White,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
-                            text = "Logout",
+                            text = "Sign out",
                             fontWeight = FontWeight.Medium,
                             color = Color.White,
                             fontSize = 16.sp
@@ -198,10 +263,130 @@ fun MySCCScreen(
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
+    
+    // Language Selection Dialog
+    if (showLanguageDialog) {
+        AlertDialog(
+            onDismissRequest = { showLanguageDialog = false },
+            title = {
+                Text(
+                    text = "Select Language",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Colors.Red
+                )
+            },
+            text = {
+                Column {
+                    LanguageOption(
+                        language = "English",
+                        isSelected = currentLanguage == "English",
+                        onClick = {
+                            if (currentLanguage != "English") {
+                                currentLanguage = "English"
+                                showLanguageChangeNotification = true
+                            }
+                            showLanguageDialog = false
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LanguageOption(
+                        language = "বাংলা",
+                        isSelected = currentLanguage == "বাংলা",
+                        onClick = {
+                            if (currentLanguage != "বাংলা") {
+                                currentLanguage = "বাংলা"
+                                showLanguageChangeNotification = true
+                            }
+                            showLanguageDialog = false
+                        }
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { showLanguageDialog = false }
+                ) {
+                    Text(
+                        text = "Cancel",
+                        color = Colors.Gray
+                    )
+                }
+            }
+        )
+    }
+    
+    // Language Change Notification
+    if (showLanguageChangeNotification) {
+        LaunchedEffect(Unit) {
+            kotlinx.coroutines.delay(3000) // Show for 3 seconds
+            showLanguageChangeNotification = false
+        }
+        
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Colors.Green
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.CheckCircle,
+                        contentDescription = "Success",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "Language changed to $currentLanguage successfully!",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+    
+    // Privacy Policy Screen
+    if (showPrivacyPolicy) {
+        com.example.smartcitizenclub.ui.user.screens.myscc.PrivacyPolicyScreen(
+            onBackClick = { showPrivacyPolicy = false }
+        )
+    }
+    
+    // FAQ Screen
+    if (showFAQ) {
+        com.example.smartcitizenclub.ui.user.screens.myscc.FAQScreen(
+            onBackClick = { showFAQ = false }
+        )
+    }
+    
+    // About Screen
+    if (showAbout) {
+        com.example.smartcitizenclub.ui.user.screens.myscc.AboutScreen(
+            onBackClick = { showAbout = false }
+        )
+    }
+    
 }
 
 @Composable
@@ -210,9 +395,57 @@ private fun SectionHeader(title: String) {
         text = title,
         fontSize = 16.sp,
         fontWeight = FontWeight.Medium,
-        color = Color(0xFF666666),
+        color = Colors.Gold,
         modifier = Modifier.padding(vertical = 8.dp)
     )
+}
+
+@Composable
+private fun LanguageOption(
+    language: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) 
+                Colors.LightGreen
+            else 
+                Color(0xFFF3F4F6)
+        ),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = language,
+                fontSize = 16.sp,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                color = if (isSelected) 
+                    Colors.Green
+                else 
+                    Colors.DarkGray
+            )
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            if (isSelected) {
+                Icon(
+                    Icons.Default.CheckCircle,
+                    contentDescription = "Selected",
+                    tint = Colors.Green,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -224,7 +457,7 @@ private fun SettingsItemCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp),
+            .padding(vertical = 0.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
@@ -234,31 +467,31 @@ private fun SettingsItemCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon with orange background circle
+            // Icon with green background circle (from logo)
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(32.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFFF6B35).copy(alpha = 0.1f)),
+                    .background(Colors.LightGreen),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     item.icon,
                     contentDescription = item.title,
-                    tint = Color(0xFFFF6B35),
-                    modifier = Modifier.size(20.dp)
+                    tint = Colors.Green,
+                    modifier = Modifier.size(16.dp)
                 )
             }
             
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             
             // Title
             Text(
                 text = item.title,
-                fontSize = 16.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color.Black,
                 modifier = Modifier.weight(1f)
@@ -268,8 +501,8 @@ private fun SettingsItemCard(
             item.value?.let { value ->
                 Text(
                     text = value,
-                    fontSize = 14.sp,
-                    color = Color(0xFF666666)
+                    fontSize = 12.sp,
+                    color = Colors.Gray
                 )
                 Spacer(modifier = Modifier.width(8.dp))
             }
@@ -279,7 +512,7 @@ private fun SettingsItemCard(
                 Icon(
                     Icons.Default.ChevronRight,
                     contentDescription = "Navigate",
-                    tint = Color(0xFF999999),
+                    tint = Colors.LightGray,
                     modifier = Modifier.size(20.dp)
                 )
             }
