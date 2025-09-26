@@ -20,6 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.OrangeGradient
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +60,7 @@ fun SendMoneyAmountScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFFE53E3E) // Red color
+                containerColor = PrimaryOrangeGradient
             ),
             modifier = Modifier.statusBarsPadding()
         )
@@ -75,46 +77,59 @@ fun SendMoneyAmountScreen(
             // Recipient Info
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp)
+                colors = CardDefaults.cardColors(containerColor = PrimaryOrangeGradient.copy(alpha = 0.05f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(36.dp)
                             .clip(CircleShape)
-                            .background(Color.Gray.copy(alpha = 0.3f)),
+                            .background(PrimaryOrangeGradient.copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Default.Person,
                             contentDescription = "Avatar",
-                            tint = Color.Gray,
-                            modifier = Modifier.size(24.dp)
+                            tint = PrimaryOrangeGradient,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                     
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     
                     Column {
-                        if (contact.name.isNotEmpty()) {
-                            Text(
-                                text = contact.name,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                        }
+                        // Name - Always show
                         Text(
-                            text = contact.phoneNumber,
+                            text = if (contact.name.isNotEmpty()) contact.name else "Unknown Contact",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (contact.name.isNotEmpty()) Color.Black else Color.Gray
+                        )
+                        
+                        Spacer(modifier = Modifier.height(4.dp))
+                        
+                        // Phone Number - Always show
+                        Text(
+                            text = if (contact.phoneNumber.isNotEmpty()) "Phone: ${contact.phoneNumber}" else "Phone: Not available",
                             fontSize = 14.sp,
-                            color = Color.Gray
+                            color = if (contact.phoneNumber.isNotEmpty()) Color.Gray else Color.Gray.copy(alpha = 0.6f)
+                        )
+                        
+                        Spacer(modifier = Modifier.height(2.dp))
+                        
+                        // Account Number - Always show
+                        Text(
+                            text = if (!contact.accountNumber.isNullOrEmpty()) "Account: ${contact.accountNumber}" else "Account: Not available",
+                            fontSize = 14.sp,
+                            color = if (!contact.accountNumber.isNullOrEmpty()) PrimaryOrangeGradient else PrimaryOrangeGradient.copy(alpha = 0.6f),
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
@@ -138,7 +153,7 @@ fun SendMoneyAmountScreen(
                     text = if (amount.isEmpty()) "৳0.00" else "৳${amount}.00",
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFE53E3E)
+                    color = PrimaryOrangeGradient
                 )
                 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -163,7 +178,7 @@ fun SendMoneyAmountScreen(
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFFE53E3E),
+                        focusedBorderColor = PrimaryOrangeGradient,
                         unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
                     ),
                     leadingIcon = {
@@ -182,7 +197,7 @@ fun SendMoneyAmountScreen(
                     text = "Quick Amount",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.Gray
+                    color = PrimaryOrangeGradient
                 )
                 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -196,14 +211,15 @@ fun SendMoneyAmountScreen(
                             onClick = { amount = quickAmount },
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Gray.copy(alpha = 0.1f)
+                                containerColor = PrimaryOrangeGradient.copy(alpha = 0.1f)
                             ),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
                                 text = "৳$quickAmount",
                                 fontSize = 14.sp,
-                                color = Color.Black
+                                color = PrimaryOrangeGradient,
+                                fontWeight = FontWeight.Medium
                             )
                         }
                     }
@@ -222,7 +238,7 @@ fun SendMoneyAmountScreen(
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE53E3E)
+                    containerColor = PrimaryOrangeGradient
                 ),
                 shape = RoundedCornerShape(25.dp),
                 enabled = amount.isNotEmpty() && amount.toDoubleOrNull() != null && amount.toDoubleOrNull()!! > 0
@@ -248,7 +264,8 @@ fun SendMoneyAmountScreenPreview() {
             contact = Contact(
                 id = "1",
                 name = "Abdul Malek Koyal Dim",
-                phoneNumber = "01777-127775"
+                phoneNumber = "01777-127775",
+                accountNumber = "123456789"
             ),
             onBackClick = {},
             onAmountEntered = {}

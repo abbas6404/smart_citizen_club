@@ -63,6 +63,7 @@ fun BottomNavigation(
     var showSendMoney by remember { mutableStateOf(false) }
     var showSendMoneyAmount by remember { mutableStateOf(false) }
     var showSendMoneyConfirm by remember { mutableStateOf(false) }
+    var showFinalConfirm by remember { mutableStateOf(false) }
     var selectedContact by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.sendmoney.ui.Contact?>(null) }
     var selectedAmount by remember { mutableStateOf(0.0) }
     
@@ -120,7 +121,47 @@ fun BottomNavigation(
     
     Scaffold(
         bottomBar = {
-            if (showBottomNavigation && !showChangePassword && !showKYCSubmit && !showSelectContact && !showNewGroup && !showNewContact && !showChatScreen && !showSendMoney && !showSendMoneyAmount && !showSendMoneyConfirm && !showCashOut && !showCashOutAmount && !showCashOutConfirm && !showMobileRecharge && !showMobileRechargeAmount && !showMobileRechargeConfirm && !showContactUs && !showTicketList && !showTicketDetails && !showLimitCharges && !showDonation && !showDonationHistory && !showPackagePurchase && !showPackageConfirm && !showLoan && !showLoanAmount && !showLoanConfirm && !showLoanPayment && !showLoanPaymentAmount && !showPayment && !showPaymentAmount) {
+            // Show bottom navigation only on main pages: Home, Finance, Messages, Account, MySCC
+            // Hide when any modal/overlay screens are shown
+            if (showBottomNavigation && 
+                selectedScreen in listOf(
+                    UserScreen.Home,
+                    UserScreen.Finance,
+                    UserScreen.Messages,
+                    UserScreen.Account,
+                    UserScreen.MySCC
+                ) && 
+                !showChangePassword && 
+                !showKYCSubmit && 
+                !showSelectContact && 
+                !showNewGroup && 
+                !showNewContact && 
+                !showChatScreen && 
+                !showSendMoney && 
+                !showSendMoneyAmount && 
+                !showSendMoneyConfirm && 
+                !showFinalConfirm && 
+                !showCashOut && 
+                !showCashOutAmount && 
+                !showCashOutConfirm && 
+                !showMobileRecharge && 
+                !showMobileRechargeAmount && 
+                !showMobileRechargeConfirm && 
+                !showContactUs && 
+                !showTicketList && 
+                !showTicketDetails && 
+                !showLimitCharges && 
+                !showDonation && 
+                !showDonationHistory && 
+                !showPackagePurchase && 
+                !showPackageConfirm && 
+                !showLoan && 
+                !showLoanAmount && 
+                !showLoanConfirm && 
+                !showLoanPayment && 
+                !showLoanPaymentAmount && 
+                !showPayment && 
+                !showPaymentAmount) {
                 // Custom Bottom Navigation Bar with rounded corners and shadow
                 Row(
                     modifier = Modifier
@@ -145,12 +186,12 @@ fun BottomNavigation(
                         onClick = { onScreenSelected(UserScreen.Home) }
                     )
                     
-                    // Transactions
+                    // Finance
                     CustomNavigationBarItem(
-                        icon = UserScreen.Transactions.icon,
-                        label = UserScreen.Transactions.title,
-                        selected = selectedScreen == UserScreen.Transactions,
-                        onClick = { onScreenSelected(UserScreen.Transactions) }
+                        icon = UserScreen.Finance.icon,
+                        label = UserScreen.Finance.title,
+                        selected = selectedScreen == UserScreen.Finance,
+                        onClick = { onScreenSelected(UserScreen.Finance) }
                     )
                     
                     // Messages
@@ -266,6 +307,17 @@ fun BottomNavigation(
                             selectedContact = contact
                             showSendMoney = false
                             showSendMoneyAmount = true
+                        },
+                        onNavigateToAmount = { recipient, accountNumber, accountName ->
+                            // Create a contact with the recipient info
+                            selectedContact = Contact(
+                                id = "manual_${recipient}",
+                                name = accountName ?: "Unknown Contact", // Always show a name
+                                phoneNumber = if (accountNumber != null) recipient else "", // If accountNumber exists, recipient is phone
+                                accountNumber = accountNumber ?: recipient // If accountNumber is null, recipient is the account number
+                            )
+                            showSendMoney = false
+                            showSendMoneyAmount = true
                         }
                     )
                 }
@@ -284,13 +336,27 @@ fun BottomNavigation(
                 }
                 showSendMoneyConfirm -> {
                     selectedContact?.let { contact ->
-                        com.example.smartcitizenclub.presentation.feature.sendmoney.ui.SendMoneyConfirmScreen(
+                        com.example.smartcitizenclub.presentation.feature.sendmoney.ui.EnterPassScreen(
                             contact = contact,
                             amount = selectedAmount,
                             onBackClick = { showSendMoneyConfirm = false },
                             onConfirmClick = { pin ->
-                                // TODO: Process the transaction
+                                // Navigate to final confirm screen
                                 showSendMoneyConfirm = false
+                                showFinalConfirm = true
+                            }
+                        )
+                    }
+                }
+                showFinalConfirm -> {
+                    selectedContact?.let { contact ->
+                        com.example.smartcitizenclub.presentation.feature.sendmoney.ui.ConfirmSendMoneyScreen(
+                            contact = contact,
+                            amount = selectedAmount,
+                            onBackClick = { showFinalConfirm = false },
+                            onSendComplete = {
+                                // Transaction completed, reset all states
+                                showFinalConfirm = false
                                 selectedContact = null
                                 selectedAmount = 0.0
                             }
@@ -611,7 +677,7 @@ fun BottomNavigation(
                         onLimitChargesClick = { showLimitCharges = true },
                         onDonationClick = { showDonation = true }
                     )
-                    UserScreen.Transactions -> FinanceScreen(
+                    UserScreen.Finance -> FinanceScreen(
                         user = user,
                         onLoanPaymentClick = { showPayment = true }
                     )

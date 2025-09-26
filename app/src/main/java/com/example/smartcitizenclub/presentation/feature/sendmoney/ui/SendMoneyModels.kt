@@ -7,6 +7,7 @@ data class Contact(
     val id: String,
     val name: String,
     val phoneNumber: String,
+    val accountNumber: String? = null,
     val avatar: String? = null,
     val isFavorite: Boolean = false,
     val isRecent: Boolean = false

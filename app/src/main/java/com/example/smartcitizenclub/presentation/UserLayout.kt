@@ -18,7 +18,7 @@ import com.example.smartcitizenclub.presentation.feature.myscc.ui.MySCCScreen
 sealed class UserScreen(val title: String, val icon: ImageVector) {
     // Main Bottom Navigation
     object Home : UserScreen("Home", Icons.Default.Home)
-    object Transactions : UserScreen("Finance", Icons.Default.AccountBalance)
+    object Finance : UserScreen("Finance", Icons.Default.AccountBalance)
     object Messages : UserScreen("Messages", Icons.Default.Message)
     object Account : UserScreen("Account", Icons.Default.AccountCircle)
     object MySCC : UserScreen("My SCC", Icons.Default.Person)

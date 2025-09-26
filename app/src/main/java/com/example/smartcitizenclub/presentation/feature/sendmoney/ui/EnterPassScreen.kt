@@ -23,10 +23,12 @@ import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.OrangeGradient
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SendMoneyConfirmScreen(
+fun EnterPassScreen(
     contact: Contact,
     amount: Double,
     onBackClick: () -> Unit,
@@ -40,11 +42,11 @@ fun SendMoneyConfirmScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Top Bar with Red Background
+        // Top Bar with Primary Orange Background
         TopAppBar(
             title = {
                 Text(
-                    text = "Confirm Transaction",
+                    text = "Enter Pass",
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -60,7 +62,7 @@ fun SendMoneyConfirmScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFFE53E3E) // Red color
+                containerColor = PrimaryOrangeGradient
             ),
             modifier = Modifier.statusBarsPadding()
         )
@@ -77,17 +79,15 @@ fun SendMoneyConfirmScreen(
             // Transaction Details Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(20.dp)
                 ) {
                     // Recipient Info
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
@@ -139,7 +139,7 @@ fun SendMoneyConfirmScreen(
                         text = "৳${String.format("%.2f", amount)}",
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE53E3E)
+                        color = PrimaryOrangeGradient
                     )
                     
                     Spacer(modifier = Modifier.height(16.dp))
@@ -193,7 +193,7 @@ fun SendMoneyConfirmScreen(
                 Text(
                     text = "Enter PIN to Confirm",
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
                 
@@ -214,7 +214,7 @@ fun SendMoneyConfirmScreen(
                     visualTransformation = if (showPin) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFFE53E3E),
+                        focusedBorderColor = PrimaryOrangeGradient,
                         unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
                     ),
                     trailingIcon = {
@@ -238,7 +238,7 @@ fun SendMoneyConfirmScreen(
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE53E3E)
+                    containerColor = PrimaryOrangeGradient
                 ),
                 shape = RoundedCornerShape(25.dp),
                 enabled = pin.length == 4
@@ -258,9 +258,9 @@ fun SendMoneyConfirmScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun SendMoneyConfirmScreenPreview() {
+fun EnterPassScreenPreview() {
     SmartCitizenClubTheme {
-        SendMoneyConfirmScreen(
+        EnterPassScreen(
             contact = Contact(
                 id = "1",
                 name = "Abdul Malek Koyal Dim",

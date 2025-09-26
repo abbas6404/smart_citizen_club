@@ -12,7 +12,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 import com.example.smartcitizenclub.presentation.theme.OrangeGradient
 import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
 
@@ -85,7 +90,7 @@ fun FAQScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFE53E3E)) // Red from logo
+                    .background(OrangeGradient)
                     .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
                 Row(
