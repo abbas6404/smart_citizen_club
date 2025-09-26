@@ -36,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import com.example.smartcitizenclub.R
 import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.feature.auth.ui.components.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,68 +83,17 @@ fun SignupScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .let { modifier ->
-                if (isKeyboardOpen) {
-                    modifier.verticalScroll(scrollState)
-                } else {
-                    modifier
-                }
-            }
+            .verticalScroll(scrollState)
             .padding(24.dp)
             .imePadding(), // Add padding for keyboard
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = if (isKeyboardOpen) Arrangement.Top else Arrangement.Center
     ) {
-        // Dynamic spacing based on keyboard state
-        Spacer(modifier = Modifier.height(if (isKeyboardOpen) 20.dp else 60.dp))
-        
-        // App Logo and Title - Only show when keyboard is closed
-        if (!isKeyboardOpen) {
-            // App Logo - Clean display with perfect spacing
-            Image(
-                painter = painterResource(id = R.drawable.smart_citizen_logo),
-                contentDescription = "Smart Citizen Club Logo",
-                modifier = Modifier
-                    .size(180.dp)
-                    .padding(vertical = 8.dp)
-            )
-            
-            Spacer(modifier = Modifier.height(20.dp))
-            
-            // App Title
-            Text(
-                text = "Smart Citizen Club",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
-                letterSpacing = 0.5.sp
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = "Join our community",
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                letterSpacing = 0.3.sp
-            )
-            
-            Spacer(modifier = Modifier.height(20.dp))
-        } else {
-            // When keyboard is open, show a smaller title
-            Text(
-                text = "Smart Citizen Club",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
-                letterSpacing = 0.5.sp
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-        }
+        // App Header with Logo and Title
+        AuthHeader(
+            isKeyboardOpen = isKeyboardOpen,
+            tagline = "Join our community"
+        )
         
         // Name Field
         OutlinedTextField(
@@ -163,178 +113,80 @@ fun SignupScreen(
         Spacer(modifier = Modifier.height(16.dp))
         
         // Mobile Number Field
-        OutlinedTextField(
+        MobileNumberField(
             value = mobileNumber,
-            onValueChange = { newValue ->
-                // Allow only digits and limit to 11 characters
-                if (newValue.all { it.isDigit() } && newValue.length <= 11) {
-                    mobileNumber = newValue
-                }
-            },
-            label = { Text("Mobile Number") },
-            leadingIcon = {
-                Icon(Icons.Default.Phone, contentDescription = "Mobile Number")
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            modifier = Modifier.fillMaxWidth(),
-            interactionSource = mobileInteractionSource,
-            singleLine = true,
+            onValueChange = { mobileNumber = it },
+            modifier = Modifier,
             enabled = !isLoading,
-            placeholder = { Text("01XXXXXXXXX (11 digits)") }
+            interactionSource = mobileInteractionSource,
+            useLabel = true
         )
         
         Spacer(modifier = Modifier.height(16.dp))
         
         // Password Field
-        OutlinedTextField(
+        PasswordField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
-            leadingIcon = {
-                Icon(Icons.Default.Lock, contentDescription = "Password")
-            },
-            trailingIcon = {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(
-                        imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
-                    )
-                }
-            },
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier,
+            enabled = !isLoading,
             interactionSource = passwordInteractionSource,
-            singleLine = true,
-            enabled = !isLoading
+            useLabel = true,
+            label = "Password",
+            placeholder = "Enter your password"
         )
         
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         
         // Confirm Password Field
-        OutlinedTextField(
+        PasswordField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password") },
-            leadingIcon = {
-                Icon(Icons.Default.Lock, contentDescription = "Confirm Password")
-            },
-            trailingIcon = {
-                IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                    Icon(
-                        imageVector = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password"
-                    )
-                }
-            },
-            visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth(),
-            interactionSource = confirmPasswordInteractionSource,
-            singleLine = true,
+            modifier = Modifier,
             enabled = !isLoading,
-            isError = confirmPassword.isNotEmpty() && password != confirmPassword,
-            supportingText = if (confirmPassword.isNotEmpty() && password != confirmPassword) {
-                { Text("Passwords do not match") }
-            } else null
+            interactionSource = confirmPasswordInteractionSource,
+            useLabel = true,
+            label = "Confirm Password",
+            placeholder = "Confirm your password"
         )
         
         Spacer(modifier = Modifier.height(24.dp))
         
         // Error Message
-        if (errorMessage != null) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                )
-            ) {
-                Text(
-                    text = errorMessage!!,
-                    modifier = Modifier.padding(16.dp),
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                    textAlign = TextAlign.Center
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-        }
+        ErrorMessageCard(errorMessage = errorMessage)
         
         // Sign Up Button with Gradient
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .background(
-                    brush = OrangeGradient,
-                    shape = RoundedCornerShape(12.dp)
-                )
-        ) {
-            Button(
-                onClick = {
-                    keyboardController?.hide() // Hide keyboard when signup is clicked
-                    authViewModel.clearError()
-                    if (password == confirmPassword) {
-                        authViewModel.signup(mobileNumber, password, name)
-                    }
-                },
-                modifier = Modifier.fillMaxSize(),
-                enabled = !isLoading && 
-                         name.isNotBlank() && 
-                         mobileNumber.isNotBlank() && 
-                         password.isNotBlank() && 
-                         confirmPassword.isNotBlank() &&
-                         password == confirmPassword,
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = androidx.compose.ui.graphics.Color.Transparent
-                )
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = androidx.compose.ui.graphics.Color.White
-                    )
-                } else {
-                    Text(
-                        text = "Create Account",
-                        fontSize = 18.sp,
-                        color = androidx.compose.ui.graphics.Color.White,
-                        fontWeight = FontWeight.SemiBold
-                    )
+        GradientButton(
+            text = "Create Account",
+            onClick = {
+                keyboardController?.hide()
+                authViewModel.clearError()
+                if (password == confirmPassword) {
+                    authViewModel.signup(mobileNumber, password, name)
                 }
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(20.dp))
+            },
+            enabled = !isLoading && 
+                     name.isNotBlank() && 
+                     mobileNumber.isNotBlank() && 
+                     password.isNotBlank() && 
+                     confirmPassword.isNotBlank() &&
+                     password == confirmPassword,
+            isLoading = isLoading
+        )
         
         // Sign In Link
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Already have an account? ",
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            TextButton(
-                onClick = {
-                    keyboardController?.hide() // Hide keyboard when navigating
-                    onNavigateToLogin()
-                },
-                enabled = !isLoading
-            ) {
-                Text(
-                    text = "Sign In",
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
-                )
-            }
-        }
+        AuthNavigationRow(
+            questionText = "Already have an account? ",
+            linkText = "Sign In",
+            onClick = {
+                keyboardController?.hide()
+                onNavigateToLogin()
+            },
+            enabled = !isLoading
+        )
         
-        // Dynamic bottom spacing based on keyboard state
-        Spacer(modifier = Modifier.height(if (isKeyboardOpen) 10.dp else 0.dp))
+        // Dynamic bottom spacing - reduced for better visibility
+        Spacer(modifier = Modifier.height(if (isKeyboardOpen) 30.dp else 10.dp))
     }
 }
 

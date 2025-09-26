@@ -12,7 +12,7 @@ import com.example.smartcitizenclub.presentation.feature.auth.ui.AuthViewModel
 import com.example.smartcitizenclub.presentation.feature.auth.ui.AuthState
 import com.example.smartcitizenclub.presentation.feature.auth.ui.LoginScreen
 import com.example.smartcitizenclub.presentation.feature.auth.ui.SignupScreen
-import com.example.smartcitizenclub.ui.user.UserLayout
+import com.example.smartcitizenclub.presentation.UserLayout
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")

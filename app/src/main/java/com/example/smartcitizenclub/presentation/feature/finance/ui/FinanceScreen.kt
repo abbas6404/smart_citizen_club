@@ -1,4 +1,4 @@
-package com.example.smartcitizenclub.ui.user.screens
+package com.example.smartcitizenclub.presentation.feature.finance.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

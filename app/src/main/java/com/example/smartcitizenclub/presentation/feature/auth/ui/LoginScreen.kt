@@ -39,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import com.example.smartcitizenclub.R
 import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.feature.auth.ui.components.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,67 +87,17 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .let { modifier ->
-                    if (isKeyboardOpen) {
-                        modifier.verticalScroll(scrollState)
-                    } else {
-                        modifier
-                    }
-                }
+                .verticalScroll(scrollState)
                 .padding(20.dp)
                 .imePadding(), // Add padding for keyboard
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = if (isKeyboardOpen) Arrangement.Top else Arrangement.Center
         ) {
-            // Dynamic spacing based on keyboard state
-            Spacer(modifier = Modifier.height(if (isKeyboardOpen) 20.dp else 60.dp))
-            
-            // App Logo and Title - Only show when keyboard is closed
-            if (!isKeyboardOpen) {
-                // App Logo - Clean display with perfect spacing
-                Image(
-                    painter = painterResource(id = R.drawable.smart_citizen_logo),
-                    contentDescription = "Smart Citizen Club Logo",
-                    modifier = Modifier
-                        .size(180.dp)
-                        .padding(vertical = 8.dp)
-                )
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                Text(
-                    text = "Smart Citizen Club",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.5.sp
-                )
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                Text(
-                    text = "Sign in to your account",
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.3.sp
-                )
-                
-                Spacer(modifier = Modifier.height(25.dp))
-            } else {
-                // When keyboard is open, show a smaller title
-                Text(
-                    text = "Smart Citizen Club",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.5.sp
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            // App Header with Logo and Title
+            AuthHeader(
+                isKeyboardOpen = isKeyboardOpen,
+                tagline = "Sign in to your account"
+            )
             
             // Login Form Card
             Card(
@@ -165,186 +116,61 @@ fun LoginScreen(
                     modifier = Modifier.padding(24.dp)
                 ) {
                     // Mobile Number Field
-                    Text(
-                        text = "Mobile Number",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                    MobileNumberField(
+                        value = mobileNumber,
+                        onValueChange = { mobileNumber = it },
+                        modifier = Modifier,
+                        enabled = !isLoading,
+                        interactionSource = mobileInteractionSource,
+                        useLabel = false
                     )
                     
-                    OutlinedTextField(
-                        value = mobileNumber,
-                        onValueChange = { newValue ->
-                            // Allow only digits and limit to 11 characters
-                            if (newValue.all { it.isDigit() } && newValue.length <= 11) {
-                                mobileNumber = newValue
-                            }
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Phone,
-                                contentDescription = "Mobile Number",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Phone
-                        ),
-                        modifier = Modifier.fillMaxWidth(),
-                        interactionSource = mobileInteractionSource,
-                        singleLine = true,
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Password Field
+                    PasswordField(
+                        value = password,
+                        onValueChange = { password = it },
+                        modifier = Modifier,
                         enabled = !isLoading,
-                        placeholder = { Text("01XXXXXXXXX (11 digits)") },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-                        )
+                        interactionSource = passwordInteractionSource,
+                        useLabel = false,
+                        label = "Password",
+                        placeholder = "Enter your password"
                     )
                     
                     Spacer(modifier = Modifier.height(20.dp))
                     
-                    // Password Field
-                    Text(
-                        text = "Password",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Lock, 
-                                contentDescription = "Password",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        },
-                        trailingIcon = {
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(
-                                    imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                    contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        },
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        modifier = Modifier.fillMaxWidth(),
-                        interactionSource = passwordInteractionSource,
-                        singleLine = true,
-                        enabled = !isLoading,
-                        placeholder = { Text("Enter your password") },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-                        )
-                    )
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
                     // Error Message
-                    if (errorMessage != null) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
-                            ),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = errorMessage!!,
-                                color = MaterialTheme.colorScheme.error,
-                                fontSize = 14.sp,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(12.dp)
-                            )
-                        }
-                    }
+                    ErrorMessageCard(errorMessage = errorMessage)
                     
                     // Login Button with Gradient
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .background(
-                                brush = OrangeGradient,
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                    ) {
-                        Button(
-                            onClick = {
-                                keyboardController?.hide() // Hide keyboard when login is clicked
-                                authViewModel.clearError()
-                                authViewModel.login(mobileNumber, password)
-                            },
-                            modifier = Modifier.fillMaxSize(),
-                            enabled = !isLoading && mobileNumber.isNotBlank() && password.isNotBlank(),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = androidx.compose.ui.graphics.Color.Transparent
-                            )
-                        ) {
-                            if (isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    strokeWidth = 3.dp,
-                                    color = androidx.compose.ui.graphics.Color.White
-                                )
-                            } else {
-                                Text(
-                                    text = "Login",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = androidx.compose.ui.graphics.Color.White
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(if (isKeyboardOpen) 50.dp else 20.dp))
-            
-            // Sign Up Link
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Not registered yet?",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                TextButton(
-                    onClick = {
-                        keyboardController?.hide() // Hide keyboard when navigating
-                        onNavigateToSignup()
-                    },
-                    enabled = !isLoading,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                ) {
-                    Text(
-                        text = "Open New Account",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
+                    GradientButton(
+                        text = "Login",
+                        onClick = {
+                            keyboardController?.hide()
+                            authViewModel.clearError()
+                            authViewModel.login(mobileNumber, password)
+                        },
+                        enabled = !isLoading && mobileNumber.isNotBlank() && password.isNotBlank(),
+                        isLoading = isLoading
                     )
                 }
             }
             
-            // Dynamic bottom spacing based on keyboard state
-            Spacer(modifier = Modifier.height(if (isKeyboardOpen) 10.dp else 20.dp))
+            // Sign Up Link
+            AuthNavigationLink(
+                questionText = "Not registered yet?",
+                linkText = "Open New Account",
+                onClick = {
+                    keyboardController?.hide()
+                    onNavigateToSignup()
+                },
+                enabled = !isLoading
+            )
+            
+            // Dynamic bottom spacing - reduced for better visibility
+            Spacer(modifier = Modifier.height(if (isKeyboardOpen) 30.dp else 10.dp))
         }
     }
 }
@@ -378,7 +204,7 @@ fun LoginScreenPreview() {
                 // Welcome Header
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(bottom = 40.dp)
+                    modifier = Modifier.padding(bottom = 30.dp)
                 ) {
                     // App Logo placeholder
                     Text(

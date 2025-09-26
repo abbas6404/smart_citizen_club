@@ -1,4 +1,4 @@
-package com.example.smartcitizenclub.ui.user.screens
+package com.example.smartcitizenclub.presentation.feature.home.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,12 +12,14 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,14 +32,16 @@ import com.google.zxing.qrcode.QRCodeWriter
 import android.widget.ImageView
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
+import com.example.smartcitizenclub.data.SubAccount
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.OrangeGradient
 
 // Home services data class
 data class HomeService(
     val id: String,
     val title: String,
     val icon: ImageVector,
-    val color: Color = Color(0xFFFF4500) // Orange color
+    val color: Color = Color.Unspecified // Will use theme colors
 )
 
 // Payment data class
@@ -45,7 +49,7 @@ data class PaymentService(
     val id: String,
     val title: String,
     val icon: ImageVector,
-    val color: Color = Color(0xFFFF4500) // Orange color
+    val color: Color = Color.Unspecified // Will use theme colors
 )
 
 // Other services data class
@@ -53,7 +57,7 @@ data class OtherService(
     val id: String,
     val title: String,
     val icon: ImageVector,
-    val color: Color = Color(0xFFFF4500) // Orange color
+    val color: Color = Color.Unspecified // Will use theme colors
 )
 
 // Promotional banner data class
@@ -63,7 +67,7 @@ data class PromoBanner(
     val subtitle: String,
     val amount: String,
     val buttonText: String,
-    val backgroundColor: Color = Color(0xFFE8F5E8) // Light green
+    val backgroundColor: Color = Color.Unspecified // Will use theme colors
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,7 +77,10 @@ fun HomeScreen(
     onSendMoneyClick: () -> Unit = {},
     onCashOutClick: () -> Unit = {},
     onMobileRechargeClick: () -> Unit = {},
-    onPackagePurchaseClick: () -> Unit = {},
+    onAddMoneyClick: () -> Unit = {},
+    onTransferMoneyClick: () -> Unit = {},
+    onLimitUpgradeClick: () -> Unit = {},
+    onInvestmentClick: () -> Unit = {},
     onLoanClick: () -> Unit = {},
     onContactUsClick: () -> Unit = {},
     onLimitChargesClick: () -> Unit = {},
@@ -82,27 +89,31 @@ fun HomeScreen(
     // Home services data
     val homeServices = remember {
         listOf(
-            HomeService("1", "Send Money", Icons.Default.Send, Color(0xFFFF4500)),
-            HomeService("2", "Cash Out", Icons.Default.AttachMoney, Color(0xFFFF4500)),
-            HomeService("3", "Mobile Recharge", Icons.Default.Phone, Color(0xFFFF4500)),
-            HomeService("4", "Package Purchase", Icons.Default.ShoppingBag, Color(0xFFFF4500)),
-            HomeService("5", "Loan", Icons.Default.AccountBalance, Color(0xFFFF4500))
+            HomeService("1", "Send Money", Icons.Default.Send),
+            HomeService("2", "Cash Out", Icons.Default.AttachMoney),
+            HomeService("3", "Mobile Recharge", Icons.Default.Phone),
+            HomeService("4", "Add Money", Icons.Default.Add),
+            HomeService("5", "Transfer Money", Icons.Default.ArrowForward),
+            HomeService("6", "Limit Upgrade", Icons.Default.Upgrade),
+            HomeService("7", "Investment", Icons.Default.TrendingUp),
+            HomeService("8", "Loan", Icons.Default.AccountBalance)
         )
     }
     
     // Payment services data
     val paymentServices = remember {
         listOf(
-            PaymentService("1", "Loan Pay", Icons.Default.Payment, Color(0xFFFF4500))
+            PaymentService("1", "Loan Pay", Icons.Default.Payment),
+            PaymentService("2", "Bill Pay", Icons.Default.Receipt)
         )
     }
     
     // Other services data
     val otherServices = remember {
         listOf(
-            OtherService("1", "Contact Us", Icons.Default.ContactSupport, Color(0xFFFF4500)),
-            OtherService("2", "Limit and Charges", Icons.Default.AccountBalance, Color(0xFFFF4500)),
-            OtherService("3", "Donation", Icons.Default.Favorite, Color(0xFFFF4500))
+            OtherService("1", "Ticket Support", Icons.Default.Support),
+            OtherService("2", "Limit and Charge", Icons.Default.AccountBalance),
+            OtherService("3", "Donation", Icons.Default.Favorite)
         )
     }
     
@@ -115,57 +126,65 @@ fun HomeScreen(
         )
     }
     
+    // State for current banner index
+    var currentBannerIndex by remember { mutableStateOf(0) }
+    
+    // Auto-cycle through banners
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(3000) // Change banner every 3 seconds
+            currentBannerIndex = (currentBannerIndex + 1) % promoBanners.size
+        }
+    }
+    
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Header Section with Orange Background
+        // Header Section with Theme Background
         item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFFF4500)) // Orange background
+                    .background(
+                        brush = OrangeGradient
+                    )
                     .padding(20.dp)
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(20.dp))
                     
-                    // QR Code display
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { /* TODO: Show QR code options */ },
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
-                        shape = RoundedCornerShape(25.dp)
+                    // User Name - Highlighted and centered
+                    Text(
+                        text = user.name,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                        letterSpacing = 1.sp
+                    )
+                    
+                    Spacer(modifier = Modifier.height(10.dp))
+                    
+                    // QR Code display with rounded corners - Centered
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Column(
+                        RealQRCode(
+                            data = "SmartCitizenClub:${user.id}:${user.phone}:${user.currentSubAccount?.accountNumber ?: "MAIN"}",
+                            size = 200.dp,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 10.dp, vertical = 0.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            // User Name
-                            Text(
-                                text = user.name,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                            
-                            // Real QR Code
-                            RealQRCode(
-                                data = "SmartCitizenClub:${user.id}:${user.phone}",
-                                size = 200.dp,
-                                modifier = Modifier
-                                    .size(200.dp)
-                                    .background(Color.White)
-                            )
-                        }
+                                .size(200.dp)
+                                .clip(RoundedCornerShape(25.dp))
+                                .clickable { /* TODO: Show QR code options */ }
+                        )
                     }
                 }
             }
         }
         
-        // Home Services Section
+        //Services Section
         item {
             Column(
                 modifier = Modifier
@@ -173,22 +192,22 @@ fun HomeScreen(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "Home Services",
+                    text = "Services",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.primary
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Home Services Grid (2 rows)
+                // Home Services Grid (2 rows, 4 items each)
                 Column {
-                    // First row (3 items)
+                    // First row (4 items)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        homeServices.take(3).forEach { service ->
+                        homeServices.take(4).forEach { service ->
                             ServiceItem(
                                 service = service,
                                 modifier = Modifier.weight(1f),
@@ -197,6 +216,7 @@ fun HomeScreen(
                                         "1" -> onSendMoneyClick()
                                         "2" -> onCashOutClick()
                                         "3" -> onMobileRechargeClick()
+                                        "4" -> onAddMoneyClick()
                                     }
                                 }
                             )
@@ -205,19 +225,21 @@ fun HomeScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    // Second row (2 items)
+                    // Second row (4 items)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        homeServices.drop(3).forEach { service ->
+                        homeServices.drop(4).forEach { service ->
                             ServiceItem(
                                 service = service,
                                 modifier = Modifier.weight(1f),
                                 onClick = {
                                     when (service.id) {
-                                        "4" -> onPackagePurchaseClick()
-                                        "5" -> onLoanClick()
+                                        "5" -> onTransferMoneyClick()
+                                        "6" -> onLimitUpgradeClick()
+                                        "7" -> onInvestmentClick()
+                                        "8" -> onLoanClick()
                                     }
                                 }
                             )
@@ -238,15 +260,15 @@ fun HomeScreen(
                     text = "Payment",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.primary
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Payment Services Grid
+                // Payment Services Grid (2 items)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     paymentServices.forEach { payment ->
                         PaymentItem(
@@ -286,7 +308,10 @@ fun HomeScreen(
                                 .size(8.dp)
                                 .clip(RoundedCornerShape(4.dp))
                                 .background(
-                                    if (index == 0) Color.Gray else Color.Gray.copy(alpha = 0.3f)
+                                    if (index == currentBannerIndex) 
+                                        MaterialTheme.colorScheme.primary 
+                                    else 
+                                        MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                                 )
                         )
                         if (index < promoBanners.size - 1) {
@@ -308,7 +333,7 @@ fun HomeScreen(
                     text = "Other",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.primary
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -318,21 +343,21 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    otherServices.forEach { service ->
-                        OtherServiceItem(
-                            service = service,
-                            modifier = Modifier.weight(1f),
-                            onClick = {
-                                // Handle service click
-                                when (service.title) {
-                                    "Contact Us" -> onContactUsClick()
-                                    "Limit and Charges" -> onLimitChargesClick()
-                                    "Donation" -> onDonationClick()
-                                    // Add other service handlers as needed
+                        otherServices.forEach { service ->
+                            OtherServiceItem(
+                                service = service,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    // Handle service click
+                                    when (service.title) {
+                                        "Ticket Support" -> onContactUsClick()
+                                        "Limit and Charge" -> onLimitChargesClick()
+                                        "Donation" -> onDonationClick()
+                                        // Add other service handlers as needed
+                                    }
                                 }
-                            }
-                        )
-                    }
+                            )
+                        }
                 }
             }
         }
@@ -415,7 +440,12 @@ private fun ServiceItem(
     ) {
         Card(
             modifier = Modifier.size(70.dp),
-            colors = CardDefaults.cardColors(containerColor = service.color),
+            colors = CardDefaults.cardColors(
+                containerColor = if (service.color != Color.Unspecified) 
+                    service.color 
+                else 
+                    MaterialTheme.colorScheme.primary
+            ),
             shape = RoundedCornerShape(12.dp)
         ) {
             Box(
@@ -425,7 +455,7 @@ private fun ServiceItem(
                 Icon(
                     service.icon,
                     contentDescription = service.title,
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -437,8 +467,8 @@ private fun ServiceItem(
             text = service.title,
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
-            color = Color.Black,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -456,7 +486,12 @@ private fun PaymentItem(
     ) {
         Card(
             modifier = Modifier.size(70.dp),
-            colors = CardDefaults.cardColors(containerColor = payment.color),
+            colors = CardDefaults.cardColors(
+                containerColor = if (payment.color != Color.Unspecified) 
+                    payment.color 
+                else 
+                    MaterialTheme.colorScheme.primary
+            ),
             shape = RoundedCornerShape(12.dp)
         ) {
             Box(
@@ -466,7 +501,7 @@ private fun PaymentItem(
                 Icon(
                     payment.icon,
                     contentDescription = payment.title,
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -478,8 +513,8 @@ private fun PaymentItem(
             text = payment.title,
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
-            color = Color.Black,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -498,7 +533,12 @@ private fun OtherServiceItem(
     ) {
         Card(
             modifier = Modifier.size(70.dp),
-            colors = CardDefaults.cardColors(containerColor = service.color),
+            colors = CardDefaults.cardColors(
+                containerColor = if (service.color != Color.Unspecified) 
+                    service.color 
+                else 
+                    MaterialTheme.colorScheme.primary
+            ),
             shape = RoundedCornerShape(12.dp)
         ) {
             Box(
@@ -508,7 +548,7 @@ private fun OtherServiceItem(
                 Icon(
                     service.icon,
                     contentDescription = service.title,
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -520,8 +560,8 @@ private fun OtherServiceItem(
             text = service.title,
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
-            color = Color.Black,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -536,7 +576,12 @@ private fun PromoBannerItem(
             .width(280.dp)
             .height(120.dp)
             .clickable { /* TODO: Handle banner click */ },
-        colors = CardDefaults.cardColors(containerColor = banner.backgroundColor),
+        colors = CardDefaults.cardColors(
+            containerColor = if (banner.backgroundColor != Color.Unspecified) 
+                banner.backgroundColor 
+            else 
+                MaterialTheme.colorScheme.surfaceVariant
+        ),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -552,35 +597,37 @@ private fun PromoBannerItem(
                     text = banner.title,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 
                 Text(
                     text = banner.subtitle,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Red
+                    color = MaterialTheme.colorScheme.error
                 )
                 
                 Text(
                     text = banner.amount,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Red
+                    color = MaterialTheme.colorScheme.error
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Button(
                     onClick = { /* TODO: Handle button click */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    ),
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.height(32.dp)
                 ) {
                     Text(
                         text = banner.buttonText,
                         fontSize = 12.sp,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onError
                     )
                 }
             }
@@ -592,13 +639,13 @@ private fun PromoBannerItem(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Gray.copy(alpha = 0.3f)),
+                    .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     Icons.Default.Image,
                     contentDescription = "Banner Image",
-                    tint = Color.Gray,
+                    tint = MaterialTheme.colorScheme.outline,
                     modifier = Modifier.size(40.dp)
                 )
             }
@@ -616,7 +663,13 @@ fun HomeScreenPreview() {
                 name = "Abbas Uddin",
                 email = "abbas@example.com",
                 phone = "+8801234567890",
-                type = UserType.USER
+                type = UserType.USER,
+                subAccounts = listOf(
+                    SubAccount("SUB001", "Personal Account", 1500.0),
+                    SubAccount("SUB002", "Business Account", 2500.0),
+                    SubAccount("SUB003", "Savings Account", 5000.0)
+                ),
+                currentSubAccount = SubAccount("SUB001", "Personal Account", 1500.0)
             )
         )
     }
