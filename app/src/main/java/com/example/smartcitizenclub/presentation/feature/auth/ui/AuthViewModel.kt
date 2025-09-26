@@ -1,18 +1,19 @@
-package com.example.smartcitizenclub.ui.auth
+package com.example.smartcitizenclub.presentation.feature.auth.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.smartcitizenclub.data.AuthRepository
+import com.example.smartcitizenclub.data.AuthRepositoryImpl
 import com.example.smartcitizenclub.data.AuthResult
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
+import com.example.smartcitizenclub.core.utils.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
-    private val authRepository = AuthRepository()
+    private val authRepository = AuthRepositoryImpl()
     
     private val _authState = MutableStateFlow<AuthState>(AuthState.Initial)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
@@ -29,11 +30,14 @@ class AuthViewModel : ViewModel() {
             _errorMessage.value = null
             
             when (val result = authRepository.login(identifier, password)) {
-                is AuthResult.Success -> {
-                    _authState.value = AuthState.Authenticated(result.user)
+                is Result.Success -> {
+                    _authState.value = AuthState.Authenticated(result.data.user!!)
                 }
-                is AuthResult.Error -> {
-                    _errorMessage.value = result.message
+                is Result.Error -> {
+                    _errorMessage.value = result.exception.message
+                }
+                is Result.Loading -> {
+                    // Handle loading state if needed
                 }
             }
             _isLoading.value = false
@@ -45,12 +49,22 @@ class AuthViewModel : ViewModel() {
             _isLoading.value = true
             _errorMessage.value = null
             
-            when (val result = authRepository.signup(identifier, password, name)) {
-                is AuthResult.Success -> {
-                    _authState.value = AuthState.Authenticated(result.user)
+            val user = User(
+                id = "new",
+                name = name,
+                phone = identifier,
+                email = "$identifier@example.com"
+            )
+            
+            when (val result = authRepository.signup(user, password)) {
+                is Result.Success -> {
+                    _authState.value = AuthState.Authenticated(result.data.user!!)
                 }
-                is AuthResult.Error -> {
-                    _errorMessage.value = result.message
+                is Result.Error -> {
+                    _errorMessage.value = result.exception.message
+                }
+                is Result.Loading -> {
+                    // Handle loading state if needed
                 }
             }
             _isLoading.value = false

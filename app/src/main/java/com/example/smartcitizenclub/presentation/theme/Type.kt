@@ -1,4 +1,4 @@
-package com.example.smartcitizenclub.ui.theme
+package com.example.smartcitizenclub.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

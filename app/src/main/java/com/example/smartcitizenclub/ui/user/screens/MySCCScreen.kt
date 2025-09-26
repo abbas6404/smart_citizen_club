@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
-import com.example.smartcitizenclub.ui.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 import kotlinx.coroutines.delay
 
 // Color constants from logo
@@ -530,7 +530,7 @@ fun MySCCScreenPreview() {
                 name = "John Doe",
                 email = "john@example.com",
                 phone = "01742-184298",
-                userType = UserType.USER
+                type = UserType.USER
             ),
             onLogout = {}
         )

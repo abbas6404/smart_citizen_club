@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
-import com.example.smartcitizenclub.ui.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 
 // Data classes for sub-accounts and groups
 data class SubAccount(
@@ -826,7 +826,7 @@ fun AccountScreenPreview() {
                 name = "John Doe",
                 email = "john@example.com",
                 phone = "01742-184298",
-                userType = UserType.USER
+                type = UserType.USER
             ),
             onLogout = {}
         )

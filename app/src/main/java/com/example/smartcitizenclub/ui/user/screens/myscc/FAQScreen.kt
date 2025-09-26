@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.smartcitizenclub.ui.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 
 data class FAQItem(
     val question: String,

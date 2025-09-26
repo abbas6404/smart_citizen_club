@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
-import com.example.smartcitizenclub.ui.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 import kotlinx.coroutines.launch
 
 // Message data class
@@ -393,7 +393,7 @@ fun ChatScreenPreview() {
                 name = "Current User",
                 email = "user@example.com",
                 phone = "+8801234567890",
-                userType = com.example.smartcitizenclub.data.UserType.USER
+                type = com.example.smartcitizenclub.data.UserType.USER
             ),
             onBackClick = {}
         )

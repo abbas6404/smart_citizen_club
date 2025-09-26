@@ -1,7 +1,8 @@
-package com.example.smartcitizenclub.ui.auth
+package com.example.smartcitizenclub.presentation.feature.auth.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
+import com.example.smartcitizenclub.presentation.theme.OrangeGradient
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.collectAsState
 import com.example.smartcitizenclub.R
 import com.example.smartcitizenclub.data.UserType
-import com.example.smartcitizenclub.ui.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,7 +51,7 @@ fun SignupScreen(
     // Handle authentication state changes
     LaunchedEffect(authViewModel.authState) {
         authViewModel.authState.collect { authState ->
-            if (authState is com.example.smartcitizenclub.ui.auth.AuthState.Authenticated) {
+            if (authState is AuthState.Authenticated) {
                 onSignupSuccess()
             }
         }
@@ -62,22 +64,25 @@ fun SignupScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // App Logo
+        // App Logo - Clean display with perfect spacing
         Image(
             painter = painterResource(id = R.drawable.smart_citizen_logo),
             contentDescription = "Smart Citizen Club Logo",
-            modifier = Modifier.size(140.dp)
+            modifier = Modifier
+                .size(180.dp)
+                .padding(vertical = 8.dp)
         )
         
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         
-        // App Logo/Title
+        // App Title
         Text(
             text = "Smart Citizen Club",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            letterSpacing = 0.5.sp
         )
         
         Spacer(modifier = Modifier.height(8.dp))
@@ -86,10 +91,11 @@ fun SignupScreen(
             text = "Join our community",
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            letterSpacing = 0.3.sp
         )
         
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         
         // Name Field
         OutlinedTextField(
@@ -201,33 +207,53 @@ fun SignupScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
         
-        // Sign Up Button
-        Button(
-            onClick = {
-                authViewModel.clearError()
-                if (password == confirmPassword) {
-                    authViewModel.signup(mobileNumber, password, name)
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading && 
-                     name.isNotBlank() && 
-                     mobileNumber.isNotBlank() && 
-                     password.isNotBlank() && 
-                     confirmPassword.isNotBlank() &&
-                     password == confirmPassword
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp
+        // Sign Up Button with Gradient
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .background(
+                    brush = OrangeGradient,
+                    shape = RoundedCornerShape(12.dp)
                 )
-            } else {
-                Text("Create Account")
+        ) {
+            Button(
+                onClick = {
+                    authViewModel.clearError()
+                    if (password == confirmPassword) {
+                        authViewModel.signup(mobileNumber, password, name)
+                    }
+                },
+                modifier = Modifier.fillMaxSize(),
+                enabled = !isLoading && 
+                         name.isNotBlank() && 
+                         mobileNumber.isNotBlank() && 
+                         password.isNotBlank() && 
+                         confirmPassword.isNotBlank() &&
+                         password == confirmPassword,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = androidx.compose.ui.graphics.Color.Transparent
+                )
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = androidx.compose.ui.graphics.Color.White
+                    )
+                } else {
+                    Text(
+                        text = "Create Account",
+                        fontSize = 18.sp,
+                        color = androidx.compose.ui.graphics.Color.White,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
         
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         
         // Sign In Link
         Row(
@@ -241,7 +267,13 @@ fun SignupScreen(
                 onClick = onNavigateToLogin,
                 enabled = !isLoading
             ) {
-                Text("Sign In")
+                Text(
+                    text = "Sign In",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
+                )
             }
         }
     }

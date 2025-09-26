@@ -14,20 +14,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.smartcitizenclub.R
-import com.example.smartcitizenclub.navigation.AppNavigation
-import com.example.smartcitizenclub.ui.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.navigation.AppNavigation
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // Configure window insets to respect system UI
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        
+        // Set system navigation bar to black
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.isAppearanceLightNavigationBars = false
+        window.navigationBarColor = android.graphics.Color.BLACK
+        
         setContent {
             SmartCitizenClubTheme {
                 Surface(

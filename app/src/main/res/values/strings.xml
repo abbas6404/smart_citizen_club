@@ -1,3 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SCC</string>
+    <!-- App Name -->
+    <string name="app_name">Smart Citizen Club</string>
+    <string name="app_short_name">SCC</string>
+    
+    <!-- Authentication -->
+    <string name="login_title">Sign In</string>
+    <string name="signup_title">Create Account</string>
+    <string name="mobile_number">Mobile Number</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="full_name">Full Name</string>
+    <string name="login_button">Login</string>
+    <string name="signup_button">Sign Up</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="not_registered">Not registered yet?</string>
+    <string name="already_registered">Already have an account?</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_finance">Finance</string>
+    <string name="nav_messages">Messages</string>
+    <string name="nav_account">Account</string>
+    <string name="nav_settings">My SCC</string>
+    
+    <!-- Home Screen -->
+    <string name="home_welcome">Welcome back!</string>
+    <string name="home_services">Home Services</string>
+    <string name="home_payments">Payments</string>
+    <string name="home_other">Other</string>
+    
+    <!-- Services -->
+    <string name="service_send_money">Send Money</string>
+    <string name="service_cash_out">Cash Out</string>
+    <string name="service_mobile_recharge">Mobile Recharge</string>
+    <string name="service_package_purchase">Package Purchase</string>
+    <string name="service_loan">Loan</string>
+    <string name="service_contact_us">Contact Us</string>
+    <string name="service_limits_charges">Limit and Charges</string>
+    <string name="service_donation">Donation</string>
+    
+    <!-- Finance -->
+    <string name="finance_title">Transactions</string>
+    <string name="finance_all">All</string>
+    <string name="finance_in">In</string>
+    <string name="finance_out">Out</string>
+    <string name="finance_loan_payment">Make Loan Payment</string>
+    
+    <!-- Messages -->
+    <string name="messages_title">Messages</string>
+    <string name="messages_new_chat">New Chat</string>
+    <string name="messages_search">Search or start new chat</string>
+    <string name="messages_no_chats">No chats yet</string>
+    <string name="messages_start_conversation">Start a conversation by tapping the chat button</string>
+    
+    <!-- Account -->
+    <string name="account_title">Account</string>
+    <string name="account_groups">Account Groups</string>
+    <string name="account_other">Other Accounts</string>
+    <string name="account_add">Add Account</string>
+    <string name="account_add_group">Add Group</string>
+    
+    <!-- Settings -->
+    <string name="settings_title">My SCC</string>
+    <string name="settings_general">General</string>
+    <string name="settings_more_info">More Information</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_change_password">Change Password</string>
+    <string name="settings_submit_kyc">Submit KYC</string>
+    <string name="settings_privacy_policy">Privacy Policy</string>
+    <string name="settings_faq">FAQ</string>
+    <string name="settings_about">About</string>
+    <string name="settings_scc_page">SCC Page</string>
+    <string name="settings_website">Website</string>
+    <string name="settings_logout">Sign out</string>
+    
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="back">Back</string>
+    <string name="next">Next</string>
+    <string name="confirm">Confirm</string>
+    <string name="loading">Loading...</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="retry">Retry</string>
+    
+    <!-- Validation Messages -->
+    <string name="error_field_required">This field is required</string>
+    <string name="error_invalid_phone">Please enter a valid phone number</string>
+    <string name="error_invalid_email">Please enter a valid email address</string>
+    <string name="error_password_too_short">Password must be at least 6 characters</string>
+    <string name="error_passwords_dont_match">Passwords don\'t match</string>
+    <string name="error_invalid_credentials">Invalid credentials</string>
+    
+    <!-- Currency -->
+    <string name="currency_symbol">৳</string>
+    <string name="currency_format">৳%s</string>
 </resources>

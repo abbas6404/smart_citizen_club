@@ -2,7 +2,7 @@
 <resources>
     <style name="Theme.SmartCitizenClub" parent="android:Theme.Material.NoActionBar">
         <!-- Status bar color -->
-        <item name="android:statusBarColor">@color/purple_700</item>
+        <item name="android:statusBarColor">@color/primary_red</item>
         <item name="android:windowBackground">@android:color/black</item>
     </style>
 </resources>

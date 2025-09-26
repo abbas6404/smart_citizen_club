@@ -1,4 +1,4 @@
-package com.example.smartcitizenclub.navigation
+package com.example.smartcitizenclub.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -8,10 +8,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.smartcitizenclub.ui.auth.AuthViewModel
-import com.example.smartcitizenclub.ui.auth.AuthState
-import com.example.smartcitizenclub.ui.auth.LoginScreen
-import com.example.smartcitizenclub.ui.auth.SignupScreen
+import com.example.smartcitizenclub.presentation.feature.auth.ui.AuthViewModel
+import com.example.smartcitizenclub.presentation.feature.auth.ui.AuthState
+import com.example.smartcitizenclub.presentation.feature.auth.ui.LoginScreen
+import com.example.smartcitizenclub.presentation.feature.auth.ui.SignupScreen
 import com.example.smartcitizenclub.ui.user.UserLayout
 
 sealed class Screen(val route: String) {

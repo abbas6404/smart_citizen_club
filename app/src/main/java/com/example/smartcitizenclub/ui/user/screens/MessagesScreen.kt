@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
-import com.example.smartcitizenclub.ui.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -472,8 +472,8 @@ fun MessagesScreenPreview() {
                 id = "1",
                 name = "John Doe",
                 email = "john@example.com",
-                phone = null,
-                userType = UserType.USER
+                phone = "01741736354",
+                type = UserType.USER
             )
         )
     }

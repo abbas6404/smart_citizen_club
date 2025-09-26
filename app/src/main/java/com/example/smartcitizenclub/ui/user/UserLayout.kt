@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
-import com.example.smartcitizenclub.ui.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 import com.example.smartcitizenclub.ui.user.components.BottomNavigation
 import com.example.smartcitizenclub.ui.user.screens.*
 
@@ -49,8 +49,8 @@ fun UserLayoutPreview() {
                 id = "1",
                 name = "John Doe",
                 email = "john@example.com",
-                phone = null,
-                userType = UserType.USER
+                phone = "01741736354",
+                type = UserType.USER
             ),
             onLogout = {},
             useSidebar = false // Preview with bottom navigation
@@ -67,8 +67,8 @@ fun UserLayoutSidebarPreview() {
                 id = "1",
                 name = "John Doe",
                 email = "john@example.com",
-                phone = null,
-                userType = UserType.USER
+                phone = "01741736354",
+                type = UserType.USER
             ),
             onLogout = {},
             useSidebar = true // Preview with sidebar
