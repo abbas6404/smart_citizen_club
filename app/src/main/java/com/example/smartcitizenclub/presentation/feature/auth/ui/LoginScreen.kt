@@ -3,8 +3,10 @@ package com.example.smartcitizenclub.presentation.feature.auth.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -18,8 +20,14 @@ import com.example.smartcitizenclub.presentation.theme.OrangeGradient
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -45,6 +53,17 @@ fun LoginScreen(
     
     val isLoading by authViewModel.isLoading.collectAsState()
     val errorMessage by authViewModel.errorMessage.collectAsState()
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val scrollState = rememberScrollState()
+    
+    // Focus tracking for keyboard detection
+    val mobileInteractionSource = remember { MutableInteractionSource() }
+    val passwordInteractionSource = remember { MutableInteractionSource() }
+    val isMobileFocused by mobileInteractionSource.collectIsFocusedAsState()
+    val isPasswordFocused by passwordInteractionSource.collectIsFocusedAsState()
+    
+    // Determine if keyboard is open (when any field is focused)
+    val isKeyboardOpen = isMobileFocused || isPasswordFocused
     
     // Set default credentials
     LaunchedEffect(Unit) {
@@ -67,41 +86,67 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp),
+                .let { modifier ->
+                    if (isKeyboardOpen) {
+                        modifier.verticalScroll(scrollState)
+                    } else {
+                        modifier
+                    }
+                }
+                .padding(20.dp)
+                .imePadding(), // Add padding for keyboard
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = if (isKeyboardOpen) Arrangement.Top else Arrangement.Center
         ) {
-            // App Logo - Clean display with perfect spacing
-            Image(
-                painter = painterResource(id = R.drawable.smart_citizen_logo),
-                contentDescription = "Smart Citizen Club Logo",
-                modifier = Modifier
-                    .size(180.dp)
-                    .padding(vertical = 8.dp)
-            )
+            // Dynamic spacing based on keyboard state
+            Spacer(modifier = Modifier.height(if (isKeyboardOpen) 20.dp else 60.dp))
             
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Text(
-                text = "Smart Citizen Club",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
-                letterSpacing = 0.5.sp
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = "Sign in to your account",
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                letterSpacing = 0.3.sp
-            )
-            
-            Spacer(modifier = Modifier.height(25.dp))
+            // App Logo and Title - Only show when keyboard is closed
+            if (!isKeyboardOpen) {
+                // App Logo - Clean display with perfect spacing
+                Image(
+                    painter = painterResource(id = R.drawable.smart_citizen_logo),
+                    contentDescription = "Smart Citizen Club Logo",
+                    modifier = Modifier
+                        .size(180.dp)
+                        .padding(vertical = 8.dp)
+                )
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                Text(
+                    text = "Smart Citizen Club",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                    letterSpacing = 0.5.sp
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = "Sign in to your account",
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    letterSpacing = 0.3.sp
+                )
+                
+                Spacer(modifier = Modifier.height(25.dp))
+            } else {
+                // When keyboard is open, show a smaller title
+                Text(
+                    text = "Smart Citizen Club",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                    letterSpacing = 0.5.sp
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             
             // Login Form Card
             Card(
@@ -147,6 +192,7 @@ fun LoginScreen(
                             keyboardType = KeyboardType.Phone
                         ),
                         modifier = Modifier.fillMaxWidth(),
+                        interactionSource = mobileInteractionSource,
                         singleLine = true,
                         enabled = !isLoading,
                         placeholder = { Text("01XXXXXXXXX (11 digits)") },
@@ -190,6 +236,7 @@ fun LoginScreen(
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         modifier = Modifier.fillMaxWidth(),
+                        interactionSource = passwordInteractionSource,
                         singleLine = true,
                         enabled = !isLoading,
                         placeholder = { Text("Enter your password") },
@@ -235,6 +282,7 @@ fun LoginScreen(
                     ) {
                         Button(
                             onClick = {
+                                keyboardController?.hide() // Hide keyboard when login is clicked
                                 authViewModel.clearError()
                                 authViewModel.login(mobileNumber, password)
                             },
@@ -264,7 +312,7 @@ fun LoginScreen(
                 }
             }
             
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(if (isKeyboardOpen) 50.dp else 20.dp))
             
             // Sign Up Link
             Column(
@@ -274,10 +322,14 @@ fun LoginScreen(
                 Text(
                     text = "Not registered yet?",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 14.sp
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
                 )
                 TextButton(
-                    onClick = onNavigateToSignup,
+                    onClick = {
+                        keyboardController?.hide() // Hide keyboard when navigating
+                        onNavigateToSignup()
+                    },
                     enabled = !isLoading,
                     modifier = Modifier.padding(vertical = 8.dp)
                 ) {
@@ -285,11 +337,14 @@ fun LoginScreen(
                         text = "Open New Account",
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
+                        fontSize = 18.sp,
                         textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
                     )
                 }
             }
+            
+            // Dynamic bottom spacing based on keyboard state
+            Spacer(modifier = Modifier.height(if (isKeyboardOpen) 10.dp else 20.dp))
         }
     }
 }
