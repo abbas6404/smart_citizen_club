@@ -23,23 +23,10 @@ import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
+import com.example.smartcitizenclub.presentation.feature.account.ui.AccountColors
 import java.text.SimpleDateFormat
 import java.util.*
-
-// SmartCitizenClub app colors
-object SmartCitizenColors {
-    val PrimaryOrange = Color(0xFFFF4500)   // Vibrant orange-red from account card
-    val SecondaryGreen = Color(0xFF10B981)  // Accent color
-    val Background = Color(0xFFF8F9FA)     // Light background
-    val ChatBackground = Color(0xFFF3F4F6)  // Slightly darker background
-    val MessageBubble = Color(0xFFE0F2FE)   // Light blue message bubble
-    val UnreadBackground = Color(0xFFF0F9FF) // Very light blue for unread
-    val TextPrimary = Color(0xFF374151)     // Dark gray text
-    val TextSecondary = Color(0xFF6B7280)   // Medium gray text
-    val TextTertiary = Color(0xFF9CA3AF)    // Light gray text
-    val Red = Color(0xFFE53E3E)             // Error/notification color
-    val Gold = Color(0xFFF59E0B)            // Warning color
-}
 
 data class Chat(
     val id: String,
@@ -69,7 +56,7 @@ fun MessagesScreen(
             Chat(
                 id = "1",
                 contactName = "Community Admin",
-                lastMessage = "Welcome to Smart Citizen Club! We're excited to have you join our community.",
+                lastMessage = "Welcome to Smart Citizen Club!",
                 timestamp = System.currentTimeMillis() - 3600000, // 1 hour ago
                 isRead = false,
                 unreadCount = 2,
@@ -79,7 +66,7 @@ fun MessagesScreen(
             Chat(
                 id = "2",
                 contactName = "Sarah Johnson",
-                lastMessage = "Thanks for the helpful information about local events!",
+                lastMessage = "Thanks for the helpful information!",
                 timestamp = System.currentTimeMillis() - 7200000, // 2 hours ago
                 isRead = true,
                 unreadCount = 0,
@@ -89,7 +76,7 @@ fun MessagesScreen(
             Chat(
                 id = "3",
                 contactName = "Mike Chen",
-                lastMessage = "Can we schedule a community meeting for next week?",
+                lastMessage = "Can we schedule a community meeting?",
                 timestamp = System.currentTimeMillis() - 86400000, // 1 day ago
                 isRead = true,
                 unreadCount = 0,
@@ -99,7 +86,7 @@ fun MessagesScreen(
             Chat(
                 id = "4",
                 contactName = "City Council",
-                lastMessage = "Important update about the new park development project.",
+                lastMessage = "Important update about park development",
                 timestamp = System.currentTimeMillis() - 172800000, // 2 days ago
                 isRead = false,
                 unreadCount = 1,
@@ -109,7 +96,7 @@ fun MessagesScreen(
             Chat(
                 id = "5",
                 contactName = "Lisa Park",
-                lastMessage = "The neighborhood cleanup was a great success!",
+                lastMessage = "Neighborhood cleanup was successful!",
                 timestamp = System.currentTimeMillis() - 259200000, // 3 days ago
                 isRead = true,
                 unreadCount = 0,
@@ -119,18 +106,18 @@ fun MessagesScreen(
             Chat(
                 id = "6",
                 contactName = "David Wilson",
-                lastMessage = "Hey, how are you doing?",
-                timestamp = System.currentTimeMillis() - 432000000, // 5 days ago
+                lastMessage = "Looking forward to community garden",
+                timestamp = System.currentTimeMillis() - 345600000, // 4 days ago
                 isRead = true,
                 unreadCount = 0,
-                isOnline = false,
+                isOnline = true,
                 isPinned = false
             ),
             Chat(
                 id = "7",
                 contactName = "Emma Thompson",
-                lastMessage = "See you tomorrow at the meeting!",
-                timestamp = System.currentTimeMillis() - 604800000, // 1 week ago
+                lastMessage = "Recycling program is working well",
+                timestamp = System.currentTimeMillis() - 432000000, // 5 days ago
                 isRead = true,
                 unreadCount = 0,
                 isOnline = false,
@@ -151,22 +138,42 @@ fun MessagesScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {
-                WhatsAppTopBar(
-                    showSearchBar = showSearchBar,
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = { searchQuery = it },
-                    onSearchToggle = { showSearchBar = !showSearchBar },
-                    onMenuClick = { /* TODO: Show menu */ }
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Messages",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = PrimaryOrangeGradient
+                    ),
+                    actions = {
+                        IconButton(onClick = { showSearchBar = !showSearchBar }) {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = "Search",
+                                tint = Color.White
+                            )
+                        }
+                        IconButton(onClick = { /* TODO: Show menu */ }) {
+                            Icon(
+                                Icons.Default.MoreVert,
+                                contentDescription = "More options",
+                                tint = Color.White
+                            )
+                        }
+                    }
                 )
             },
-            containerColor = SmartCitizenColors.Background
+            containerColor = Color.White
         ) { paddingValues ->
             // Content
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentPadding = PaddingValues(bottom = 16.dp)
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 80.dp)
             ) {
                 if (filteredChats.isEmpty()) {
                     item {
@@ -189,7 +196,7 @@ fun MessagesScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            containerColor = SmartCitizenColors.SecondaryGreen,
+            containerColor = PrimaryOrangeGradient,
             elevation = FloatingActionButtonDefaults.elevation(
                 defaultElevation = 6.dp,
                 pressedElevation = 8.dp
@@ -219,7 +226,7 @@ private fun WhatsAppTopBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(SmartCitizenColors.PrimaryOrange)
+                .background(PrimaryOrangeGradient)
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -265,7 +272,7 @@ private fun WhatsAppTopBar(
                 )
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = SmartCitizenColors.PrimaryOrange
+                containerColor = PrimaryOrangeGradient
             ),
             actions = {
                 IconButton(onClick = onSearchToggle) {
@@ -296,27 +303,29 @@ private fun ChatItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .background(
-                if (chat.isRead) Color.Transparent else SmartCitizenColors.UnreadBackground
-            )
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Avatar with online indicator
         Box {
-            // Avatar
             Box(
                 modifier = Modifier
                     .size(56.dp)
                     .clip(CircleShape)
-                    .background(SmartCitizenColors.SecondaryGreen),
+                    .background(
+                        when {
+                            chat.isPinned -> PrimaryOrangeGradient
+                            chat.unreadCount > 0 -> PrimaryOrangeGradient
+                            else -> AccountColors.Blue
+                        }
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = chat.contactName.take(1).uppercase(),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color.White,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
             
@@ -326,15 +335,15 @@ private fun ChatItem(
                     modifier = Modifier
                         .size(16.dp)
                         .clip(CircleShape)
-                        .background(SmartCitizenColors.SecondaryGreen)
+                        .background(PrimaryOrangeGradient)
                         .align(Alignment.BottomEnd)
                 )
             }
         }
         
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(16.dp))
         
-        // Chat content
+        // Chat info
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -343,67 +352,70 @@ private fun ChatItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = chat.contactName,
-                    fontSize = 16.sp,
-                    fontWeight = if (chat.isRead) FontWeight.Normal else FontWeight.Bold,
-                    color = SmartCitizenColors.TextPrimary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
-                
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
                 ) {
+                    Text(
+                        text = chat.contactName,
+                        fontSize = 16.sp,
+                        fontWeight = if (chat.isRead) FontWeight.Medium else FontWeight.Bold,
+                        color = AccountColors.TextPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    
                     if (chat.isPinned) {
+                        Spacer(modifier = Modifier.width(8.dp))
                         Icon(
                             Icons.Default.PushPin,
                             contentDescription = "Pinned",
-                            tint = SmartCitizenColors.TextTertiary,
+                            tint = PrimaryOrangeGradient,
                             modifier = Modifier.size(16.dp)
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
                     }
-                    
-                    Text(
-                        text = formatTimestamp(chat.timestamp),
-                        fontSize = 12.sp,
-                        color = SmartCitizenColors.TextTertiary
-                    )
                 }
+                
+                Text(
+                    text = formatTimestamp(chat.timestamp),
+                    fontSize = 12.sp,
+                    color = AccountColors.TextSecondary,
+                    fontWeight = FontWeight.Normal
+                )
             }
             
             Spacer(modifier = Modifier.height(4.dp))
             
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = chat.lastMessage,
                     fontSize = 14.sp,
-                    color = if (chat.isRead) SmartCitizenColors.TextSecondary else SmartCitizenColors.TextPrimary,
+                    color = if (chat.isRead) AccountColors.TextSecondary else AccountColors.TextPrimary,
                     fontWeight = if (chat.isRead) FontWeight.Normal else FontWeight.Medium,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     modifier = Modifier.weight(1f)
                 )
                 
                 if (chat.unreadCount > 0) {
+                    Spacer(modifier = Modifier.width(8.dp))
                     Box(
                         modifier = Modifier
                             .size(20.dp)
                             .clip(CircleShape)
-                            .background(SmartCitizenColors.SecondaryGreen),
+                            .background(PrimaryOrangeGradient),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = if (chat.unreadCount > 99) "99+" else chat.unreadCount.toString(),
+                            color = Color.White,
                             fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
@@ -418,32 +430,68 @@ private fun EmptyState() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            Icons.Default.Chat,
-            contentDescription = "No Chats",
-            modifier = Modifier.size(80.dp),
-            tint = SmartCitizenColors.TextTertiary
-        )
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .clip(CircleShape)
+                .background(PrimaryOrangeGradient.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Default.Chat,
+                contentDescription = "No Chats",
+                modifier = Modifier.size(60.dp),
+                tint = PrimaryOrangeGradient
+            )
+        }
         
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         
         Text(
-            text = "No chats yet",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = SmartCitizenColors.TextSecondary
-        )
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        Text(
-            text = "Start a conversation by tapping the chat button",
-            fontSize = 14.sp,
-            color = SmartCitizenColors.TextTertiary,
+            text = "No messages yet",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = AccountColors.TextPrimary,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        Text(
+            text = "Start a conversation by tapping the chat button below",
+            fontSize = 16.sp,
+            color = AccountColors.TextSecondary,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            lineHeight = 24.sp
+        )
+        
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        Button(
+            onClick = { /* TODO: Handle new chat */ },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = PrimaryOrangeGradient
+            ),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+        ) {
+            Icon(
+                Icons.Default.Chat,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Start New Chat",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
     }
 }
 

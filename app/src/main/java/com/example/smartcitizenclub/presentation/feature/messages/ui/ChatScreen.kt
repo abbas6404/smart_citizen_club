@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.feature.account.ui.AccountColors
 import kotlinx.coroutines.launch
 
 // Message data class
@@ -112,7 +113,7 @@ fun ChatScreen(
                             Text(
                                 text = if (chat.isOnline) "Online" else "Last seen recently",
                                 fontSize = 14.sp,
-                                color = if (chat.isOnline) SmartCitizenColors.SecondaryGreen else SmartCitizenColors.TextSecondary
+                                color = if (chat.isOnline) AccountColors.SecondaryGreen else AccountColors.TextSecondary
                             )
                         }
                     }
@@ -202,7 +203,7 @@ fun ChatScreen(
                         Icon(
                             Icons.Default.AttachFile,
                             contentDescription = "Attach",
-                            tint = SmartCitizenColors.TextSecondary
+                            tint = AccountColors.TextSecondary
                         )
                     }
 
@@ -214,8 +215,8 @@ fun ChatScreen(
                         modifier = Modifier.weight(1f),
                         maxLines = 4,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = SmartCitizenColors.SecondaryGreen,
-                            unfocusedBorderColor = SmartCitizenColors.TextTertiary,
+                            focusedBorderColor = AccountColors.SecondaryGreen,
+                            unfocusedBorderColor = AccountColors.TextTertiary,
                             focusedContainerColor = Color.White,
                             unfocusedContainerColor = Color.White
                         ),
@@ -227,7 +228,7 @@ fun ChatScreen(
                         Icon(
                             Icons.Default.EmojiEmotions,
                             contentDescription = "Emoji",
-                            tint = SmartCitizenColors.TextSecondary
+                            tint = AccountColors.TextSecondary
                         )
                     }
 
@@ -244,7 +245,7 @@ fun ChatScreen(
                         Icon(
                             Icons.Default.Send,
                             contentDescription = "Send",
-                            tint = if (messageText.isNotBlank()) SmartCitizenColors.SecondaryGreen else SmartCitizenColors.TextTertiary
+                            tint = if (messageText.isNotBlank()) AccountColors.SecondaryGreen else AccountColors.TextTertiary
                         )
                     }
                 }
@@ -284,13 +285,13 @@ private fun AttachmentOption(
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(SmartCitizenColors.SecondaryGreen.copy(alpha = 0.1f)),
+                .background(AccountColors.SecondaryGreen.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 icon,
                 contentDescription = text,
-                tint = SmartCitizenColors.SecondaryGreen,
+                tint = AccountColors.SecondaryGreen,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -298,7 +299,7 @@ private fun AttachmentOption(
         Text(
             text = text,
             fontSize = 12.sp,
-            color = SmartCitizenColors.TextPrimary
+            color = AccountColors.TextPrimary
         )
     }
 }
@@ -330,7 +331,7 @@ private fun MessageBubble(
                         )
                     )
                     .background(
-                        if (message.isFromMe) SmartCitizenColors.SecondaryGreen else Color.White
+                        if (message.isFromMe) AccountColors.SecondaryGreen else Color.White
                     )
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 contentAlignment = Alignment.CenterStart
@@ -352,14 +353,14 @@ private fun MessageBubble(
                 Text(
                     text = message.timestamp,
                     fontSize = 12.sp,
-                    color = SmartCitizenColors.TextSecondary
+                    color = AccountColors.TextSecondary
                 )
 
                 if (message.isFromMe) {
                     Icon(
                         if (message.isRead) Icons.Default.DoneAll else Icons.Default.Done,
                         contentDescription = "Message status",
-                        tint = if (message.isRead) SmartCitizenColors.SecondaryGreen else SmartCitizenColors.TextSecondary,
+                        tint = if (message.isRead) AccountColors.SecondaryGreen else AccountColors.TextSecondary,
                         modifier = Modifier.size(16.dp)
                     )
                 }

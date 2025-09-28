@@ -27,26 +27,13 @@ data class AccountGroup(
     val icon: ImageVector
 )
 
-// Color constants for account groups
-private object AccountGroupColors {
-    val Red = Color(0xFFE53E3E)
-    val Gold = Color(0xFFF59E0B)
-    val Green = Color(0xFF10B981)
-    val Blue = Color(0xFF3B82F6)
-    val Purple = Color(0xFF8B5CF6)
-    val Orange = Color(0xFFF97316)
-    val Gray = Color(0xFF6B7280)
-    val LightGray = Color(0xFFF3F4F6)
-    val DarkGray = Color(0xFF374151)
-}
-
 // Sample account groups data
 val sampleAccountGroups = listOf(
-    AccountGroup("1", "Personal", AccountGroupColors.Blue, Icons.Default.Person),
-    AccountGroup("2", "Business", AccountGroupColors.Green, Icons.Default.Business),
-    AccountGroup("3", "Savings", AccountGroupColors.Orange, Icons.Default.Savings),
-    AccountGroup("4", "Investment", AccountGroupColors.Purple, Icons.Default.TrendingUp),
-    AccountGroup("5", "Emergency", AccountGroupColors.Red, Icons.Default.Warning)
+    AccountGroup("1", "Personal", AccountColors.Blue, Icons.Default.Person),
+    AccountGroup("2", "Business", AccountColors.Green, Icons.Default.Business),
+    AccountGroup("3", "Savings", AccountColors.Orange, Icons.Default.Savings),
+    AccountGroup("4", "Investment", AccountColors.Purple, Icons.Default.TrendingUp),
+    AccountGroup("5", "Emergency", AccountColors.Red, Icons.Default.Warning)
 )
 
 // Reusable Group Selection Component
@@ -64,9 +51,9 @@ fun GroupSelection(
                 .fillMaxWidth()
                 .clickable { onGroupSelected(null) },
             colors = CardDefaults.cardColors(
-                containerColor = if (selectedGroupId == null) AccountGroupColors.Green.copy(alpha = 0.1f) else Color.White
+                containerColor = if (selectedGroupId == null) AccountColors.Green.copy(alpha = 0.1f) else Color.White
             ),
-            border = if (selectedGroupId == null) BorderStroke(1.dp, AccountGroupColors.Green) else null
+            border = if (selectedGroupId == null) BorderStroke(1.dp, AccountColors.Green) else null
         ) {
             Row(
                 modifier = Modifier
@@ -77,14 +64,14 @@ fun GroupSelection(
                 Icon(
                     Icons.Default.Group,
                     contentDescription = "No Group",
-                    tint = if (selectedGroupId == null) AccountGroupColors.Green else AccountGroupColors.DarkGray,
+                    tint = if (selectedGroupId == null) AccountColors.Green else AccountColors.DarkGray,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = "No Group",
                     fontSize = 16.sp,
-                    color = if (selectedGroupId == null) AccountGroupColors.Green else AccountGroupColors.DarkGray,
+                    color = if (selectedGroupId == null) AccountColors.Green else AccountColors.DarkGray,
                     fontWeight = if (selectedGroupId == null) FontWeight.Bold else FontWeight.Normal
                 )
             }
@@ -110,14 +97,14 @@ fun GroupSelection(
                     Icon(
                         group.icon,
                         contentDescription = group.name,
-                        tint = if (selectedGroupId == group.id) group.color else AccountGroupColors.DarkGray,
+                        tint = if (selectedGroupId == group.id) group.color else AccountColors.DarkGray,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = group.name,
                         fontSize = 16.sp,
-                        color = if (selectedGroupId == group.id) group.color else AccountGroupColors.DarkGray,
+                        color = if (selectedGroupId == group.id) group.color else AccountColors.DarkGray,
                         fontWeight = if (selectedGroupId == group.id) FontWeight.Bold else FontWeight.Normal
                     )
                 }
@@ -181,7 +168,7 @@ fun GroupCard(
                             text = group.name,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1F2937)
+                            color = AccountColors.TextPrimary
                         )
                         Text(
                             text = "${accounts.size} accounts • ৳${
@@ -189,7 +176,7 @@ fun GroupCard(
                                     "%.0f", accounts.sumOf { it.balance })
                             }", 
                             fontSize = 14.sp, 
-                            color = Color(0xFF6B7280)
+                            color = AccountColors.TextSecondary
                         )
                     }
                 }
@@ -197,7 +184,7 @@ fun GroupCard(
                 Icon(
                     if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                     contentDescription = if (isExpanded) "Collapse" else "Expand",
-                    tint = Color(0xFF6B7280),
+                    tint = AccountColors.TextSecondary,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -206,7 +193,7 @@ fun GroupCard(
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 Divider(
-                    color = Color(0xFFE5E7EB),
+                    color = AccountColors.Divider,
                     thickness = 1.dp
                 )
                 
@@ -301,7 +288,7 @@ fun ChangeGroupDialog(
                 Text(
                     text = "Select a new group for \"${account.name}\"",
                     fontSize = 14.sp,
-                    color = AccountGroupColors.DarkGray
+                    color = AccountColors.TextSecondary
                 )
 
                 // Group Selection - Reusable component

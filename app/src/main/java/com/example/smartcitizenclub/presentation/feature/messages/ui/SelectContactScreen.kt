@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.feature.account.ui.AccountColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -168,7 +169,7 @@ fun SelectContactScreen(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = SmartCitizenColors.Background
+                        containerColor = AccountColors.Background
                     )
                 )
             } else {
@@ -185,7 +186,7 @@ fun SelectContactScreen(
                             Text(
                                 text = "${contacts.size} contacts",
                                 fontSize = 14.sp,
-                                color = SmartCitizenColors.TextSecondary
+                                color = AccountColors.TextSecondary
                             )
                         }
                     },
@@ -239,7 +240,7 @@ fun SelectContactScreen(
                     ActionOption(
                         title = "New group",
                         icon = Icons.Default.Group,
-                        iconBackground = SmartCitizenColors.SecondaryGreen,
+                        iconBackground = AccountColors.SecondaryGreen,
                         onClick = onNewGroup
                     )
                     
@@ -247,7 +248,7 @@ fun SelectContactScreen(
                     ActionOption(
                         title = "New contact",
                         icon = Icons.Default.PersonAdd,
-                        iconBackground = SmartCitizenColors.SecondaryGreen,
+                        iconBackground = AccountColors.SecondaryGreen,
                         onClick = onNewContact
                     )
                 }
@@ -342,7 +343,7 @@ private fun ActionOption(
             Icon(
                 Icons.Default.GridView,
                 contentDescription = "Grid",
-                tint = SmartCitizenColors.TextSecondary,
+                tint = AccountColors.TextSecondary,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -369,9 +370,9 @@ private fun ContactItem(
                 .clip(CircleShape)
                 .background(
                     if (contact.isSCCMember) 
-                        SmartCitizenColors.SecondaryGreen 
+                        AccountColors.SecondaryGreen 
                     else 
-                        SmartCitizenColors.PrimaryOrange
+                        AccountColors.PrimaryOrange
                 ),
             contentAlignment = Alignment.Center
         ) {
@@ -395,7 +396,7 @@ private fun ContactItem(
             Text(
                 text = contact.status ?: if (showInviteOption) "Invite to SCC" else "SCC Member",
                 fontSize = 14.sp,
-                color = SmartCitizenColors.TextSecondary
+                color = AccountColors.TextSecondary
             )
         }
         
@@ -403,7 +404,7 @@ private fun ContactItem(
             TextButton(
                 onClick = { /* TODO: Invite to SCC */ },
                 colors = ButtonDefaults.textButtonColors(
-                    contentColor = SmartCitizenColors.PrimaryOrange
+                    contentColor = AccountColors.PrimaryOrange
                 )
             ) {
                 Text(

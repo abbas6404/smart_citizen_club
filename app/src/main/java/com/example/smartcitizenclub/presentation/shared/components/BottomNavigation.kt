@@ -37,7 +37,6 @@ import com.example.smartcitizenclub.presentation.feature.recharge.ui.MobileOpera
 import com.example.smartcitizenclub.presentation.feature.contact.ui.SupportTicket
 import com.example.smartcitizenclub.presentation.feature.donation.ui.DonationCampaign
 import com.example.smartcitizenclub.presentation.feature.donation.ui.UserDonation
-import com.example.smartcitizenclub.presentation.feature.packages.ui.*
 import com.example.smartcitizenclub.presentation.feature.loan.ui.*
 import com.example.smartcitizenclub.presentation.feature.payments.ui.*
 import com.example.smartcitizenclub.presentation.feature.sendmoney.ui.Contact

@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.feature.account.ui.AccountColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +83,7 @@ fun NewContactScreen(
                 Icon(
                     Icons.Default.Person,
                     contentDescription = "Person icon",
-                    tint = SmartCitizenColors.TextSecondary,
+                    tint = AccountColors.TextSecondary,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
@@ -92,10 +93,10 @@ fun NewContactScreen(
                     label = { Text("First name") },
                     modifier = Modifier.weight(1f),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = SmartCitizenColors.SecondaryGreen,
-                        unfocusedBorderColor = SmartCitizenColors.TextTertiary,
-                        focusedLabelColor = SmartCitizenColors.SecondaryGreen,
-                        unfocusedLabelColor = SmartCitizenColors.TextSecondary,
+                        focusedBorderColor = AccountColors.SecondaryGreen,
+                        unfocusedBorderColor = AccountColors.TextTertiary,
+                        focusedLabelColor = AccountColors.SecondaryGreen,
+                        unfocusedLabelColor = AccountColors.TextSecondary,
                         focusedTextColor = Color.Black,
                         unfocusedTextColor = Color.Black
                     )
@@ -115,10 +116,10 @@ fun NewContactScreen(
                     label = { Text("Last name") },
                     modifier = Modifier.weight(1f),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = SmartCitizenColors.SecondaryGreen,
-                        unfocusedBorderColor = SmartCitizenColors.TextTertiary,
-                        focusedLabelColor = SmartCitizenColors.SecondaryGreen,
-                        unfocusedLabelColor = SmartCitizenColors.TextSecondary,
+                        focusedBorderColor = AccountColors.SecondaryGreen,
+                        unfocusedBorderColor = AccountColors.TextTertiary,
+                        focusedLabelColor = AccountColors.SecondaryGreen,
+                        unfocusedLabelColor = AccountColors.TextSecondary,
                         focusedTextColor = Color.Black,
                         unfocusedTextColor = Color.Black
                     )
@@ -134,7 +135,7 @@ fun NewContactScreen(
                 Icon(
                     Icons.Default.Phone,
                     contentDescription = "Phone icon",
-                    tint = SmartCitizenColors.TextSecondary,
+                    tint = AccountColors.TextSecondary,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
@@ -157,17 +158,17 @@ fun NewContactScreen(
                             Icon(
                                 Icons.Default.ArrowDropDown, 
                                 contentDescription = "Dropdown arrow",
-                                tint = SmartCitizenColors.TextSecondary
+                                tint = AccountColors.TextSecondary
                             )
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { expanded = true },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = SmartCitizenColors.SecondaryGreen,
-                            unfocusedBorderColor = SmartCitizenColors.TextTertiary,
-                            focusedLabelColor = SmartCitizenColors.SecondaryGreen,
-                            unfocusedLabelColor = SmartCitizenColors.TextSecondary,
+                            focusedBorderColor = AccountColors.SecondaryGreen,
+                            unfocusedBorderColor = AccountColors.TextTertiary,
+                            focusedLabelColor = AccountColors.SecondaryGreen,
+                            unfocusedLabelColor = AccountColors.TextSecondary,
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
                         )
@@ -215,10 +216,10 @@ fun NewContactScreen(
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = SmartCitizenColors.SecondaryGreen,
-                        unfocusedBorderColor = SmartCitizenColors.TextTertiary,
-                        focusedLabelColor = SmartCitizenColors.SecondaryGreen,
-                        unfocusedLabelColor = SmartCitizenColors.TextSecondary,
+                        focusedBorderColor = AccountColors.SecondaryGreen,
+                        unfocusedBorderColor = AccountColors.TextTertiary,
+                        focusedLabelColor = AccountColors.SecondaryGreen,
+                        unfocusedLabelColor = AccountColors.TextSecondary,
                         focusedTextColor = Color.Black,
                         unfocusedTextColor = Color.Black
                     )
@@ -231,11 +232,11 @@ fun NewContactScreen(
                 onClick = { showQRCode = true },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = SmartCitizenColors.SecondaryGreen
+                    contentColor = AccountColors.SecondaryGreen
                 ),
                 border = androidx.compose.foundation.BorderStroke(
                     1.dp, 
-                    SmartCitizenColors.SecondaryGreen
+                    AccountColors.SecondaryGreen
                 ),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -260,7 +261,7 @@ fun NewContactScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = SmartCitizenColors.SecondaryGreen),
+                colors = ButtonDefaults.buttonColors(containerColor = AccountColors.SecondaryGreen),
                 shape = RoundedCornerShape(28.dp)
             ) {
                 Text(

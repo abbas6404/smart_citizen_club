@@ -13,16 +13,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
-
-// Color constants for account screen
-private object AccountScreenColors {
-    val DarkGray = Color(0xFF374151)
-    val Gray = Color(0xFF6B7280)
-    val Green = Color(0xFF10B981)
-}
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +34,9 @@ fun AccountScreen(
     var showContextMenu by remember { mutableStateOf(false) }
     var selectedAccount by remember { mutableStateOf<SubAccount?>(null) }
     var showChangeGroupDialog by remember { mutableStateOf(false) }
+    var showFloatingMenu by remember { mutableStateOf(false) }
+    var showShareDialog by remember { mutableStateOf(false) }
+    var selectedAccountForShare by remember { mutableStateOf<SubAccount?>(null) }
     
     // Sample data
     val subAccounts = remember {
@@ -56,43 +57,117 @@ fun AccountScreen(
     val ungroupedAccounts = subAccounts.filter { it.groupId == null && it.id != "1" }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        text = "My Accounts",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1E3A8A)
-                ),
-                actions = {
-                    IconButton(onClick = onLogout) {
-                        Icon(
-                            Icons.Default.Logout,
-                            contentDescription = "Logout",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+        floatingActionButton = {
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Add Group FAB with text
+                if (showFloatingMenu) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.clickable { 
+                            showAddGroupDialog = true
+                            showFloatingMenu = false
+                        }
+                    ) {
+                        Text(
+                            text = "Add Group",
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier
+                                .background(
+                                    PrimaryOrangeGradient,
+                                    RoundedCornerShape(20.dp)
+                                )
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
                         )
+                        FloatingActionButton(
+                            onClick = { },
+                            containerColor = Color(0xFF10B981),
+                            contentColor = Color.White,
+                            modifier = Modifier.size(56.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.GroupAdd,
+                                contentDescription = "Add Group",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
                 }
-            )
+                
+                // Add Account FAB with text
+                if (showFloatingMenu) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.clickable { 
+                            showAddAccountDialog = true
+                            showFloatingMenu = false
+                        }
+                    ) {
+                        Text(
+                            text = "Add Account",
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier
+                                .background(
+                                    PrimaryOrangeGradient,
+                                    RoundedCornerShape(20.dp)
+                                )
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                        )
+                        FloatingActionButton(
+                            onClick = { },
+                            containerColor = Color(0xFF3B82F6),
+                            contentColor = Color.White,
+                            modifier = Modifier.size(56.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.AccountBalance,
+                                contentDescription = "Add Account",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+                }
+                
+                // Main FAB
+                FloatingActionButton(
+                    onClick = { showFloatingMenu = !showFloatingMenu },
+                    containerColor = PrimaryOrangeGradient,
+                    contentColor = Color.White,
+                    modifier = Modifier.size(64.dp)
+                ) {
+                    Icon(
+                        if (showFloatingMenu) Icons.Default.Close else Icons.Default.Add,
+                        contentDescription = if (showFloatingMenu) "Close Menu" else "Add",
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            }
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 8.dp),
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Active Account Card (Mastercard Style)
             activeAccount?.let { account ->
-                ActiveAccountCard(account = account)
+                ActiveAccountCard(
+                    account = account,
+                    onLongPress = { selectedAccount ->
+                        selectedAccountForShare = selectedAccount
+                        showShareDialog = true
+                    }
+                )
             }
 
             // Groups Section
@@ -147,6 +222,16 @@ fun AccountScreen(
             }
         }
     }
+    
+    // Share Account Dialog
+    ShareAccountDialog(
+        showDialog = showShareDialog,
+        account = selectedAccountForShare,
+        onDismiss = {
+            showShareDialog = false
+            selectedAccountForShare = null
+        }
+    )
 
     // Context Menu for Account Actions
     AccountContextMenu(
