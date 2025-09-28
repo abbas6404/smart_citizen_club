@@ -74,6 +74,7 @@ data class PromoBanner(
 @Composable
 fun HomeScreen(
     user: User,
+    onScanQRClick: () -> Unit = {},
     onSendMoneyClick: () -> Unit = {},
     onCashOutClick: () -> Unit = {},
     onMobileRechargeClick: () -> Unit = {},
@@ -83,12 +84,13 @@ fun HomeScreen(
     onInvestmentClick: () -> Unit = {},
     onLoanClick: () -> Unit = {},
     onContactUsClick: () -> Unit = {},
-    onLimitChargesClick: () -> Unit = {},
+    onChargeLimitClick: () -> Unit = {},
     onDonationClick: () -> Unit = {}
 ) {
     // Home services data
     val homeServices = remember {
         listOf(
+            HomeService("0", "Scan QR", Icons.Default.QrCode),
             HomeService("1", "Send Money", Icons.Default.Send),
             HomeService("2", "Cash Out", Icons.Default.AttachMoney),
             HomeService("3", "Mobile Recharge", Icons.Default.Phone),
@@ -112,7 +114,7 @@ fun HomeScreen(
     val otherServices = remember {
         listOf(
             OtherService("1", "Ticket Support", Icons.Default.Support),
-            OtherService("2", "Limit and Charge", Icons.Default.AccountBalance),
+            OtherService("2", "Charge and Limit", Icons.Default.AccountBalance),
             OtherService("3", "Donation", Icons.Default.Favorite)
         )
     }
@@ -200,7 +202,7 @@ fun HomeScreen(
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Home Services Grid (2 rows, 4 items each)
+                // Home Services Grid (3 rows, 4 items each row)
                 Column {
                     // First row (4 items)
                     Row(
@@ -213,10 +215,10 @@ fun HomeScreen(
                                 modifier = Modifier.weight(1f),
                                 onClick = {
                                     when (service.id) {
+                                        "0" -> onScanQRClick()
                                         "1" -> onSendMoneyClick()
                                         "2" -> onCashOutClick()
                                         "3" -> onMobileRechargeClick()
-                                        "4" -> onAddMoneyClick()
                                     }
                                 }
                             )
@@ -230,15 +232,35 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        homeServices.drop(4).forEach { service ->
+                        homeServices.drop(4).take(4).forEach { service ->
                             ServiceItem(
                                 service = service,
                                 modifier = Modifier.weight(1f),
                                 onClick = {
                                     when (service.id) {
+                                        "4" -> onAddMoneyClick()
                                         "5" -> onTransferMoneyClick()
                                         "6" -> onLimitUpgradeClick()
                                         "7" -> onInvestmentClick()
+                                    }
+                                }
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Third row (1 item - centered)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        homeServices.drop(8).forEach { service ->
+                            ServiceItem(
+                                service = service,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    when (service.id) {
                                         "8" -> onLoanClick()
                                     }
                                 }
@@ -351,7 +373,7 @@ fun HomeScreen(
                                     // Handle service click
                                     when (service.title) {
                                         "Ticket Support" -> onContactUsClick()
-                                        "Limit and Charge" -> onLimitChargesClick()
+                                        "Charge and Limit" -> onChargeLimitClick()
                                         "Donation" -> onDonationClick()
                                         // Add other service handlers as needed
                                     }

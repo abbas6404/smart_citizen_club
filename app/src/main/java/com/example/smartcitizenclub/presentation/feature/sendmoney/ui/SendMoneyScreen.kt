@@ -189,64 +189,62 @@ fun SendMoneyScreen(
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    Row(
+                    OutlinedTextField(
+                        value = recipientInput,
+                        onValueChange = { newValue ->
+                            // Limit input to 11 digits maximum
+                            if (newValue.length <= 11) {
+                                recipientInput = newValue
+                            }
+                        },
+                        placeholder = {
+                            Text(
+                                text = "Phone or 9 Digit acc number",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.Phone,
-                            contentDescription = "Phone",
-                            tint = PrimaryOrangeGradient,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
-                        OutlinedTextField(
-                            value = recipientInput,
-                            onValueChange = { newValue ->
-                                // Limit input to 11 digits maximum
-                                if (newValue.length <= 11) {
-                                    recipientInput = newValue
-                                }
-                            },
-                            placeholder = {
-                                Text(
-                                    text = "Phone or 9 Digit acc number",
-                                    fontSize = 14.sp,
-                                    color = Color.Gray
-                                )
-                            },
-                            modifier = Modifier.weight(1f),
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = PrimaryOrangeGradient,
-                                unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                            ),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-                        )
-                        
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
-                        // Send Button
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(PrimaryOrangeGradient)
-                                .clickable { 
-                                    handleRecipientInput(recipientInput)
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryOrangeGradient,
+                            unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
+                        ),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        leadingIcon = {
                             Icon(
-                                Icons.Default.ArrowForward,
-                                contentDescription = "Send",
-                                tint = Color.White,
+                                Icons.Default.Phone,
+                                contentDescription = "Phone",
+                                tint = PrimaryOrangeGradient,
                                 modifier = Modifier.size(20.dp)
                             )
+                        },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = { 
+                                    handleRecipientInput(recipientInput)
+                                },
+                                enabled = recipientInput.isNotEmpty()
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (recipientInput.isNotEmpty()) PrimaryOrangeGradient else Color.Gray.copy(alpha = 0.3f)
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        Icons.Default.ArrowForward,
+                                        contentDescription = "Send",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
                         }
-                    }
+                    )
                 }
             }
             
@@ -363,7 +361,8 @@ fun SendMoneyScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { 
-                                    recipientInput = contact.phoneNumber
+                                    // Directly navigate to amount screen when saved number is clicked
+                                    onNavigateToAmount(contact.phoneNumber, null, contact.name)
                                 },
                             colors = CardDefaults.cardColors(
                                 containerColor = Color.White

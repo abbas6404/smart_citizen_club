@@ -1,10 +1,10 @@
 package com.example.smartcitizenclub.presentation.feature.cashout.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -13,38 +13,55 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.smartcitizenclub.data.User
-import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CashOutConfirmScreen(
-    provider: CashOutProvider,
+    mobileNumber: String,
     amount: Double,
+    reference: String? = null,
     onBackClick: () -> Unit,
-    onConfirmClick: (String) -> Unit = {} // PIN parameter
+    onCashOutComplete: () -> Unit = {}
 ) {
-    var pin by remember { mutableStateOf("") }
-    var showPin by remember { mutableStateOf(false) }
+    var isHolding by remember { mutableStateOf(false) }
+    var progress by remember { mutableStateOf(0f) }
+    
+    // Simulate progress when holding
+    LaunchedEffect(isHolding) {
+        if (isHolding) {
+            while (progress < 1f && isHolding) {
+                delay(50)
+                progress += 0.02f
+            }
+            if (progress >= 1f) {
+                // Immediately navigate to success screen
+                onCashOutComplete()
+            }
+        } else {
+            progress = 0f
+        }
+    }
     
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Top Bar with Red Background
+        // Top Bar with Orange Background
         TopAppBar(
             title = {
                 Text(
-                    text = "Confirm Transaction",
+                    text = "Cash Out",
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -60,7 +77,7 @@ fun CashOutConfirmScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFFE53E3E) // Red color
+                containerColor = PrimaryOrangeGradient
             ),
             modifier = Modifier.statusBarsPadding()
         )
@@ -69,182 +86,162 @@ fun CashOutConfirmScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .padding(top = 16.dp)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Transaction Details Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = RoundedCornerShape(12.dp)
+            // Transaction Details
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                // Left Column - Transaction Info
                 Column(
-                    modifier = Modifier.padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.weight(1f)
                 ) {
-                    // Provider Info
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .clip(CircleShape)
-                                .background(Color.Gray.copy(alpha = 0.3f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Default.AccountBalance,
-                                contentDescription = "Provider",
-                                tint = Color.Gray,
-                                modifier = Modifier.size(30.dp)
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.width(16.dp))
-                        
-                        Column {
-                            Text(
-                                text = provider.name,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                        }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    // Amount
                     Text(
-                        text = "Amount to Cash Out",
+                        text = "Total",
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
+                    Text(
+                        text = "৳${String.format("%.2f", amount)}",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     Text(
-                        text = "৳${String.format("%.2f", amount)}",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE53E3E)
+                        text = "to ${mobileNumber}",
+                        fontSize = 12.sp,
+                        color = Color.Gray
                     )
                     
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Transaction Fee (if any)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                    // Reference display (if provided)
+                    if (!reference.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
                         Text(
-                            text = "Transaction Fee",
-                            fontSize = 14.sp,
+                            text = "Reference:",
+                            fontSize = 12.sp,
                             color = Color.Gray
                         )
                         Text(
-                            text = "৳0.00",
-                            fontSize = 14.sp,
-                            color = Color.Gray
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Divider(color = Color.Gray.copy(alpha = 0.3f))
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    // Total Amount
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Total Amount",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-                        Text(
-                            text = "৳${String.format("%.2f", amount)}",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            text = reference,
+                            fontSize = 12.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
-            }
-            
-            // PIN Input Section
-            Column {
-                Text(
-                    text = "Enter PIN to Confirm",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Black
-                )
                 
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                OutlinedTextField(
-                    value = pin,
-                    onValueChange = { pin = it },
-                    placeholder = {
-                        Text(
-                            text = "Enter 4-digit PIN",
-                            fontSize = 14.sp,
-                            color = Color.Gray
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    visualTransformation = if (showPin) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFFE53E3E),
-                        unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                    ),
-                    trailingIcon = {
-                        IconButton(onClick = { showPin = !showPin }) {
-                            Icon(
-                                if (showPin) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                contentDescription = if (showPin) "Hide PIN" else "Show PIN",
-                                tint = Color.Gray
-                            )
-                        }
-                    }
-                )
+                // Right Column - Balance Info
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = "New Balance",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                    Text(
+                        text = "৳${String.format("%.2f", 0.67)}",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.weight(1f))
             
-            // Confirm Button
-            Button(
-                onClick = { onConfirmClick(pin) },
+            // Tap and Hold Button with Progress Border
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE53E3E)
-                ),
-                shape = RoundedCornerShape(25.dp),
-                enabled = pin.length == 4
+                    .height(200.dp)
+                    .padding(horizontal = 0.dp)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onPress = {
+                                isHolding = true
+                                tryAwaitRelease()
+                                isHolding = false
+                            }
+                        )
+                    }
             ) {
-                Text(
-                    text = "Confirm Cash Out",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+                // Progress Border (when holding)
+                if (isHolding) {
+                    CircularProgressIndicator(
+                        progress = progress,
+                        modifier = Modifier
+                            .size(220.dp)
+                            .align(Alignment.Center),
+                        color = PrimaryOrangeGradient,
+                        strokeWidth = 8.dp,
+                        trackColor = Color.Transparent,
+                        strokeCap = StrokeCap.Round
+                    )
+                }
+                
+                // Main Button
+                Card(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
+                    colors = CardDefaults.cardColors(
+                        containerColor = PrimaryOrangeGradient
+                    ),
+                    shape = RoundedCornerShape(topStart = 150.dp, topEnd = 150.dp, bottomStart = 0.dp, bottomEnd = 0.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.BottomCenter
+                    ) {
+                        // Content positioned at bottom
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Bottom,
+                            modifier = Modifier.padding(bottom = 24.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.AttachMoney,
+                                contentDescription = "Cash Out",
+                                tint = Color.White,
+                                modifier = Modifier.size(40.dp)
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            
+                            if (isHolding) {
+                                // Show percentage in center when holding
+                                Text(
+                                    text = "${(progress * 100).toInt()}%",
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center
+                                )
+                            } else {
+                                // Show normal text when not holding
+                                Text(
+                                    text = "Tap and hold for Cash Out",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                }
             }
             
-            Spacer(modifier = Modifier.height(80.dp))
+            Spacer(modifier = Modifier.height(0.dp))
         }
     }
 }
@@ -254,13 +251,11 @@ fun CashOutConfirmScreen(
 fun CashOutConfirmScreenPreview() {
     SmartCitizenClubTheme {
         CashOutConfirmScreen(
-            provider = CashOutProvider(
-                id = "1",
-                name = "bKash"
-            ),
+            mobileNumber = "01533619640",
             amount = 1000.0,
+            reference = "Cash out for expenses",
             onBackClick = {},
-            onConfirmClick = {}
+            onCashOutComplete = {}
         )
     }
 }

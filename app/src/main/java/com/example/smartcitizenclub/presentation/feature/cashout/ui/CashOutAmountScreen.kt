@@ -1,9 +1,8 @@
 package com.example.smartcitizenclub.presentation.feature.cashout.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -12,7 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -20,25 +18,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CashOutAmountScreen(
-    provider: CashOutProvider,
+    mobileNumber: String,
     onBackClick: () -> Unit,
     onAmountEntered: (Double) -> Unit = {}
 ) {
     var amount by remember { mutableStateOf("") }
-    
-    // Quick amount buttons
-    val quickAmounts = listOf("500", "1000", "2000", "5000")
     
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Top Bar with Red Background
+        // Top Bar with Orange Background
         TopAppBar(
             title = {
                 Text(
@@ -58,177 +54,198 @@ fun CashOutAmountScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFFE53E3E) // Red color
+                containerColor = PrimaryOrangeGradient
             ),
             modifier = Modifier.statusBarsPadding()
         )
         
         // Main Content
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             
-            // Provider Info
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Color.Gray.copy(alpha = 0.3f)),
-                        contentAlignment = Alignment.Center
+            // Mobile Number Display
+            item {
+                Column {
+                    Text(
+                        text = "To",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            Icons.Default.AccountBalance,
-                            contentDescription = "Provider",
-                            tint = Color.Gray,
-                            modifier = Modifier.size(24.dp)
+                            Icons.Default.Phone,
+                            contentDescription = "Phone",
+                            tint = PrimaryOrangeGradient,
+                            modifier = Modifier.size(20.dp)
                         )
-                    }
-                    
-                    Spacer(modifier = Modifier.width(12.dp))
-                    
-                    Column {
+                        
+                        Spacer(modifier = Modifier.width(12.dp))
+                        
                         Text(
-                            text = provider.name,
+                            text = mobileNumber,
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            color = Color.Black,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
             }
             
             // Amount Input Section
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Enter Amount",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Amount Display
-                Text(
-                    text = if (amount.isEmpty()) "৳0.00" else "৳${amount}.00",
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFE53E3E)
-                )
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                // Amount Input Field
-                OutlinedTextField(
-                    value = amount,
-                    onValueChange = { newAmount ->
-                        // Only allow numeric input
-                        if (newAmount.all { it.isDigit() } && newAmount.length <= 6) {
-                            amount = newAmount
-                        }
-                    },
-                    placeholder = {
-                        Text(
-                            text = "Enter amount",
-                            fontSize = 16.sp,
-                            color = Color.Gray
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFFE53E3E),
-                        unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                    ),
-                    leadingIcon = {
+            item {
+                Column {
+                    Text(
+                        text = "Amount",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = "৳",
-                            fontSize = 18.sp,
-                            color = Color.Gray
+                            fontSize = 20.sp,
+                            color = PrimaryOrangeGradient,
+                            fontWeight = FontWeight.Bold
+                        )
+                        
+                        Spacer(modifier = Modifier.width(8.dp))
+                        
+                        OutlinedTextField(
+                            value = amount,
+                            onValueChange = { newValue ->
+                                // Allow only numbers and decimal point
+                                if (newValue.matches(Regex("^\\d*\\.?\\d*$")) && newValue.length <= 10) {
+                                    amount = newValue
+                                }
+                            },
+                            placeholder = {
+                                Text(
+                                    text = "0.00",
+                                    fontSize = 16.sp,
+                                    color = Color.Gray
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Decimal
+                            ),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = PrimaryOrangeGradient,
+                                unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
+                            ),
+                            shape = RoundedCornerShape(12.dp)
                         )
                     }
-                )
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                // Quick Amount Buttons
-                Text(
-                    text = "Quick Amount",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Gray
-                )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    quickAmounts.forEach { quickAmount ->
-                        Button(
-                            onClick = { amount = quickAmount },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Gray.copy(alpha = 0.1f)
-                            ),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = "৳$quickAmount",
-                                fontSize = 14.sp,
-                                color = Color.Black
-                            )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Text(
+                        text = "Enter amount to cash out",
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
+            
+            // Quick Amount Buttons
+            item {
+                Column {
+                    Text(
+                        text = "Quick Amount",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black
+                    )
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val quickAmounts = listOf("100", "500", "1000", "2000")
+                        
+                        quickAmounts.forEach { quickAmount ->
+                            OutlinedButton(
+                                onClick = { amount = quickAmount },
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(48.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = PrimaryOrangeGradient
+                                ),
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp, 
+                                    PrimaryOrangeGradient
+                                ),
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = "৳$quickAmount",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    maxLines = 1
+                                )
+                            }
                         }
                     }
                 }
             }
             
-            Spacer(modifier = Modifier.weight(1f))
-            
-            // Continue Button
-            Button(
-                onClick = { 
-                    val amountValue = amount.toDoubleOrNull() ?: 0.0
-                    onAmountEntered(amountValue)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE53E3E)
-                ),
-                shape = RoundedCornerShape(25.dp),
-                enabled = amount.isNotEmpty() && amount.toDoubleOrNull() != null && amount.toDoubleOrNull()!! > 0
-            ) {
-                Text(
-                    text = "Continue",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
             }
             
-            Spacer(modifier = Modifier.height(80.dp))
+            // Continue Button
+            item {
+                Button(
+                    onClick = {
+                        val amountValue = amount.toDoubleOrNull()
+                        if (amountValue != null && amountValue > 0) {
+                            onAmountEntered(amountValue)
+                        }
+                    },
+                    enabled = amount.isNotEmpty() && amount.toDoubleOrNull() != null && amount.toDoubleOrNull()!! > 0,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = PrimaryOrangeGradient
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Continue",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+            }
+            
+            item {
+                Spacer(modifier = Modifier.height(32.dp))
+            }
         }
     }
 }
@@ -238,10 +255,7 @@ fun CashOutAmountScreen(
 fun CashOutAmountScreenPreview() {
     SmartCitizenClubTheme {
         CashOutAmountScreen(
-            provider = CashOutProvider(
-                id = "1",
-                name = "bKash"
-            ),
+            mobileNumber = "01533619640",
             onBackClick = {},
             onAmountEntered = {}
         )

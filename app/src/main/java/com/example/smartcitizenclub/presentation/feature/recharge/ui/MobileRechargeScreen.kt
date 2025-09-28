@@ -1,5 +1,7 @@
 package com.example.smartcitizenclub.presentation.feature.recharge.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,39 +25,113 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
+import com.example.smartcitizenclub.presentation.feature.sendmoney.ui.Contact
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import android.content.SharedPreferences
+import org.json.JSONArray
+import org.json.JSONObject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MobileRechargeScreen(
     onBackClick: () -> Unit,
-    onOperatorClick: (MobileOperator) -> Unit = {}
+    onNumberEntered: (String) -> Unit = {}
 ) {
-    var phoneNumber by remember { mutableStateOf("") }
+    var numberInput by remember { mutableStateOf("") }
+    var savedNumbers by remember { mutableStateOf<List<Contact>>(emptyList()) }
     
-    // Sample mobile operators
-    val recentOperators = remember {
+    val context = LocalContext.current
+    
+    // Sample recent numbers
+    val recentNumbers = remember {
         listOf(
-            MobileOperator("1", "Grameenphone"),
-            MobileOperator("2", "Robi")
+            Contact("1", "01741736354", "01741736354", isRecent = true),
+            Contact("2", "01912345678", "01912345678", isRecent = true)
         )
     }
     
-    val favoriteOperators = remember {
-        listOf(
-            MobileOperator("3", "Banglalink"),
-            MobileOperator("4", "Airtel")
-        )
+    // Function to load saved numbers from SharedPreferences
+    fun loadSavedNumbers(): List<Contact> {
+        val prefs: SharedPreferences = context.getSharedPreferences("mobile_recharge_saved", android.content.Context.MODE_PRIVATE)
+        val savedNumbersJson = prefs.getString("saved_numbers", "[]")
+        val savedNumbersList = mutableListOf<Contact>()
+        
+        try {
+            val jsonArray = JSONArray(savedNumbersJson)
+            for (i in 0 until jsonArray.length()) {
+                val jsonObject = jsonArray.getJSONObject(i)
+                val contact = Contact(
+                    id = jsonObject.getString("id"),
+                    name = jsonObject.getString("name"),
+                    phoneNumber = jsonObject.getString("phoneNumber"),
+                    isRecent = false,
+                    isFavorite = true
+                )
+                savedNumbersList.add(contact)
+            }
+        } catch (e: Exception) {
+            // If there's an error, return empty list
+        }
+        
+        return savedNumbersList
     }
     
-    val allOperators = remember {
-        listOf(
-            MobileOperator("5", "Grameenphone"),
-            MobileOperator("6", "Robi"),
-            MobileOperator("7", "Banglalink"),
-            MobileOperator("8", "Airtel"),
-            MobileOperator("9", "Teletalk")
-        )
+    // Function to save a number to SharedPreferences
+    fun saveNumber(phoneNumber: String, name: String = phoneNumber) {
+        val prefs: SharedPreferences = context.getSharedPreferences("mobile_recharge_saved", android.content.Context.MODE_PRIVATE)
+        val currentSaved = loadSavedNumbers().toMutableList()
+        
+        // Check if number already exists
+        val existingIndex = currentSaved.indexOfFirst { it.phoneNumber == phoneNumber }
+        if (existingIndex != -1) {
+            // Update existing
+            currentSaved[existingIndex] = Contact(
+                id = currentSaved[existingIndex].id,
+                name = name,
+                phoneNumber = phoneNumber,
+                isRecent = false,
+                isFavorite = true
+            )
+        } else {
+            // Add new
+            val newContact = Contact(
+                id = System.currentTimeMillis().toString(),
+                name = name,
+                phoneNumber = phoneNumber,
+                isRecent = false,
+                isFavorite = true
+            )
+            currentSaved.add(newContact)
+        }
+        
+        // Save to SharedPreferences
+        val jsonArray = JSONArray()
+        currentSaved.forEach { contact ->
+            val jsonObject = JSONObject()
+            jsonObject.put("id", contact.id)
+            jsonObject.put("name", contact.name)
+            jsonObject.put("phoneNumber", contact.phoneNumber)
+            jsonArray.put(jsonObject)
+        }
+        
+        prefs.edit().putString("saved_numbers", jsonArray.toString()).apply()
+        
+        // Update the state
+        savedNumbers = currentSaved
+    }
+    
+    // Load saved numbers from device storage
+    LaunchedEffect(Unit) {
+        savedNumbers = loadSavedNumbers()
+    }
+    
+    fun handleNumberInput(number: String) {
+        if (number.length == 11) {
+            // Save the number to saved numbers when used
+            saveNumber(number)
+            onNumberEntered(number)
+        }
     }
     
     Column(
@@ -62,7 +139,7 @@ fun MobileRechargeScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Top Bar with Red Background
+        // Top Bar with Orange Background
         TopAppBar(
             title = {
                 Text(
@@ -82,7 +159,7 @@ fun MobileRechargeScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFFE53E3E) // Red color
+                containerColor = PrimaryOrangeGradient
             ),
             modifier = Modifier.statusBarsPadding()
         )
@@ -102,7 +179,7 @@ fun MobileRechargeScreen(
             item {
                 Column {
                     Text(
-                        text = "Phone Number",
+                        text = "Mobile Number",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.Black
@@ -110,66 +187,65 @@ fun MobileRechargeScreen(
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    Row(
+                    OutlinedTextField(
+                        value = numberInput,
+                        onValueChange = { newValue ->
+                            if (newValue.length <= 11 && newValue.all { it.isDigit() }) {
+                                numberInput = newValue
+                            }
+                        },
+                        placeholder = {
+                            Text(
+                                text = "01XXXXXXXXX",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.Phone,
-                            contentDescription = "Phone",
-                            tint = Color(0xFFE53E3E),
-                            modifier = Modifier.size(20.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
-                        OutlinedTextField(
-                            value = phoneNumber,
-                            onValueChange = { newValue ->
-                                // Allow only digits and limit to 11 characters
-                                if (newValue.all { it.isDigit() } && newValue.length <= 11) {
-                                    phoneNumber = newValue
-                                }
-                            },
-                            placeholder = {
-                                Text(
-                                    text = "Enter 11-digit Mobile Number",
-                                    fontSize = 14.sp,
-                                    color = Color.Gray
-                                )
-                            },
-                            modifier = Modifier.weight(1f),
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFFE53E3E),
-                                unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                            ),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-                        )
-                        
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
-                        // Send Button
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(Color.Gray)
-                                .clickable { /* Handle send action */ },
-                            contentAlignment = Alignment.Center
-                        ) {
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryOrangeGradient,
+                            unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
+                        ),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        leadingIcon = {
                             Icon(
-                                Icons.Default.ArrowForward,
-                                contentDescription = "Send",
-                                tint = Color.White,
+                                Icons.Default.Phone,
+                                contentDescription = "Phone",
+                                tint = PrimaryOrangeGradient,
                                 modifier = Modifier.size(20.dp)
                             )
+                        },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = {
+                                    handleNumberInput(numberInput)
+                                },
+                                enabled = numberInput.length == 11
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (numberInput.length == 11) PrimaryOrangeGradient else Color.Gray.copy(alpha = 0.3f)
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        Icons.Default.ArrowForward,
+                                        contentDescription = "Continue",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
                         }
-                    }
+                    )
                 }
             }
             
-            // Recent Operators Section
+            // Recent Numbers Section
             item {
                 Column {
                     Text(
@@ -181,24 +257,24 @@ fun MobileRechargeScreen(
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    recentOperators.forEach { operator ->
-                        OperatorItem(
-                            operator = operator,
-                            onClick = { onOperatorClick(operator) }
+                    recentNumbers.forEach { contact ->
+                        ContactItem(
+                            contact = contact,
+                            onClick = { handleNumberInput(contact.phoneNumber) }
                         )
                         
-                        if (operator != recentOperators.last()) {
+                        if (contact != recentNumbers.last()) {
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
             }
             
-            // Favourites Section
+            // Saved Numbers Section
             item {
                 Column {
                     Text(
-                        text = "Favourites",
+                        text = "Saved Numbers",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
@@ -206,43 +282,19 @@ fun MobileRechargeScreen(
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    favoriteOperators.forEach { operator ->
-                        OperatorItem(
-                            operator = operator,
-                            onClick = { onOperatorClick(operator) }
+                    savedNumbers.forEach { contact ->
+                        ContactItem(
+                            contact = contact,
+                            onClick = { handleNumberInput(contact.phoneNumber) }
                         )
                         
-                        if (operator != favoriteOperators.last()) {
+                        if (contact != savedNumbers.last()) {
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
             }
             
-            // All Operators Section
-            item {
-                Column {
-                    Text(
-                        text = "All Operators",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    allOperators.forEach { operator ->
-                        OperatorItem(
-                            operator = operator,
-                            onClick = { onOperatorClick(operator) }
-                        )
-                        
-                        if (operator != allOperators.last()) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }
-                }
-            }
             
             // Bottom spacing
             item {
@@ -253,8 +305,8 @@ fun MobileRechargeScreen(
 }
 
 @Composable
-private fun OperatorItem(
-    operator: MobileOperator,
+private fun ContactItem(
+    contact: Contact,
     onClick: () -> Unit
 ) {
     Row(
@@ -269,28 +321,43 @@ private fun OperatorItem(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(Color.Gray.copy(alpha = 0.3f)),
+                .background(PrimaryOrangeGradient.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 Icons.Default.Phone,
-                contentDescription = "Operator",
-                tint = Color.Gray,
+                contentDescription = "Contact",
+                tint = PrimaryOrangeGradient,
                 modifier = Modifier.size(24.dp)
             )
         }
         
         Spacer(modifier = Modifier.width(12.dp))
         
-        // Operator Info
+        // Contact Info
         Column {
             Text(
-                text = operator.name,
+                text = contact.name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.Black
             )
+            Text(
+                text = contact.phoneNumber,
+                fontSize = 14.sp,
+                color = Color.Gray
+            )
         }
+        
+        Spacer(modifier = Modifier.weight(1f))
+        
+        // Arrow icon
+        Icon(
+            Icons.Default.ArrowForward,
+            contentDescription = "Select",
+            tint = Color.Gray,
+            modifier = Modifier.size(20.dp)
+        )
     }
 }
 
@@ -300,7 +367,7 @@ fun MobileRechargeScreenPreview() {
     SmartCitizenClubTheme {
         MobileRechargeScreen(
             onBackClick = {},
-            onOperatorClick = {}
+            onNumberEntered = {}
         )
     }
 }

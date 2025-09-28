@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +41,8 @@ import com.example.smartcitizenclub.presentation.feature.packages.ui.*
 import com.example.smartcitizenclub.presentation.feature.loan.ui.*
 import com.example.smartcitizenclub.presentation.feature.payments.ui.*
 import com.example.smartcitizenclub.presentation.feature.sendmoney.ui.Contact
+import com.example.smartcitizenclub.presentation.feature.sendmoney.ui.ConfirmSendMoneyScreen
+import com.example.smartcitizenclub.presentation.feature.sendmoney.ui.SendMoneySuccessScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,28 +62,47 @@ fun BottomNavigation(
     var showChatScreen by remember { mutableStateOf(false) }
     var selectedChat by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.messages.ui.Chat?>(null) }
     
+    // QR Scan navigation states
+    var showQRScan by remember { mutableStateOf(false) }
+    
     // Send Money navigation states
     var showSendMoney by remember { mutableStateOf(false) }
     var showSendMoneyAmount by remember { mutableStateOf(false) }
     var showSendMoneyConfirm by remember { mutableStateOf(false) }
+    var showSendMoneySuccess by remember { mutableStateOf(false) }
     var showFinalConfirm by remember { mutableStateOf(false) }
     var selectedContact by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.sendmoney.ui.Contact?>(null) }
     var selectedAmount by remember { mutableStateOf(0.0) }
+    var selectedReference by remember { mutableStateOf<String?>(null) }
     
     // Cash Out navigation states
     var showCashOut by remember { mutableStateOf(false) }
     var showCashOutAmount by remember { mutableStateOf(false) }
+    var showCashOutPin by remember { mutableStateOf(false) }
     var showCashOutConfirm by remember { mutableStateOf(false) }
-    var selectedProvider by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.cashout.ui.CashOutProvider?>(null) }
+    var showCashOutSuccess by remember { mutableStateOf(false) }
+    var cashOutMobileNumber by remember { mutableStateOf("") }
     var cashOutAmount by remember { mutableStateOf(0.0) }
+    var cashOutReference by remember { mutableStateOf<String?>(null) }
+    
+    // Add Money navigation states
+    var showAddMoney by remember { mutableStateOf(false) }
+    
+    // Transfer Money navigation states
+    var showTransferMoney by remember { mutableStateOf(false) }
+    
+    // Limit Upgrade navigation states
+    var showLimitUpgrade by remember { mutableStateOf(false) }
     
     // Mobile Recharge navigation states
     var showMobileRecharge by remember { mutableStateOf(false) }
     var showMobileRechargeAmount by remember { mutableStateOf(false) }
+    var showMobileRechargePin by remember { mutableStateOf(false) }
     var showMobileRechargeConfirm by remember { mutableStateOf(false) }
-    var selectedOperator by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.recharge.ui.MobileOperator?>(null) }
+    var showMobileRechargeSuccess by remember { mutableStateOf(false) }
     var rechargePhoneNumber by remember { mutableStateOf("") }
     var rechargeAmount by remember { mutableStateOf(0.0) }
+    var rechargeReference by remember { mutableStateOf<String?>(null) }
     
     // Contact Us navigation states
     var showContactUs by remember { mutableStateOf(false) }
@@ -88,18 +110,21 @@ fun BottomNavigation(
     var showTicketDetails by remember { mutableStateOf(false) }
     var selectedTicket by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.contact.ui.SupportTicket?>(null) }
     
-    // Limit and Charges navigation states
-    var showLimitCharges by remember { mutableStateOf(false) }
-    
     // Donation navigation states
     var showDonation by remember { mutableStateOf(false) }
     var showDonationHistory by remember { mutableStateOf(false) }
     var selectedCampaign by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.donation.ui.DonationCampaign?>(null) }
     
-    // Package Purchase navigation states
-    var showPackagePurchase by remember { mutableStateOf(false) }
-    var showPackageConfirm by remember { mutableStateOf(false) }
-    var selectedPackage by remember { mutableStateOf<Package?>(null) }
+    // Charge and Limit navigation states
+    var showChargeLimit by remember { mutableStateOf(false) }
+    
+    // Investment navigation states
+    var showInvestment by remember { mutableStateOf(false) }
+    var showInvestmentAmount by remember { mutableStateOf(false) }
+    var showInvestmentPin by remember { mutableStateOf(false) }
+    var showInvestmentSuccess by remember { mutableStateOf(false) }
+    var selectedInvestmentOption by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.investment.ui.InvestmentOption?>(null) }
+    var investmentAmount by remember { mutableStateOf(0.0) }
     
     // Loan navigation states
     var showLoan by remember { mutableStateOf(false) }
@@ -137,24 +162,35 @@ fun BottomNavigation(
                 !showNewGroup && 
                 !showNewContact && 
                 !showChatScreen && 
+                !showQRScan &&
                 !showSendMoney && 
                 !showSendMoneyAmount && 
                 !showSendMoneyConfirm && 
+                !showSendMoneySuccess &&
                 !showFinalConfirm && 
                 !showCashOut && 
                 !showCashOutAmount && 
-                !showCashOutConfirm && 
+                !showCashOutPin &&
+                !showCashOutConfirm &&
+                !showCashOutSuccess && 
+                !showAddMoney &&
+                !showTransferMoney &&
+                !showLimitUpgrade &&
                 !showMobileRecharge && 
                 !showMobileRechargeAmount && 
-                !showMobileRechargeConfirm && 
+                !showMobileRechargePin &&
+                !showMobileRechargeConfirm &&
+                !showMobileRechargeSuccess && 
                 !showContactUs && 
                 !showTicketList && 
                 !showTicketDetails && 
-                !showLimitCharges && 
                 !showDonation && 
                 !showDonationHistory && 
-                !showPackagePurchase && 
-                !showPackageConfirm && 
+                !showChargeLimit && 
+                !showInvestment && 
+                !showInvestmentAmount && 
+                !showInvestmentPin && 
+                !showInvestmentSuccess && 
                 !showLoan && 
                 !showLoanAmount && 
                 !showLoanConfirm && 
@@ -300,6 +336,29 @@ fun BottomNavigation(
                         )
                     }
                 }
+                showQRScan -> {
+                        com.example.smartcitizenclub.presentation.feature.qrscan.ui.QRScanScreen(
+                            onBackClick = { showQRScan = false },
+                            onQRCodeScanned = { qrData ->
+                                // Handle scanned QR code data
+                                // For now, just close the scanner
+                                showQRScan = false
+                                // TODO: Process QR code data based on content
+                            },
+                            onSendMoneyClick = { qrData ->
+                                // Navigate to send money with QR data
+                                showQRScan = false
+                                showSendMoney = true
+                                // TODO: Pass QR data to send money flow
+                            },
+                            onCashOutClick = { qrData ->
+                                // Navigate to cash out with QR data
+                                showQRScan = false
+                                showCashOut = true
+                                // TODO: Pass QR data to cash out flow
+                            }
+                        )
+                    }
                 showSendMoney -> {
                     com.example.smartcitizenclub.presentation.feature.sendmoney.ui.SendMoneyScreen(
                         onBackClick = { showSendMoney = false },
@@ -340,8 +399,9 @@ fun BottomNavigation(
                             contact = contact,
                             amount = selectedAmount,
                             onBackClick = { showSendMoneyConfirm = false },
-                            onConfirmClick = { pin ->
-                                // Navigate to final confirm screen
+                            onConfirmClick = { pin, reference ->
+                                // Store reference and navigate to final confirm screen
+                                selectedReference = reference
                                 showSendMoneyConfirm = false
                                 showFinalConfirm = true
                             }
@@ -353,12 +413,35 @@ fun BottomNavigation(
                         com.example.smartcitizenclub.presentation.feature.sendmoney.ui.ConfirmSendMoneyScreen(
                             contact = contact,
                             amount = selectedAmount,
+                            reference = selectedReference,
                             onBackClick = { showFinalConfirm = false },
                             onSendComplete = {
-                                // Transaction completed, reset all states
                                 showFinalConfirm = false
+                                showSendMoneySuccess = true
+                            }
+                        )
+                    }
+                }
+                showSendMoneySuccess -> {
+                    selectedContact?.let { contact ->
+                        com.example.smartcitizenclub.presentation.feature.sendmoney.ui.SendMoneySuccessScreen(
+                            contact = contact,
+                            amount = selectedAmount,
+                            reference = selectedReference,
+                            onBackToHome = {
+                                // Reset all send money states and go to home
+                                showSendMoneySuccess = false
                                 selectedContact = null
                                 selectedAmount = 0.0
+                                selectedReference = null
+                            },
+                            onNewTransaction = {
+                                // Reset all send money states and start new transaction
+                                showSendMoneySuccess = false
+                                selectedContact = null
+                                selectedAmount = 0.0
+                                selectedReference = null
+                                showSendMoney = true
                             }
                         )
                     }
@@ -366,86 +449,196 @@ fun BottomNavigation(
                 showCashOut -> {
                     com.example.smartcitizenclub.presentation.feature.cashout.ui.CashOutScreen(
                         onBackClick = { showCashOut = false },
-                        onProviderClick = { provider ->
-                            selectedProvider = provider
+                        onNumberEntered = { mobileNumber ->
+                            cashOutMobileNumber = mobileNumber
                             showCashOut = false
                             showCashOutAmount = true
                         }
                     )
                 }
                 showCashOutAmount -> {
-                    selectedProvider?.let { provider ->
-                        com.example.smartcitizenclub.presentation.feature.cashout.ui.CashOutAmountScreen(
-                            provider = provider,
-                            onBackClick = { showCashOutAmount = false },
-                            onAmountEntered = { amount ->
-                                cashOutAmount = amount
-                                showCashOutAmount = false
-                                showCashOutConfirm = true
-                            }
-                        )
-                    }
+                    com.example.smartcitizenclub.presentation.feature.cashout.ui.CashOutAmountScreen(
+                        mobileNumber = cashOutMobileNumber,
+                        onBackClick = { showCashOutAmount = false },
+                        onAmountEntered = { amount ->
+                            cashOutAmount = amount
+                            showCashOutAmount = false
+                            showCashOutPin = true
+                        }
+                    )
+                }
+                showCashOutPin -> {
+                    com.example.smartcitizenclub.presentation.feature.cashout.ui.CashOutPinScreen(
+                        mobileNumber = cashOutMobileNumber,
+                        amount = cashOutAmount,
+                        onBackClick = { showCashOutPin = false },
+                        onPinEntered = { pin, reference ->
+                            cashOutReference = reference
+                            showCashOutPin = false
+                            showCashOutConfirm = true
+                        }
+                    )
                 }
                 showCashOutConfirm -> {
-                    selectedProvider?.let { provider ->
-                        com.example.smartcitizenclub.presentation.feature.cashout.ui.CashOutConfirmScreen(
-                            provider = provider,
-                            amount = cashOutAmount,
-                            onBackClick = { showCashOutConfirm = false },
-                            onConfirmClick = { pin ->
-                                // TODO: Process the cash out transaction
-                                showCashOutConfirm = false
-                                selectedProvider = null
-                                cashOutAmount = 0.0
-                            }
-                        )
-                    }
+                    com.example.smartcitizenclub.presentation.feature.cashout.ui.CashOutConfirmScreen(
+                        mobileNumber = cashOutMobileNumber,
+                        amount = cashOutAmount,
+                        reference = cashOutReference,
+                        onBackClick = { showCashOutConfirm = false },
+                        onCashOutComplete = {
+                            showCashOutConfirm = false
+                            showCashOutSuccess = true
+                        }
+                    )
+                }
+                showCashOutSuccess -> {
+                    com.example.smartcitizenclub.presentation.feature.cashout.ui.CashOutSuccessScreen(
+                        mobileNumber = cashOutMobileNumber,
+                        amount = cashOutAmount,
+                        reference = cashOutReference,
+                        onBackToHome = {
+                            // Reset all cashout states and go to home
+                            showCashOutSuccess = false
+                            cashOutMobileNumber = ""
+                            cashOutAmount = 0.0
+                            cashOutReference = null
+                        },
+                        onNewTransaction = {
+                            // Reset all cashout states and start new transaction
+                            showCashOutSuccess = false
+                            cashOutMobileNumber = ""
+                            cashOutAmount = 0.0
+                            cashOutReference = null
+                            showCashOut = true
+                        }
+                    )
+                }
+                showAddMoney -> {
+                    com.example.smartcitizenclub.presentation.feature.addmoney.ui.AddMoneyScreen(
+                        onBackClick = { showAddMoney = false },
+                        onBinanceClick = { 
+                            // TODO: Handle Binance transfer
+                            showAddMoney = false
+                        },
+                        onBkashClick = { 
+                            // TODO: Handle Bkash transfer
+                            showAddMoney = false
+                        },
+                        onNagadClick = { 
+                            // TODO: Handle Nagad transfer
+                            showAddMoney = false
+                        },
+                        onRocketClick = { 
+                            // TODO: Handle Rocket transfer
+                            showAddMoney = false
+                        }
+                    )
+                }
+                showTransferMoney -> {
+                    com.example.smartcitizenclub.presentation.feature.transfermoney.ui.TransferMoneyScreen(
+                        onBackClick = { showTransferMoney = false },
+                        onSccToBinanceClick = { 
+                            // TODO: Handle SCC to Binance transfer
+                            showTransferMoney = false
+                        },
+                        onSccToBkashClick = { 
+                            // TODO: Handle SCC to Bkash transfer
+                            showTransferMoney = false
+                        },
+                        onSccToNagadClick = { 
+                            // TODO: Handle SCC to Nagad transfer
+                            showTransferMoney = false
+                        },
+                        onSccToRocketClick = { 
+                            // TODO: Handle SCC to Rocket transfer
+                            showTransferMoney = false
+                        }
+                    )
+                }
+                showLimitUpgrade -> {
+                    com.example.smartcitizenclub.presentation.feature.limitupgrade.ui.LimitUpgradeScreen(
+                        onBackClick = { showLimitUpgrade = false },
+                        onBasicUpgradeClick = { 
+                            // TODO: Handle Basic upgrade
+                            showLimitUpgrade = false
+                        },
+                        onPremiumUpgradeClick = { 
+                            // TODO: Handle Premium upgrade
+                            showLimitUpgrade = false
+                        },
+                        onGoldUpgradeClick = { 
+                            // TODO: Handle Gold upgrade
+                            showLimitUpgrade = false
+                        },
+                        onPlatinumUpgradeClick = { 
+                            // TODO: Handle Platinum upgrade
+                            showLimitUpgrade = false
+                        }
+                    )
                 }
                 showMobileRecharge -> {
                     com.example.smartcitizenclub.presentation.feature.recharge.ui.MobileRechargeScreen(
                         onBackClick = { showMobileRecharge = false },
-                        onOperatorClick = { operator ->
-                            selectedOperator = operator
+                        onNumberEntered = { phoneNumber ->
+                            rechargePhoneNumber = phoneNumber
                             showMobileRecharge = false
                             showMobileRechargeAmount = true
                         }
                     )
                 }
                 showMobileRechargeAmount -> {
-                    selectedOperator?.let { operator ->
-                        com.example.smartcitizenclub.presentation.feature.recharge.ui.MobileRechargeAmountScreen(
-                            operator = operator,
-                            phoneNumber = rechargePhoneNumber,
-                            onBackClick = { showMobileRechargeAmount = false },
-                            onAmountEntered = { amount ->
-                                rechargeAmount = amount
-                                showMobileRechargeAmount = false
-                                showMobileRechargeConfirm = true
-                            },
-                            onPackageSelected = { pkg ->
-                                rechargeAmount = pkg.amount
-                                showMobileRechargeAmount = false
-                                showMobileRechargeConfirm = true
-                            }
-                        )
-                    }
+                    com.example.smartcitizenclub.presentation.feature.recharge.ui.MobileRechargeAmountScreen(
+                        phoneNumber = rechargePhoneNumber,
+                        onBackClick = { showMobileRechargeAmount = false },
+                        onAmountEntered = { amount ->
+                            rechargeAmount = amount
+                            showMobileRechargeAmount = false
+                            showMobileRechargePin = true
+                        }
+                    )
+                }
+                showMobileRechargePin -> {
+                    com.example.smartcitizenclub.presentation.feature.recharge.ui.MobileRechargePinScreen(
+                        phoneNumber = rechargePhoneNumber,
+                        amount = rechargeAmount,
+                        onBackClick = { showMobileRechargePin = false },
+                        onPinEntered = { pin ->
+                            showMobileRechargePin = false
+                            showMobileRechargeConfirm = true
+                        }
+                    )
                 }
                 showMobileRechargeConfirm -> {
-                    selectedOperator?.let { operator ->
-                        com.example.smartcitizenclub.presentation.feature.recharge.ui.MobileRechargeConfirmScreen(
-                            operator = operator,
-                            phoneNumber = rechargePhoneNumber,
-                            amount = rechargeAmount,
-                            onBackClick = { showMobileRechargeConfirm = false },
-                            onConfirmClick = { pin ->
-                                // TODO: Process the mobile recharge transaction
-                                showMobileRechargeConfirm = false
-                                selectedOperator = null
-                                rechargePhoneNumber = ""
-                                rechargeAmount = 0.0
-                            }
-                        )
-                    }
+                    com.example.smartcitizenclub.presentation.feature.recharge.ui.MobileRechargeConfirmScreen(
+                        phoneNumber = rechargePhoneNumber,
+                        amount = rechargeAmount,
+                        onBackClick = { showMobileRechargeConfirm = false },
+                        onRechargeComplete = {
+                            showMobileRechargeConfirm = false
+                            showMobileRechargeSuccess = true
+                        }
+                    )
+                }
+                showMobileRechargeSuccess -> {
+                    com.example.smartcitizenclub.presentation.feature.recharge.ui.MobileRechargeSuccessScreen(
+                        phoneNumber = rechargePhoneNumber,
+                        amount = rechargeAmount,
+                        onBackToHome = {
+                            // Reset all mobile recharge states and go to home
+                            showMobileRechargeSuccess = false
+                            rechargePhoneNumber = ""
+                            rechargeAmount = 0.0
+                            rechargeReference = null
+                        },
+                        onNewTransaction = {
+                            // Reset all mobile recharge states and start new transaction
+                            showMobileRechargeSuccess = false
+                            rechargePhoneNumber = ""
+                            rechargeAmount = 0.0
+                            rechargeReference = null
+                            showMobileRecharge = true
+                        }
+                    )
                 }
                 showContactUs -> {
                     com.example.smartcitizenclub.presentation.feature.contact.ui.ContactUsScreen(
@@ -482,12 +675,6 @@ fun BottomNavigation(
                         )
                     }
                 }
-                showLimitCharges -> {
-                    com.example.smartcitizenclub.presentation.feature.limits.ui.LimitChargesScreen(
-                        user = user,
-                        onBackClick = { showLimitCharges = false }
-                    )
-                }
                 showDonation -> {
                     com.example.smartcitizenclub.presentation.feature.donation.ui.DonationScreen(
                         user = user,
@@ -510,25 +697,65 @@ fun BottomNavigation(
                         }
                     )
                 }
-                showPackagePurchase -> {
-                    PackagePurchaseScreen(
-                        onBackClick = { showPackagePurchase = false },
-                        onPackageSelected = { pkg ->
-                            selectedPackage = pkg
-                            showPackagePurchase = false
-                            showPackageConfirm = true
+                showChargeLimit -> {
+                    com.example.smartcitizenclub.presentation.feature.chargelimit.ui.ChargeLimitScreen(
+                        user = user,
+                        onBackClick = { showChargeLimit = false }
+                    )
+                }
+                showInvestment -> {
+                    com.example.smartcitizenclub.presentation.feature.investment.ui.InvestmentScreen(
+                        user = user,
+                        onBackClick = { showInvestment = false },
+                        onInvestmentSelected = { option ->
+                            selectedInvestmentOption = option
+                            showInvestment = false
+                            showInvestmentAmount = true
                         }
                     )
                 }
-                showPackageConfirm -> {
-                    selectedPackage?.let { pkg ->
-                        PackageConfirmScreen(
-                            pkg = pkg,
-                            onBackClick = { showPackageConfirm = false },
-                            onConfirmClick = { paymentMethod, pin ->
-                                // TODO: Process the package purchase transaction
-                                showPackageConfirm = false
-                                selectedPackage = null
+                showInvestmentAmount -> {
+                    selectedInvestmentOption?.let { option ->
+                        com.example.smartcitizenclub.presentation.feature.investment.ui.InvestmentAmountScreen(
+                            option = option,
+                            onBackClick = { showInvestmentAmount = false },
+                            onAmountEntered = { amount ->
+                                investmentAmount = amount
+                                showInvestmentAmount = false
+                                showInvestmentPin = true
+                            }
+                        )
+                    }
+                }
+                showInvestmentPin -> {
+                    selectedInvestmentOption?.let { option ->
+                        com.example.smartcitizenclub.presentation.feature.investment.ui.InvestmentPinScreen(
+                            option = option,
+                            amount = investmentAmount,
+                            onBackClick = { showInvestmentPin = false },
+                            onPinEntered = { pin ->
+                                // TODO: Process the investment transaction
+                                showInvestmentPin = false
+                                showInvestmentSuccess = true
+                            }
+                        )
+                    }
+                }
+                showInvestmentSuccess -> {
+                    selectedInvestmentOption?.let { option ->
+                        com.example.smartcitizenclub.presentation.feature.investment.ui.InvestmentSuccessScreen(
+                            option = option,
+                            amount = investmentAmount,
+                            onBackClick = { 
+                                showInvestmentSuccess = false
+                                selectedInvestmentOption = null
+                                investmentAmount = 0.0
+                            },
+                            onViewPortfolioClick = {
+                                // TODO: Navigate to portfolio
+                                showInvestmentSuccess = false
+                                selectedInvestmentOption = null
+                                investmentAmount = 0.0
                             }
                         )
                     }
@@ -665,16 +892,17 @@ fun BottomNavigation(
                 when (selectedScreen) {
                     UserScreen.Home -> HomeScreen(
                         user = user,
+                        onScanQRClick = { showQRScan = true },
                         onSendMoneyClick = { showSendMoney = true },
                         onCashOutClick = { showCashOut = true },
                         onMobileRechargeClick = { showMobileRecharge = true },
-                        onAddMoneyClick = { /* TODO: Handle add money */ },
-                        onTransferMoneyClick = { /* TODO: Handle transfer money */ },
-                        onLimitUpgradeClick = { /* TODO: Handle limit upgrade */ },
-                        onInvestmentClick = { /* TODO: Handle investment */ },
+                        onAddMoneyClick = { showAddMoney = true },
+                        onTransferMoneyClick = { showTransferMoney = true },
+                        onLimitUpgradeClick = { showLimitUpgrade = true },
+                        onInvestmentClick = { showInvestment = true },
                         onLoanClick = { showLoan = true },
                         onContactUsClick = { showContactUs = true },
-                        onLimitChargesClick = { showLimitCharges = true },
+                        onChargeLimitClick = { showChargeLimit = true },
                         onDonationClick = { showDonation = true }
                     )
                     UserScreen.Finance -> FinanceScreen(

@@ -16,12 +16,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
-import com.example.smartcitizenclub.presentation.theme.OrangeGradient
 import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,26 +29,25 @@ import kotlinx.coroutines.delay
 fun ConfirmSendMoneyScreen(
     contact: Contact,
     amount: Double,
+    reference: String? = null,
     onBackClick: () -> Unit,
     onSendComplete: () -> Unit = {}
 ) {
     var isHolding by remember { mutableStateOf(false) }
     var progress by remember { mutableStateOf(0f) }
-    var isCompleted by remember { mutableStateOf(false) }
     
     // Simulate progress when holding
     LaunchedEffect(isHolding) {
-        if (isHolding && !isCompleted) {
+        if (isHolding) {
             while (progress < 1f && isHolding) {
                 delay(50)
                 progress += 0.02f
             }
             if (progress >= 1f) {
-                isCompleted = true
-                delay(1000)
+                // Immediately navigate to success screen
                 onSendComplete()
             }
-        } else if (!isHolding && !isCompleted) {
+        } else {
             progress = 0f
         }
     }
@@ -58,140 +57,180 @@ fun ConfirmSendMoneyScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Top Bar with Close Button
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp)
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Confirm to Send Money",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = PrimaryOrangeGradient,
-                modifier = Modifier.weight(1f)
-            )
-            
-            Spacer(modifier = Modifier.width(16.dp))
-            
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    Icons.Default.Close,
-                    contentDescription = "Close",
-                    tint = Color.Red,
-                    modifier = Modifier.size(24.dp)
+        // Top Bar with Orange Background
+        TopAppBar(
+            title = {
+                Text(
+                    text = "Confirm Send Money",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
                 )
-            }
-        }
+            },
+            navigationIcon = {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = PrimaryOrangeGradient
+            ),
+            modifier = Modifier.statusBarsPadding()
+        )
         
         // Main Content
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Recipient Info
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF4CAF50).copy(alpha = 0.2f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "0",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4CAF50)
-                    )
-                }
-                
-                Spacer(modifier = Modifier.width(16.dp))
-                
-                Column {
-                    Text(
-                        text = contact.phoneNumber,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
-                    )
-                    Text(
-                        text = contact.phoneNumber,
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-            }
+            Spacer(modifier = Modifier.height(16.dp))
             
-            // Transaction Details
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+            // Transaction Details Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                // Left Column - Transaction Info
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // Contact Avatar
+                    Box(
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(CircleShape)
+                            .background(PrimaryOrangeGradient.copy(alpha = 0.1f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = "Contact",
+                            tint = PrimaryOrangeGradient,
+                            modifier = Modifier.size(36.dp)
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Contact Name
                     Text(
-                        text = "Total",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = "৳${String.format("%.2f", amount)}",
-                        fontSize = 18.sp,
+                        text = contact.name,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
+                    // Phone Number
                     Text(
-                        text = "+ No charge",
-                        fontSize = 12.sp,
-                        color = Color(0xFF4CAF50)
+                        text = contact.phoneNumber,
+                        fontSize = 16.sp,
+                        color = Color.Gray
                     )
                     
-                }
-                
-                // Right Column - Balance Info
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.End
-                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Amount
                     Text(
-                        text = "New Balance",
+                        text = "৳${String.format("%.2f", amount)}",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryOrangeGradient
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Text(
+                        text = "Send Money",
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
-                    Text(
-                        text = "৳${String.format("%.2f", 0.67)}",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
+                    
+                    // Reference (if provided)
+                    if (!reference.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Reference",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                            Text(
+                                text = reference,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Transaction Fee (if any)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Transaction Fee",
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                        Text(
+                            text = "৳0.00",
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Divider(color = Color.Gray.copy(alpha = 0.3f))
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Total Amount
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Total Amount",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+                        Text(
+                            text = "৳${String.format("%.2f", amount)}",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+                    }
                 }
             }
             
-            
             Spacer(modifier = Modifier.weight(1f))
             
-            // Tap and Hold Button - Large rounded top corners, square bottom
-            Card(
+            // Tap and Hold Button
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .height(200.dp)
+                    .padding(horizontal = 0.dp)
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onPress = {
@@ -200,87 +239,76 @@ fun ConfirmSendMoneyScreen(
                                 isHolding = false
                             }
                         )
-                    },
-                colors = CardDefaults.cardColors(
-                    containerColor = if (isHolding) PrimaryOrangeGradient.copy(alpha = 0.8f) else PrimaryOrangeGradient
-                ),
-                shape = RoundedCornerShape(topStart = 180.dp, topEnd = 180.dp, bottomStart = 0.dp, bottomEnd = 0.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                    }
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                // Progress Border (when holding)
+                if (isHolding) {
+                    CircularProgressIndicator(
+                        progress = progress,
+                        modifier = Modifier
+                            .size(220.dp)
+                            .align(Alignment.Center),
+                        color = PrimaryOrangeGradient,
+                        strokeWidth = 8.dp,
+                        trackColor = Color.Transparent,
+                        strokeCap = StrokeCap.Round
+                    )
+                }
+                
+                // Main Button
+                Card(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
+                    colors = CardDefaults.cardColors(
+                        containerColor = PrimaryOrangeGradient
+                    ),
+                    shape = RoundedCornerShape(topStart = 150.dp, topEnd = 150.dp, bottomStart = 0.dp, bottomEnd = 0.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
                 ) {
-                    if (isCompleted) {
-                        // Success State
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.BottomCenter
+                    ) {
+                        // Content positioned at bottom
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Icon(
-                                Icons.Default.Check,
-                                contentDescription = "Success",
-                                tint = Color.White,
-                                modifier = Modifier.size(32.dp)
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Money Sent Successfully!",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                            )
-                        }
-                    } else if (isHolding) {
-                        // Holding State
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            CircularProgressIndicator(
-                                progress = progress,
-                                modifier = Modifier.size(40.dp),
-                                color = Color.White,
-                                strokeWidth = 4.dp,
-                                trackColor = Color.White.copy(alpha = 0.3f),
-                                strokeCap = StrokeCap.Round
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "${(progress * 100).toInt()}%",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                            )
-                        }
-                    } else {
-                        // Default State - Icon and text on separate lines
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.Bottom,
+                            modifier = Modifier.padding(bottom = 24.dp)
                         ) {
                             Icon(
                                 Icons.Default.Send,
                                 contentDescription = "Send Money",
                                 tint = Color.White,
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(40.dp)
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Tap and hold for Send Money",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            
+                            if (isHolding) {
+                                // Show percentage in center when holding
+                                Text(
+                                    text = "${(progress * 100).toInt()}%",
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center
+                                )
+                            } else {
+                                // Show normal text when not holding
+                                Text(
+                                    text = "Tap and hold for Send Money",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
                     }
                 }
             }
             
-            Spacer(modifier = Modifier.height(0.dp))
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
@@ -290,12 +318,9 @@ fun ConfirmSendMoneyScreen(
 fun ConfirmSendMoneyScreenPreview() {
     SmartCitizenClubTheme {
         ConfirmSendMoneyScreen(
-            contact = Contact(
-                id = "1",
-                name = "Abdul Malek Koyal Dim",
-                phoneNumber = "01533619640"
-            ),
-            amount = 1.0,
+            contact = Contact("1", "John Doe", "01712345678", "Contact"),
+            amount = 100.0,
+            reference = "Test Reference",
             onBackClick = {},
             onSendComplete = {}
         )

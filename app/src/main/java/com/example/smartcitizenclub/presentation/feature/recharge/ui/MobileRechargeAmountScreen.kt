@@ -21,44 +21,31 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MobileRechargeAmountScreen(
-    operator: MobileOperator,
     phoneNumber: String,
     onBackClick: () -> Unit,
-    onAmountEntered: (Double) -> Unit = {},
-    onPackageSelected: (RechargePackage) -> Unit = {}
+    onAmountEntered: (Double) -> Unit = {}
 ) {
     var amount by remember { mutableStateOf("") }
     
     // Sample quick amounts
     val quickAmounts = listOf("10", "20", "50", "100", "200", "500")
     
-    // Sample recharge packages
-    val rechargePackages = remember {
-        listOf(
-            RechargePackage("1", operator, 10.0, "7 days", "100 MB Data"),
-            RechargePackage("2", operator, 25.0, "30 days", "500 MB Data"),
-            RechargePackage("3", operator, 50.0, "30 days", "1 GB Data"),
-            RechargePackage("4", operator, 100.0, "30 days", "2 GB Data"),
-            RechargePackage("5", operator, 200.0, "30 days", "5 GB Data"),
-            RechargePackage("6", operator, 500.0, "30 days", "15 GB Data")
-        )
-    }
-    
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Top Bar with Red Background
+        // Top Bar with Orange Background
         TopAppBar(
             title = {
                 Text(
-                    text = "Recharge Amount",
+                    text = "Mobile Recharge",
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -74,7 +61,7 @@ fun MobileRechargeAmountScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFFE53E3E) // Red color
+                containerColor = PrimaryOrangeGradient
             ),
             modifier = Modifier.statusBarsPadding()
         )
@@ -90,7 +77,7 @@ fun MobileRechargeAmountScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
             
-            // Operator and Phone Info
+            // Phone Number Info Card
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -108,13 +95,13 @@ fun MobileRechargeAmountScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(CircleShape)
-                                .background(Color.Gray.copy(alpha = 0.3f)),
+                                .background(PrimaryOrangeGradient.copy(alpha = 0.1f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 Icons.Default.Phone,
-                                contentDescription = "Operator",
-                                tint = Color.Gray,
+                                contentDescription = "Phone",
+                                tint = PrimaryOrangeGradient,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -123,7 +110,7 @@ fun MobileRechargeAmountScreen(
                         
                         Column {
                             Text(
-                                text = operator.name,
+                                text = "Mobile Number",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black
@@ -157,7 +144,7 @@ fun MobileRechargeAmountScreen(
                         text = if (amount.isEmpty()) "৳0.00" else "৳${amount}.00",
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE53E3E)
+                        color = PrimaryOrangeGradient
                     )
                     
                     Spacer(modifier = Modifier.height(24.dp))
@@ -182,7 +169,7 @@ fun MobileRechargeAmountScreen(
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFFE53E3E),
+                            focusedBorderColor = PrimaryOrangeGradient,
                             unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
                         ),
                         leadingIcon = {
@@ -213,79 +200,22 @@ fun MobileRechargeAmountScreen(
                         quickAmounts.forEach { quickAmount ->
                             Button(
                                 onClick = { amount = quickAmount },
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(48.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Gray.copy(alpha = 0.1f)
+                                    containerColor = PrimaryOrangeGradient.copy(alpha = 0.1f)
                                 ),
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                             ) {
                                 Text(
                                     text = "৳$quickAmount",
                                     fontSize = 14.sp,
-                                    color = Color.Black
+                                    color = PrimaryOrangeGradient,
+                                    fontWeight = FontWeight.Medium,
+                                    maxLines = 1
                                 )
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Recharge Packages Section
-            item {
-                Column {
-                    Text(
-                        text = "Recharge Packages",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        rechargePackages.forEach { pkg ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { onPackageSelected(pkg) },
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Column {
-                                        Text(
-                                            text = "৳${pkg.amount.toInt()}",
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.Black
-                                        )
-                                        Text(
-                                            text = pkg.description,
-                                            fontSize = 14.sp,
-                                            color = Color.Gray
-                                        )
-                                        Text(
-                                            text = pkg.validity,
-                                            fontSize = 12.sp,
-                                            color = Color.Gray
-                                        )
-                                    }
-                                    
-                                    Icon(
-                                        Icons.Default.ArrowForward,
-                                        contentDescription = "Select",
-                                        tint = Color.Gray
-                                    )
-                                }
                             }
                         }
                     }
@@ -303,7 +233,7 @@ fun MobileRechargeAmountScreen(
                         .fillMaxWidth()
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFE53E3E)
+                        containerColor = PrimaryOrangeGradient
                     ),
                     shape = RoundedCornerShape(25.dp),
                     enabled = amount.isNotEmpty() && amount.toDoubleOrNull() != null && amount.toDoubleOrNull()!! > 0
@@ -327,14 +257,9 @@ fun MobileRechargeAmountScreen(
 fun MobileRechargeAmountScreenPreview() {
     SmartCitizenClubTheme {
         MobileRechargeAmountScreen(
-            operator = MobileOperator(
-                id = "1",
-                name = "Grameenphone"
-            ),
             phoneNumber = "01741736354",
             onBackClick = {},
-            onAmountEntered = {},
-            onPackageSelected = {}
+            onAmountEntered = {}
         )
     }
 }

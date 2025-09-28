@@ -1,10 +1,10 @@
 package com.example.smartcitizenclub.presentation.feature.recharge.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -13,39 +13,54 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.smartcitizenclub.data.User
-import com.example.smartcitizenclub.data.UserType
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MobileRechargeConfirmScreen(
-    operator: MobileOperator,
     phoneNumber: String,
     amount: Double,
     onBackClick: () -> Unit,
-    onConfirmClick: (String) -> Unit = {} // PIN parameter
+    onRechargeComplete: () -> Unit = {}
 ) {
-    var pin by remember { mutableStateOf("") }
-    var showPin by remember { mutableStateOf(false) }
+    var isHolding by remember { mutableStateOf(false) }
+    var progress by remember { mutableStateOf(0f) }
+    
+    // Simulate progress when holding
+    LaunchedEffect(isHolding) {
+        if (isHolding) {
+            while (progress < 1f && isHolding) {
+                delay(50)
+                progress += 0.02f
+            }
+            if (progress >= 1f) {
+                // Immediately navigate to success screen
+                onRechargeComplete()
+            }
+        } else {
+            progress = 0f
+        }
+    }
     
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Top Bar with Red Background
+        // Top Bar with Orange Background
         TopAppBar(
             title = {
                 Text(
-                    text = "Confirm Recharge",
+                    text = "Mobile Recharge",
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -61,89 +76,71 @@ fun MobileRechargeConfirmScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFFE53E3E) // Red color
+                containerColor = PrimaryOrangeGradient
             ),
             modifier = Modifier.statusBarsPadding()
         )
         
         // Main Content
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             
             // Transaction Details Card
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(20.dp)
                 ) {
-                    // Operator Info
+                    // Amount
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .clip(CircleShape)
-                                .background(Color.Gray.copy(alpha = 0.3f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Default.Phone,
-                                contentDescription = "Operator",
-                                tint = Color.Gray,
-                                modifier = Modifier.size(30.dp)
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.width(16.dp))
-                        
-                        Column {
-                            Text(
-                                text = operator.name,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                            Text(
-                                text = phoneNumber,
-                                fontSize = 14.sp,
-                                color = Color.Gray
-                            )
-                        }
+                        Text(
+                            text = "Amount",
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                        Text(
+                            text = "৳${String.format("%.2f", amount)}",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryOrangeGradient
+                        )
                     }
                     
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                     
-                    // Amount
-                    Text(
-                        text = "Recharge Amount",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
+                    // Mobile Number
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Mobile Number",
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                        Text(
+                            text = phoneNumber,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Black
+                        )
+                    }
                     
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                     
-                    Text(
-                        text = "৳${String.format("%.2f", amount)}",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE53E3E)
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Transaction Fee (if any)
+                    // Transaction Fee
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -187,70 +184,88 @@ fun MobileRechargeConfirmScreen(
                 }
             }
             
-            // PIN Input Section
-            Column {
-                Text(
-                    text = "Enter PIN to Confirm",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Black
-                )
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                OutlinedTextField(
-                    value = pin,
-                    onValueChange = { pin = it },
-                    placeholder = {
-                        Text(
-                            text = "Enter 4-digit PIN",
-                            fontSize = 14.sp,
-                            color = Color.Gray
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    visualTransformation = if (showPin) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFFE53E3E),
-                        unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                    ),
-                    trailingIcon = {
-                        IconButton(onClick = { showPin = !showPin }) {
-                            Icon(
-                                if (showPin) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                contentDescription = if (showPin) "Hide PIN" else "Show PIN",
-                                tint = Color.Gray
-                            )
-                        }
-                    }
-                )
-            }
-            
             Spacer(modifier = Modifier.weight(1f))
             
-            // Confirm Button
-            Button(
-                onClick = { onConfirmClick(pin) },
+            // Tap and Hold Button
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE53E3E)
-                ),
-                shape = RoundedCornerShape(25.dp),
-                enabled = pin.length == 4
+                    .height(200.dp)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onPress = {
+                                isHolding = true
+                                tryAwaitRelease()
+                                isHolding = false
+                            }
+                        )
+                    }
             ) {
-                Text(
-                    text = "Confirm Recharge",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+                // Progress Border (when holding)
+                if (isHolding) {
+                    CircularProgressIndicator(
+                        progress = progress,
+                        modifier = Modifier
+                            .size(220.dp)
+                            .align(Alignment.Center),
+                        color = PrimaryOrangeGradient,
+                        strokeWidth = 8.dp,
+                        trackColor = Color.Transparent,
+                        strokeCap = StrokeCap.Round
+                    )
+                }
+                
+                // Main Button
+                Card(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
+                    colors = CardDefaults.cardColors(
+                        containerColor = PrimaryOrangeGradient
+                    ),
+                    shape = RoundedCornerShape(topStart = 150.dp, topEnd = 150.dp, bottomStart = 0.dp, bottomEnd = 0.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        // Content positioned at center
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                Icons.Default.Phone,
+                                contentDescription = "Mobile Recharge",
+                                tint = Color.White,
+                                modifier = Modifier.size(40.dp)
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            
+                            if (isHolding) {
+                                // Show percentage in center when holding
+                                Text(
+                                    text = "${(progress * 100).toInt()}%",
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center
+                                )
+                            } else {
+                                // Show normal text when not holding
+                                Text(
+                                    text = "Tap and hold for Mobile Recharge",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                }
             }
-            
-            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
@@ -260,14 +275,10 @@ fun MobileRechargeConfirmScreen(
 fun MobileRechargeConfirmScreenPreview() {
     SmartCitizenClubTheme {
         MobileRechargeConfirmScreen(
-            operator = MobileOperator(
-                id = "1",
-                name = "Grameenphone"
-            ),
             phoneNumber = "01741736354",
             amount = 100.0,
             onBackClick = {},
-            onConfirmClick = {}
+            onRechargeComplete = {}
         )
     }
 }

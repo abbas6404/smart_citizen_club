@@ -88,15 +88,15 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(20.dp)
+                .padding(horizontal = 24.dp, vertical = 16.dp)
                 .imePadding(), // Add padding for keyboard
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = if (isKeyboardOpen) Arrangement.Top else Arrangement.Center
+            verticalArrangement = Arrangement.Center
         ) {
             // App Header with Logo and Title
             AuthHeader(
                 isKeyboardOpen = isKeyboardOpen,
-                tagline = "Sign in to your account"
+                tagline = "Sign in to continue"
             )
             
             // Login Form Card
@@ -104,16 +104,16 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(
-                        elevation = 12.dp,
-                        shape = RoundedCornerShape(20.dp)
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(16.dp)
                     ),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
-                shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp)
+                    modifier = Modifier.padding(20.dp)
                 ) {
                     // Mobile Number Field
                     MobileNumberField(
@@ -215,10 +215,11 @@ fun LoginScreenPreview() {
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     Text(
-                        text = "Welcome",
-                        fontSize = 32.sp,
+                        text = "Smart Citizen Club",
+                        fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.primary,
+                        letterSpacing = 0.5.sp
                     )
                     
                     Text(

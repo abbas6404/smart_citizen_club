@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.shadow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -80,113 +81,140 @@ fun SignupScreen(
         }
     }
     
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(24.dp)
-            .imePadding(), // Add padding for keyboard
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = if (isKeyboardOpen) Arrangement.Top else Arrangement.Center
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        // App Header with Logo and Title
-        AuthHeader(
-            isKeyboardOpen = isKeyboardOpen,
-            tagline = "Join our community"
-        )
-        
-        // Name Field
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Full Name") },
-            leadingIcon = {
-                Icon(Icons.Default.Person, contentDescription = "Name")
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            modifier = Modifier.fillMaxWidth(),
-            interactionSource = nameInteractionSource,
-            singleLine = true,
-            enabled = !isLoading
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        // Mobile Number Field
-        MobileNumberField(
-            value = mobileNumber,
-            onValueChange = { mobileNumber = it },
-            modifier = Modifier,
-            enabled = !isLoading,
-            interactionSource = mobileInteractionSource,
-            useLabel = true
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        // Password Field
-        PasswordField(
-            value = password,
-            onValueChange = { password = it },
-            modifier = Modifier,
-            enabled = !isLoading,
-            interactionSource = passwordInteractionSource,
-            useLabel = true,
-            label = "Password",
-            placeholder = "Enter your password"
-        )
-        
-        Spacer(modifier = Modifier.height(12.dp))
-        
-        // Confirm Password Field
-        PasswordField(
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            modifier = Modifier,
-            enabled = !isLoading,
-            interactionSource = confirmPasswordInteractionSource,
-            useLabel = true,
-            label = "Confirm Password",
-            placeholder = "Confirm your password"
-        )
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Error Message
-        ErrorMessageCard(errorMessage = errorMessage)
-        
-        // Sign Up Button with Gradient
-        GradientButton(
-            text = "Create Account",
-            onClick = {
-                keyboardController?.hide()
-                authViewModel.clearError()
-                if (password == confirmPassword) {
-                    authViewModel.signup(mobileNumber, password, name)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .imePadding(), // Add padding for keyboard
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // App Header with Logo and Title
+            AuthHeader(
+                isKeyboardOpen = isKeyboardOpen,
+                tagline = "Join our community"
+            )
+            
+            // Signup Form Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    // Name Field
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Full Name") },
+                        leadingIcon = {
+                            Icon(Icons.Default.Person, contentDescription = "Name")
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        modifier = Modifier.fillMaxWidth(),
+                        interactionSource = nameInteractionSource,
+                        singleLine = true,
+                        enabled = !isLoading,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Mobile Number Field
+                    MobileNumberField(
+                        value = mobileNumber,
+                        onValueChange = { mobileNumber = it },
+                        modifier = Modifier,
+                        enabled = !isLoading,
+                        interactionSource = mobileInteractionSource,
+                        useLabel = true
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Password Field
+                    PasswordField(
+                        value = password,
+                        onValueChange = { password = it },
+                        modifier = Modifier,
+                        enabled = !isLoading,
+                        interactionSource = passwordInteractionSource,
+                        useLabel = true,
+                        label = "Password",
+                        placeholder = "Enter your password"
+                    )
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    // Confirm Password Field
+                    PasswordField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        modifier = Modifier,
+                        enabled = !isLoading,
+                        interactionSource = confirmPasswordInteractionSource,
+                        useLabel = true,
+                        label = "Confirm Password",
+                        placeholder = "Confirm your password"
+                    )
+                    
+                    Spacer(modifier = Modifier.height(20.dp))
+                    
+                    // Error Message
+                    ErrorMessageCard(errorMessage = errorMessage)
+                    
+                    // Sign Up Button with Gradient
+                    GradientButton(
+                        text = "Create Account",
+                        onClick = {
+                            keyboardController?.hide()
+                            authViewModel.clearError()
+                            if (password == confirmPassword) {
+                                authViewModel.signup(mobileNumber, password, name)
+                            }
+                        },
+                        enabled = !isLoading && 
+                                 name.isNotBlank() && 
+                                 mobileNumber.isNotBlank() && 
+                                 password.isNotBlank() && 
+                                 confirmPassword.isNotBlank() &&
+                                 password == confirmPassword,
+                        isLoading = isLoading
+                    )
                 }
-            },
-            enabled = !isLoading && 
-                     name.isNotBlank() && 
-                     mobileNumber.isNotBlank() && 
-                     password.isNotBlank() && 
-                     confirmPassword.isNotBlank() &&
-                     password == confirmPassword,
-            isLoading = isLoading
-        )
-        
-        // Sign In Link
-        AuthNavigationRow(
-            questionText = "Already have an account? ",
-            linkText = "Sign In",
-            onClick = {
-                keyboardController?.hide()
-                onNavigateToLogin()
-            },
-            enabled = !isLoading
-        )
-        
-        // Dynamic bottom spacing - reduced for better visibility
-        Spacer(modifier = Modifier.height(if (isKeyboardOpen) 30.dp else 10.dp))
+            }
+            
+            // Sign In Link
+            AuthNavigationRow(
+                questionText = "Already have an account? ",
+                linkText = "Sign In",
+                onClick = {
+                    keyboardController?.hide()
+                    onNavigateToLogin()
+                },
+                enabled = !isLoading
+            )
+            
+            // Dynamic bottom spacing - reduced for better visibility
+            Spacer(modifier = Modifier.height(if (isKeyboardOpen) 30.dp else 10.dp))
+        }
     }
 }
 

@@ -105,7 +105,7 @@ fun MySCCScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(OrangeGradient)
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(vertical = 12.dp)
         ) {
             Column {
                 // Title
@@ -470,7 +470,7 @@ private fun SettingsItemCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Icon with primary color background circle

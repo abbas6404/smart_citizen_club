@@ -1,8 +1,7 @@
-package com.example.smartcitizenclub.presentation.feature.sendmoney.ui
+package com.example.smartcitizenclub.presentation.feature.investment.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -11,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -23,19 +21,16 @@ import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
-import com.example.smartcitizenclub.presentation.theme.OrangeGradient
-import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EnterPassScreen(
-    contact: Contact,
+fun InvestmentPinScreen(
+    option: InvestmentOption,
     amount: Double,
     onBackClick: () -> Unit,
-    onConfirmClick: (String, String?) -> Unit = { _, _ -> } // PIN and Reference parameters
+    onPinEntered: (String) -> Unit = {}
 ) {
     var pin by remember { mutableStateOf("") }
-    var reference by remember { mutableStateOf("") }
     var showPin by remember { mutableStateOf(false) }
     
     Column(
@@ -43,11 +38,11 @@ fun EnterPassScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Top Bar with Primary Orange Background
+        // Top Bar with Blue Background
         TopAppBar(
             title = {
                 Text(
-                    text = "Enter Pass",
+                    text = "Investment PIN",
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -63,7 +58,7 @@ fun EnterPassScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = PrimaryOrangeGradient
+                containerColor = InvestmentColors.Primary
             ),
             modifier = Modifier.statusBarsPadding()
         )
@@ -77,162 +72,147 @@ fun EnterPassScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             
-            // Transaction Details Card
+            // Investment Summary
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp)
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Recipient Info
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .clip(CircleShape)
-                                .background(Color.Gray.copy(alpha = 0.3f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = "Avatar",
-                                tint = Color.Gray,
-                                modifier = Modifier.size(30.dp)
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.width(16.dp))
-                        
-                        Column {
-                            if (contact.name.isNotEmpty()) {
-                                Text(
-                                    text = contact.name,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black
-                                )
-                            }
-                            Text(
-                                text = contact.phoneNumber,
-                                fontSize = 14.sp,
-                                color = Color.Gray
-                            )
-                        }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    // Amount
                     Text(
-                        text = "Amount to Send",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Text(
-                        text = "৳${String.format("%.2f", amount)}",
-                        fontSize = 32.sp,
+                        text = "Investment Summary",
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = PrimaryOrangeGradient
+                        color = Color.Black
                     )
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    // Transaction Fee (if any)
+                    // Investment details
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text(
+                                text = "Investment Plan",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                            Text(
+                                text = option.name,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black
+                            )
+                        }
+                        
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = "Amount",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                            Text(
+                                text = "৳${String.format("%.2f", amount)}",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = InvestmentColors.Primary
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text(
+                                text = "Expected Return",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                            Text(
+                                text = "${option.expectedReturn}%",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = InvestmentColors.Green
+                            )
+                        }
+                        
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = "Duration",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                            Text(
+                                text = option.duration,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Divider(color = Color.Gray.copy(alpha = 0.3f))
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Transaction Fee",
+                            text = "Expected Return Amount:",
                             fontSize = 14.sp,
-                            color = Color.Gray
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Black
                         )
                         Text(
-                            text = "৳0.00",
-                            fontSize = 14.sp,
-                            color = Color.Gray
+                            text = "৳${String.format("%.2f", amount * (option.expectedReturn / 100))}",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = InvestmentColors.Green
                         )
                     }
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    Divider(color = Color.Gray.copy(alpha = 0.3f))
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    // Total Amount
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Total Amount",
-                            fontSize = 16.sp,
+                            text = "Total Value:",
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black
                         )
                         Text(
-                            text = "৳${String.format("%.2f", amount)}",
-                            fontSize = 16.sp,
+                            text = "৳${String.format("%.2f", amount + (amount * (option.expectedReturn / 100)))}",
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            color = InvestmentColors.Green
                         )
                     }
                 }
             }
             
-            // Reference Input Section
-            Column {
-                Text(
-                    text = "Reference (Optional)",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                OutlinedTextField(
-                    value = reference,
-                    onValueChange = { reference = it },
-                    placeholder = {
-                        Text(
-                            text = "Enter reference note (e.g., Payment for services)",
-                            fontSize = 14.sp,
-                            color = Color.Gray
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = PrimaryOrangeGradient,
-                        unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                    ),
-                    leadingIcon = {
-                        Icon(
-                            Icons.Default.Note,
-                            contentDescription = "Reference",
-                            tint = Color.Gray
-                        )
-                    }
-                )
-            }
-            
             // PIN Input Section
             Column {
                 Text(
-                    text = "Enter PIN to Confirm",
+                    text = "Enter PIN to Confirm Investment",
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                     color = Color.Black
                 )
                 
@@ -240,11 +220,7 @@ fun EnterPassScreen(
                 
                 OutlinedTextField(
                     value = pin,
-                    onValueChange = { newValue ->
-                        if (newValue.length <= 4 && newValue.all { it.isDigit() }) {
-                            pin = newValue
-                        }
-                    },
+                    onValueChange = { if (it.length <= 4) pin = it },
                     placeholder = {
                         Text(
                             text = "Enter 4-digit PIN",
@@ -257,7 +233,7 @@ fun EnterPassScreen(
                     visualTransformation = if (showPin) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = PrimaryOrangeGradient,
+                        focusedBorderColor = InvestmentColors.Primary,
                         unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
                     ),
                     trailingIcon = {
@@ -276,18 +252,18 @@ fun EnterPassScreen(
             
             // Confirm Button
             Button(
-                onClick = { onConfirmClick(pin, reference.ifBlank { null }) },
+                onClick = { onPinEntered(pin) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryOrangeGradient
+                    containerColor = InvestmentColors.Primary
                 ),
                 shape = RoundedCornerShape(25.dp),
                 enabled = pin.length == 4
             ) {
                 Text(
-                    text = "Confirm Send Money",
+                    text = "Confirm Investment",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -301,17 +277,23 @@ fun EnterPassScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun EnterPassScreenPreview() {
+fun InvestmentPinScreenPreview() {
     SmartCitizenClubTheme {
-        EnterPassScreen(
-            contact = Contact(
+        InvestmentPinScreen(
+            option = InvestmentOption(
                 id = "1",
-                name = "Abdul Malek Koyal Dim",
-                phoneNumber = "01777-127775"
+                name = "SCC Savings Plan",
+                description = "Low-risk savings with guaranteed returns",
+                minAmount = 1000.0,
+                maxAmount = 100000.0,
+                expectedReturn = 8.5,
+                riskLevel = RiskLevel.LOW,
+                duration = "1 year",
+                category = InvestmentCategory.SAVINGS
             ),
-            amount = 1000.0,
+            amount = 10000.0,
             onBackClick = {},
-            onConfirmClick = { _, _ -> }
+            onPinEntered = {}
         )
     }
 }

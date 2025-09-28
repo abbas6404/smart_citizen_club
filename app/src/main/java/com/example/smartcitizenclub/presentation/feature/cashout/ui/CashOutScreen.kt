@@ -1,19 +1,19 @@
 package com.example.smartcitizenclub.presentation.feature.cashout.ui
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.provider.ContactsContract
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,81 +28,147 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import com.example.smartcitizenclub.data.User
-import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
-import com.journeyapps.barcodescanner.ScanOptions
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
+
+// Contact data class
+data class Contact(
+    val id: String,
+    val name: String,
+    val phoneNumber: String
+)
+
+// Function to read contacts from device
+fun readContacts(context: Context): List<Contact> {
+    val contacts = mutableListOf<Contact>()
+    val cursor = context.contentResolver.query(
+        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+        null,
+        null,
+        null,
+        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC"
+    )
+    
+    cursor?.use {
+        val nameColumn = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+        val numberColumn = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+        
+        while (it.moveToNext()) {
+            val name = it.getString(nameColumn) ?: ""
+            val number = it.getString(numberColumn) ?: ""
+            if (number.isNotEmpty()) {
+                contacts.add(Contact(
+                    id = contacts.size.toString(),
+                    name = name,
+                    phoneNumber = number
+                ))
+            }
+        }
+    }
+    
+    return contacts
+}
+
+@Composable
+fun ContactItem(
+    contact: Contact,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                Icons.Default.Phone,
+                contentDescription = "Phone",
+                tint = PrimaryOrangeGradient,
+                modifier = Modifier.size(20.dp)
+            )
+            
+            Spacer(modifier = Modifier.width(12.dp))
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = contact.phoneNumber,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Black
+                )
+                if (contact.name.isNotEmpty()) {
+                    Text(
+                        text = contact.name,
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
+            
+            Icon(
+                Icons.Default.ArrowForward,
+                contentDescription = "Select",
+                tint = PrimaryOrangeGradient,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CashOutScreen(
     onBackClick: () -> Unit,
-    onProviderClick: (CashOutProvider) -> Unit = {}
+    onNumberEntered: (String) -> Unit = {}
 ) {
-    var accountInput by remember { mutableStateOf("") }
     val context = LocalContext.current
-    
-    // QR Code scanning launcher
-    val qrScannerLauncher = rememberLauncherForActivityResult(
-        contract = com.journeyapps.barcodescanner.ScanContract(),
-        onResult = { result ->
-            if (result.contents != null) {
-                // Handle the scanned QR code content
-                accountInput = result.contents
-            }
-        }
-    )
+    var numberInput by remember { mutableStateOf("") }
+    var hasContactPermission by remember { 
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
+        ) 
+    }
+    var deviceContacts by remember { mutableStateOf<List<Contact>>(emptyList()) }
     
     // Permission launcher
     val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            if (isGranted) {
-                // Permission granted, start scanning
-                val options = ScanOptions()
-                options.setPrompt("Scan a QR code")
-                options.setBeepEnabled(true)
-                options.setBarcodeImageEnabled(true)
-                qrScannerLauncher.launch(options)
-            } else {
-                // Permission denied, show a message or handle accordingly
-                // TODO: Show permission denied message
-            }
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasContactPermission = isGranted
+        if (isGranted) {
+            deviceContacts = readContacts(context)
         }
-    )
-    
-    // Sample cash out providers
-    val recentProviders = remember {
-        listOf(
-            CashOutProvider("1", "bKash"),
-            CashOutProvider("2", "Nagad")
-        )
     }
     
-    val favoriteProviders = remember {
-        listOf(
-            CashOutProvider("3", "Rocket"),
-            CashOutProvider("4", "Upay")
-        )
+    // Load contacts when permission is granted
+    LaunchedEffect(hasContactPermission) {
+        if (hasContactPermission) {
+            deviceContacts = readContacts(context)
+        }
     }
     
-    val allProviders = remember {
-        listOf(
-            CashOutProvider("5", "bKash"),
-            CashOutProvider("6", "Nagad"),
-            CashOutProvider("7", "Rocket"),
-            CashOutProvider("8", "Upay"),
-            CashOutProvider("9", "MCash"),
-            CashOutProvider("10", "T-Cash")
-        )
-    }
+    // Recent contacts (empty for now - can be populated from transaction history)
+    val recentContacts = remember { emptyList<Contact>() }
+    
+    // Use only device contacts - no fallback data
+    val allContacts = deviceContacts.take(20) // Limit to first 20 contacts
     
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Top Bar with Red Background
+        // Top Bar with Orange Background
         TopAppBar(
             title = {
                 Text(
@@ -115,14 +181,14 @@ fun CashOutScreen(
             navigationIcon = {
                 IconButton(onClick = onBackClick) {
                     Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
+                        Icons.Default.ArrowBack,
                         contentDescription = "Back",
                         tint = Color.White
                     )
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFFE53E3E) // Red color
+                containerColor = PrimaryOrangeGradient
             ),
             modifier = Modifier.statusBarsPadding()
         )
@@ -138,11 +204,11 @@ fun CashOutScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
             
-            // Account Input Section
+            // Mobile Number Input Section
             item {
                 Column {
                     Text(
-                        text = "Account Number",
+                        text = "Mobile Number",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.Black
@@ -150,233 +216,251 @@ fun CashOutScreen(
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.AccountBalance,
-                            contentDescription = "Account",
-                            tint = Color(0xFFE53E3E),
-                            modifier = Modifier.size(20.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
-                        OutlinedTextField(
-                            value = accountInput,
-                            onValueChange = { accountInput = it },
-                            placeholder = {
-                                Text(
-                                    text = "Enter Account Number or Mobile Number",
-                                    fontSize = 14.sp,
-                                    color = Color.Gray
-                                )
-                            },
-                            modifier = Modifier.weight(1f),
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFFE53E3E),
-                                unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                            ),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-                        )
-                        
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
-                        // Send Button
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(Color.Gray)
-                                .clickable { /* Handle send action */ },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowForward,
-                                contentDescription = "Send",
-                                tint = Color.White,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
-                }
-            }
-            
-            // QR Code Scanner Button
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { 
-                            // Check camera permission before scanning
-                            if (ContextCompat.checkSelfPermission(
-                                    context,
-                                    Manifest.permission.CAMERA
-                                ) == PackageManager.PERMISSION_GRANTED
-                            ) {
-                                val options = ScanOptions()
-                                options.setPrompt("Scan a QR code")
-                                options.setBeepEnabled(true)
-                                options.setBarcodeImageEnabled(true)
-                                qrScannerLauncher.launch(options)
-                            } else {
-                                // Request camera permission
-                                permissionLauncher.launch(Manifest.permission.CAMERA)
+                    OutlinedTextField(
+                        value = numberInput,
+                        onValueChange = { newValue ->
+                            // Limit to 11 digits
+                            if (newValue.length <= 11 && newValue.all { it.isDigit() }) {
+                                numberInput = newValue
                             }
                         },
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            Icons.Default.QrCodeScanner,
-                            contentDescription = "Scan QR Code",
-                            tint = Color(0xFFE53E3E),
-                            modifier = Modifier.size(24.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
-                        Text(
-                            text = "Tap to Scan QR Code",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.Black
-                        )
-                    }
+                        placeholder = {
+                            Text(
+                                text = "01XXXXXXXXX",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryOrangeGradient,
+                            unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
+                        ),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Phone,
+                                contentDescription = "Phone",
+                                tint = PrimaryOrangeGradient,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = { 
+                                    if (numberInput.length == 11) {
+                                        onNumberEntered(numberInput)
+                                    }
+                                },
+                                enabled = numberInput.length == 11
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (numberInput.length == 11) PrimaryOrangeGradient else Color.Gray.copy(alpha = 0.3f)
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        Icons.Default.ArrowForward,
+                                        contentDescription = "Continue",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+                        }
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Text(
+                        text = "Enter 11-digit mobile number",
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
                 }
             }
             
-            // Recent Providers Section
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            
+            // Recent Contacts Section
             item {
                 Column {
                     Text(
                         text = "Recent",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = PrimaryOrangeGradient
                     )
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    recentProviders.forEach { provider ->
-                        ProviderItem(
-                            provider = provider,
-                            onClick = { onProviderClick(provider) }
+                    recentContacts.forEach { contact ->
+                        ContactItem(
+                            contact = contact,
+                            onClick = { onNumberEntered(contact.phoneNumber) }
                         )
                         
-                        if (provider != recentProviders.last()) {
+                        if (contact != recentContacts.last()) {
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
             }
             
-            // Favourites Section
+            // Saved Numbers Section
             item {
                 Column {
-                    Text(
-                        text = "Favourites",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Saved Numbers",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryOrangeGradient
+                        )
+                        
+                        Row {
+                            if (!hasContactPermission) {
+                                IconButton(
+                                    onClick = { 
+                                        permissionLauncher.launch(Manifest.permission.READ_CONTACTS)
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Default.Contacts,
+                                        contentDescription = "Access Contacts",
+                                        tint = PrimaryOrangeGradient,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
+                            
+                            IconButton(
+                                onClick = { /* Handle add saved number */ }
+                            ) {
+                                Icon(
+                                    Icons.Default.Add,
+                                    contentDescription = "Add Saved Number",
+                                    tint = PrimaryOrangeGradient,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+                    }
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    favoriteProviders.forEach { provider ->
-                        ProviderItem(
-                            provider = provider,
-                            onClick = { onProviderClick(provider) }
-                        )
+                    // Show permission request message if no permission
+                    if (!hasContactPermission) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = PrimaryOrangeGradient.copy(alpha = 0.1f)
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    Icons.Default.Info,
+                                    contentDescription = "Info",
+                                    tint = PrimaryOrangeGradient,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                
+                                Spacer(modifier = Modifier.width(12.dp))
+                                
+                                Text(
+                                    text = "Tap the contacts icon to access your saved mobile numbers",
+                                    fontSize = 12.sp,
+                                    color = PrimaryOrangeGradient,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
                         
-                        if (provider != favoriteProviders.last()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    
+                    // Show all device contacts in one section
+                    allContacts.forEach { contact ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { 
+                                    // Directly navigate to amount screen when saved number is clicked
+                                    onNumberEntered(contact.phoneNumber)
+                                },
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    Icons.Default.Phone,
+                                    contentDescription = "Phone",
+                                    tint = PrimaryOrangeGradient,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                
+                                Spacer(modifier = Modifier.width(12.dp))
+                                
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = contact.phoneNumber,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = Color.Black
+                                    )
+                                    if (contact.name.isNotEmpty()) {
+                                        Text(
+                                            text = contact.name,
+                                            fontSize = 12.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
+                                }
+                                
+                                Icon(
+                                    Icons.Default.ArrowForward,
+                                    contentDescription = "Select",
+                                    tint = PrimaryOrangeGradient,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                        
+                        if (contact != allContacts.last()) {
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
             }
             
-            // All Providers Section
             item {
-                Column {
-                    Text(
-                        text = "All Providers",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    allProviders.forEach { provider ->
-                        ProviderItem(
-                            provider = provider,
-                            onClick = { onProviderClick(provider) }
-                        )
-                        
-                        if (provider != allProviders.last()) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }
-                }
+                Spacer(modifier = Modifier.height(32.dp))
             }
-            
-            // Bottom spacing
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
-            }
-        }
-    }
-}
-
-@Composable
-private fun ProviderItem(
-    provider: CashOutProvider,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Avatar
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(Color.Gray.copy(alpha = 0.3f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                Icons.Default.AccountBalance,
-                contentDescription = "Provider",
-                tint = Color.Gray,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-        
-        Spacer(modifier = Modifier.width(12.dp))
-        
-        // Provider Info
-        Column {
-            Text(
-                text = provider.name,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.Black
-            )
         }
     }
 }
@@ -387,7 +471,7 @@ fun CashOutScreenPreview() {
     SmartCitizenClubTheme {
         CashOutScreen(
             onBackClick = {},
-            onProviderClick = {}
+            onNumberEntered = {}
         )
     }
 }

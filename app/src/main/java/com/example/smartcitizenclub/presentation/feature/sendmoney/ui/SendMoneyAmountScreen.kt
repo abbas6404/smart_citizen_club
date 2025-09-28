@@ -209,17 +209,21 @@ fun SendMoneyAmountScreen(
                     quickAmounts.forEach { quickAmount ->
                         Button(
                             onClick = { amount = quickAmount },
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = PrimaryOrangeGradient.copy(alpha = 0.1f)
                             ),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Text(
                                 text = "৳$quickAmount",
                                 fontSize = 14.sp,
                                 color = PrimaryOrangeGradient,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1
                             )
                         }
                     }
