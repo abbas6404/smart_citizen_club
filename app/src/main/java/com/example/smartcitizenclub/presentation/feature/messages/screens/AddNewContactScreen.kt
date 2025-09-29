@@ -1,5 +1,6 @@
-package com.example.smartcitizenclub.presentation.feature.messages.ui
+package com.example.smartcitizenclub.presentation.feature.messages.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,19 +18,36 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
+import com.example.smartcitizenclub.presentation.theme.OrangeGradient
 import com.example.smartcitizenclub.presentation.feature.account.ui.AccountColors
+import com.example.smartcitizenclub.presentation.feature.messages.data.MessagingSampleData
+import com.example.smartcitizenclub.presentation.feature.messages.utils.isValidPhoneNumber
+import com.example.smartcitizenclub.presentation.feature.messages.utils.formatPhoneNumber
 
+/**
+ * Screen for adding new contacts
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewContactScreen(
+fun AddNewContactScreen(
     onBackClick: () -> Unit,
     onSaveContact: (String, String, String, String, Boolean) -> Unit
 ) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
-    var countryCode by remember { mutableStateOf("BD +880") } // Default as per image
+    var countryCode by remember { mutableStateOf("BD +880") }
     var phoneNumber by remember { mutableStateOf("") }
     var showQRCode by remember { mutableStateOf(false) }
+    var isValidForm by remember { mutableStateOf(false) }
+
+    // Validate form whenever inputs change
+    LaunchedEffect(firstName, lastName, phoneNumber) {
+        isValidForm = firstName.isNotBlank() && 
+                     lastName.isNotBlank() && 
+                     phoneNumber.isNotBlank() && 
+                     isValidPhoneNumber(phoneNumber)
+    }
 
     Scaffold(
         topBar = {
@@ -54,7 +72,7 @@ fun NewContactScreen(
                 actions = {
                     IconButton(onClick = { /* TODO: More options */ }) {
                         Icon(
-                            Icons.Default.Apps, // Grid-like icon
+                            Icons.Default.Apps,
                             contentDescription = "More options",
                             tint = Color.Black
                         )
@@ -93,9 +111,9 @@ fun NewContactScreen(
                     label = { Text("First name") },
                     modifier = Modifier.weight(1f),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AccountColors.SecondaryGreen,
+                        focusedBorderColor = PrimaryOrangeGradient,
                         unfocusedBorderColor = AccountColors.TextTertiary,
-                        focusedLabelColor = AccountColors.SecondaryGreen,
+                        focusedLabelColor = PrimaryOrangeGradient,
                         unfocusedLabelColor = AccountColors.TextSecondary,
                         focusedTextColor = Color.Black,
                         unfocusedTextColor = Color.Black
@@ -116,9 +134,9 @@ fun NewContactScreen(
                     label = { Text("Last name") },
                     modifier = Modifier.weight(1f),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AccountColors.SecondaryGreen,
+                        focusedBorderColor = PrimaryOrangeGradient,
                         unfocusedBorderColor = AccountColors.TextTertiary,
-                        focusedLabelColor = AccountColors.SecondaryGreen,
+                        focusedLabelColor = PrimaryOrangeGradient,
                         unfocusedLabelColor = AccountColors.TextSecondary,
                         focusedTextColor = Color.Black,
                         unfocusedTextColor = Color.Black
@@ -165,9 +183,9 @@ fun NewContactScreen(
                             .fillMaxWidth()
                             .clickable { expanded = true },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = AccountColors.SecondaryGreen,
+                            focusedBorderColor = PrimaryOrangeGradient,
                             unfocusedBorderColor = AccountColors.TextTertiary,
-                            focusedLabelColor = AccountColors.SecondaryGreen,
+                            focusedLabelColor = PrimaryOrangeGradient,
                             unfocusedLabelColor = AccountColors.TextSecondary,
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
@@ -178,34 +196,15 @@ fun NewContactScreen(
                         onDismissRequest = { expanded = false },
                         modifier = Modifier.width(IntrinsicSize.Max)
                     ) {
-                        DropdownMenuItem(
-                            text = { Text("BD +880") },
-                            onClick = {
-                                countryCode = "BD +880"
-                                expanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("US +1") },
-                            onClick = {
-                                countryCode = "US +1"
-                                expanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("IN +91") },
-                            onClick = {
-                                countryCode = "IN +91"
-                                expanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("UK +44") },
-                            onClick = {
-                                countryCode = "UK +44"
-                                expanded = false
-                            }
-                        )
+                        MessagingSampleData.countryCodes.forEach { code ->
+                            DropdownMenuItem(
+                                text = { Text(code) },
+                                onClick = {
+                                    countryCode = code
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -216,9 +215,9 @@ fun NewContactScreen(
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AccountColors.SecondaryGreen,
+                        focusedBorderColor = PrimaryOrangeGradient,
                         unfocusedBorderColor = AccountColors.TextTertiary,
-                        focusedLabelColor = AccountColors.SecondaryGreen,
+                        focusedLabelColor = PrimaryOrangeGradient,
                         unfocusedLabelColor = AccountColors.TextSecondary,
                         focusedTextColor = Color.Black,
                         unfocusedTextColor = Color.Black
@@ -227,18 +226,18 @@ fun NewContactScreen(
             }
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Save by QR Code button
+            // Save by QR Code button with Orange Gradient Border
             OutlinedButton(
                 onClick = { showQRCode = true },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = AccountColors.SecondaryGreen
+                    contentColor = PrimaryOrangeGradient
                 ),
                 border = androidx.compose.foundation.BorderStroke(
-                    1.dp, 
-                    AccountColors.SecondaryGreen
+                    2.dp, 
+                    PrimaryOrangeGradient
                 ),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Icon(
                     Icons.Default.QrCode,
@@ -255,14 +254,26 @@ fun NewContactScreen(
 
             Spacer(modifier = Modifier.weight(1f)) // Pushes content to top and button to bottom
 
-            // Save Button
+            // Save Button with Orange Gradient
             Button(
-                onClick = { onSaveContact(firstName, lastName, countryCode, phoneNumber, showQRCode) },
+                onClick = { 
+                    val formattedPhone = formatPhoneNumber(countryCode, phoneNumber)
+                    onSaveContact(firstName, lastName, countryCode, formattedPhone, showQRCode) 
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = AccountColors.SecondaryGreen),
-                shape = RoundedCornerShape(28.dp)
+                    .height(56.dp)
+                    .background(
+                        brush = if (isValidForm) OrangeGradient else androidx.compose.ui.graphics.Brush.linearGradient(
+                            colors = listOf(AccountColors.TextTertiary, AccountColors.TextTertiary)
+                        ),
+                        shape = RoundedCornerShape(28.dp)
+                    ),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(28.dp),
+                enabled = isValidForm
             ) {
                 Text(
                     text = "Save",
@@ -279,9 +290,9 @@ fun NewContactScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun NewContactScreenPreview() {
+fun AddNewContactScreenPreview() {
     SmartCitizenClubTheme {
-        NewContactScreen(
+        AddNewContactScreen(
             onBackClick = {},
             onSaveContact = { _, _, _, _, _ -> }
         )

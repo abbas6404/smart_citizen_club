@@ -74,7 +74,6 @@ data class PromoBanner(
 @Composable
 fun HomeScreen(
     user: User,
-    onScanQRClick: () -> Unit = {},
     onSendMoneyClick: () -> Unit = {},
     onCashOutClick: () -> Unit = {},
     onMobileRechargeClick: () -> Unit = {},
@@ -83,6 +82,7 @@ fun HomeScreen(
     onLimitUpgradeClick: () -> Unit = {},
     onInvestmentClick: () -> Unit = {},
     onLoanClick: () -> Unit = {},
+    onTransactionHistoryClick: () -> Unit = {},
     onContactUsClick: () -> Unit = {},
     onChargeLimitClick: () -> Unit = {},
     onDonationClick: () -> Unit = {}
@@ -90,15 +90,15 @@ fun HomeScreen(
     // Home services data
     val homeServices = remember {
         listOf(
-            HomeService("0", "Scan QR", Icons.Default.QrCode),
             HomeService("1", "Send Money", Icons.Default.Send),
             HomeService("2", "Cash Out", Icons.Default.AttachMoney),
             HomeService("3", "Mobile Recharge", Icons.Default.Phone),
             HomeService("4", "Add Money", Icons.Default.Add),
             HomeService("5", "Transfer Money", Icons.Default.ArrowForward),
-            HomeService("6", "Limit Upgrade", Icons.Default.Upgrade),
+            HomeService("6", "Active Auto Income", Icons.Default.Upgrade),
             HomeService("7", "Investment", Icons.Default.TrendingUp),
-            HomeService("8", "Loan", Icons.Default.AccountBalance)
+            HomeService("8", "Loan", Icons.Default.AccountBalance),
+            HomeService("9", "Transaction History", Icons.Default.History)
         )
     }
     
@@ -215,10 +215,10 @@ fun HomeScreen(
                                 modifier = Modifier.weight(1f),
                                 onClick = {
                                     when (service.id) {
-                                        "0" -> onScanQRClick()
                                         "1" -> onSendMoneyClick()
                                         "2" -> onCashOutClick()
                                         "3" -> onMobileRechargeClick()
+                                        "4" -> onAddMoneyClick()
                                     }
                                 }
                             )
@@ -238,10 +238,10 @@ fun HomeScreen(
                                 modifier = Modifier.weight(1f),
                                 onClick = {
                                     when (service.id) {
-                                        "4" -> onAddMoneyClick()
                                         "5" -> onTransferMoneyClick()
                                         "6" -> onLimitUpgradeClick()
                                         "7" -> onInvestmentClick()
+                                        "8" -> onLoanClick()
                                     }
                                 }
                             )
@@ -250,7 +250,7 @@ fun HomeScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    // Third row (1 item - centered)
+                    // Third row (1 item - Transaction History)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Start
@@ -261,7 +261,7 @@ fun HomeScreen(
                                 modifier = Modifier.weight(1f),
                                 onClick = {
                                     when (service.id) {
-                                        "8" -> onLoanClick()
+                                        "9" -> onTransactionHistoryClick()
                                     }
                                 }
                             )

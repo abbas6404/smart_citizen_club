@@ -1,4 +1,4 @@
-package com.example.smartcitizenclub.presentation.feature.messages.ui
+package com.example.smartcitizenclub.presentation.feature.messages.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -19,14 +18,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.smartcitizenclub.data.User
-import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 import com.example.smartcitizenclub.presentation.feature.account.ui.AccountColors
+import com.example.smartcitizenclub.presentation.feature.messages.models.Contact
+import com.example.smartcitizenclub.presentation.feature.messages.data.MessagingSampleData
+import com.example.smartcitizenclub.presentation.feature.messages.utils.generateAvatarText
 
+/**
+ * Contact selection screen for starting new chats
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectContactScreen(
+fun ContactSelectionScreen(
     onBackClick: () -> Unit,
     onNewGroup: () -> Unit,
     onNewContact: () -> Unit,
@@ -35,74 +38,9 @@ fun SelectContactScreen(
     var searchQuery by remember { mutableStateOf("") }
     var showSearchBar by remember { mutableStateOf(false) }
     
-    // Sample contacts data
+    // Get contacts from sample data
     val contacts = remember {
-        listOf(
-            Contact(
-                id = "1",
-                name = "Ariyan Abbas",
-                phoneNumber = "+8801234567890",
-                isSCCMember = true,
-                avatarColor = Color(0xFF4CAF50),
-                status = "Message yourself"
-            ),
-            Contact(
-                id = "2",
-                name = "Aaa",
-                phoneNumber = "+8801234567891",
-                isSCCMember = true,
-                avatarColor = Color(0xFF2196F3),
-                status = "Hey there! I am using Smart Citizen Club."
-            ),
-            Contact(
-                id = "3",
-                name = "Akbor Computer",
-                phoneNumber = "+8801234567892",
-                isSCCMember = true,
-                avatarColor = Color(0xFFFFC107),
-                status = "Hey there! I am using Smart Citizen Club."
-            ),
-            Contact(
-                id = "4",
-                name = "Akhi 222 CSE DIU",
-                phoneNumber = "+8801234567893",
-                isSCCMember = true,
-                avatarColor = Color(0xFF9C27B0),
-                status = "Sleeping"
-            ),
-            Contact(
-                id = "5",
-                name = "Akhi 222 DIU",
-                phoneNumber = "+8801234567894",
-                isSCCMember = true,
-                avatarColor = Color(0xFFF44336),
-                status = "Sleeping"
-            ),
-            Contact(
-                id = "6",
-                name = "Al-amin fs pup",
-                phoneNumber = "+8801234567895",
-                isSCCMember = false,
-                avatarColor = Color(0xFF00BCD4),
-                status = "Available"
-            ),
-            Contact(
-                id = "7",
-                name = "John Smith",
-                phoneNumber = "+8801234567896",
-                isSCCMember = false,
-                avatarColor = Color(0xFFE91E63),
-                status = "Last seen recently"
-            ),
-            Contact(
-                id = "8",
-                name = "Sarah Johnson",
-                phoneNumber = "+8801234567897",
-                isSCCMember = true,
-                avatarColor = Color(0xFF607D8B),
-                status = "Online"
-            )
-        )
+        MessagingSampleData.sampleContacts
     }
     
     val filteredContacts = remember(searchQuery, contacts) {
@@ -377,7 +315,7 @@ private fun ContactItem(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = contact.name.first().toString(),
+                text = generateAvatarText(contact.name),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
@@ -419,9 +357,9 @@ private fun ContactItem(
 
 @Preview(showBackground = true)
 @Composable
-fun SelectContactScreenPreview() {
+fun ContactSelectionScreenPreview() {
     SmartCitizenClubTheme {
-        SelectContactScreen(
+        ContactSelectionScreen(
             onBackClick = {},
             onNewGroup = {},
             onNewContact = {},

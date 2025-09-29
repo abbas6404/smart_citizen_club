@@ -11,14 +11,13 @@ import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 import com.example.smartcitizenclub.presentation.shared.components.BottomNavigation
 import com.example.smartcitizenclub.presentation.feature.account.ui.AccountScreen
-import com.example.smartcitizenclub.presentation.feature.finance.ui.FinanceScreen
 import com.example.smartcitizenclub.presentation.feature.messages.ui.MessagesScreen
 import com.example.smartcitizenclub.presentation.feature.myscc.ui.MySCCScreen
 
 sealed class UserScreen(val title: String, val icon: ImageVector) {
     // Main Bottom Navigation
     object Home : UserScreen("Home", Icons.Default.Home)
-    object Finance : UserScreen("Finance", Icons.Default.AccountBalance)
+    object QRScan : UserScreen("Scan", Icons.Default.QrCodeScanner)
     object Messages : UserScreen("Messages", Icons.Default.Message)
     object Account : UserScreen("Account", Icons.Default.AccountCircle)
     object MySCC : UserScreen("My SCC", Icons.Default.Person)

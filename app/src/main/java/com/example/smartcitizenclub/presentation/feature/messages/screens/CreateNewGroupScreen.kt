@@ -1,4 +1,4 @@
-package com.example.smartcitizenclub.presentation.feature.messages.ui
+package com.example.smartcitizenclub.presentation.feature.messages.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,34 +21,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 import com.example.smartcitizenclub.presentation.feature.account.ui.AccountColors
+import com.example.smartcitizenclub.presentation.feature.messages.models.Contact
+import com.example.smartcitizenclub.presentation.feature.messages.data.MessagingSampleData
+import com.example.smartcitizenclub.presentation.feature.messages.utils.generateAvatarText
 
+/**
+ * Screen for creating new groups
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewGroupScreen(
+fun CreateNewGroupScreen(
     onBackClick: () -> Unit,
     onNextClick: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedContacts by remember { mutableStateOf(listOf<Contact>()) }
 
-    // Sample contacts data
+    // Get contacts from sample data
     val allContacts = remember {
-        listOf(
-            Contact("1", "Al-amin fs", "01712345678", true, Color(0xFF4CAF50)),
-            Contact("2", "Akhi 222 CSE DIU", "01812345678", true, Color(0xFF2196F3)),
-            Contact("3", "Aaa", "01912345678", true, Color(0xFFFFC107)),
-            Contact("4", "Alice Smith", "01612345678", true, Color(0xFF9C27B0)),
-            Contact("5", "Bob Johnson", "01512345678", true, Color(0xFFF44336)),
-            Contact("6", "Charlie Brown", "01723456789", true, Color(0xFF00BCD4)),
-            Contact("7", "Diana Prince", "01823456789", true, Color(0xFFE91E63)),
-            Contact("8", "Eve Adams", "01923456789", true, Color(0xFF607D8B)),
-            Contact("9", "Frank White", "01623456789", true, Color(0xFF795548)),
-            Contact("10", "Grace Lee", "01523456789", true, Color(0xFF8BC34A)),
-            Contact("11", "Henry King", "01734567890", true, Color(0xFFCDDC39)),
-            Contact("12", "Ivy Queen", "01834567890", true, Color(0xFF03A9F4)),
-            Contact("13", "Jack Black", "01934567890", true, Color(0xFFFF5722)),
-            Contact("14", "Karen Green", "01634567890", true, Color(0xFFFFEB3B)),
-            Contact("15", "Liam Blue", "01534567890", true, Color(0xFF673AB7))
+        MessagingSampleData.sampleContacts + listOf(
+            Contact("9", "Alice Smith", "01612345678", true, Color(0xFF9C27B0)),
+            Contact("10", "Bob Johnson", "01512345678", true, Color(0xFFF44336)),
+            Contact("11", "Charlie Brown", "01723456789", true, Color(0xFF00BCD4)),
+            Contact("12", "Diana Prince", "01823456789", true, Color(0xFFE91E63)),
+            Contact("13", "Eve Adams", "01923456789", true, Color(0xFF607D8B)),
+            Contact("14", "Frank White", "01623456789", true, Color(0xFF795548)),
+            Contact("15", "Grace Lee", "01523456789", true, Color(0xFF8BC34A))
         )
     }
 
@@ -202,7 +200,7 @@ private fun SelectedContactItem(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = contact.name.take(1).uppercase(),
+                        text = generateAvatarText(contact.name),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -263,7 +261,7 @@ private fun ContactListItem(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = contact.name.take(1).uppercase(),
+                    text = generateAvatarText(contact.name),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -310,9 +308,9 @@ private fun ContactListItem(
 
 @Preview(showBackground = true)
 @Composable
-fun NewGroupScreenPreview() {
+fun CreateNewGroupScreenPreview() {
     SmartCitizenClubTheme {
-        NewGroupScreen(
+        CreateNewGroupScreen(
             onBackClick = {},
             onNextClick = {}
         )

@@ -165,6 +165,7 @@ fun QRScanScreen(
                                     val scanner = BarcodeScanning.getClient()
                                     
                                     imageAnalyzer.setAnalyzer(cameraExecutor) { imageProxy ->
+                                        @OptIn(androidx.camera.core.ExperimentalGetImage::class)
                                         val mediaImage = imageProxy.image
                                         if (mediaImage != null) {
                                             val image = InputImage.fromMediaImage(

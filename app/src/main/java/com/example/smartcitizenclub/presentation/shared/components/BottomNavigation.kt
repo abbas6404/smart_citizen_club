@@ -1,6 +1,7 @@
 package com.example.smartcitizenclub.presentation.shared.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,8 +29,11 @@ import com.example.smartcitizenclub.presentation.theme.OrangeGradient
 import com.example.smartcitizenclub.presentation.UserScreen
 import com.example.smartcitizenclub.presentation.feature.home.ui.HomeScreen
 import com.example.smartcitizenclub.presentation.feature.account.ui.AccountScreen
-import com.example.smartcitizenclub.presentation.feature.finance.ui.FinanceScreen
 import com.example.smartcitizenclub.presentation.feature.messages.ui.MessagesScreen
+import com.example.smartcitizenclub.presentation.feature.messages.screens.ContactSelectionScreen
+import com.example.smartcitizenclub.presentation.feature.messages.screens.AddNewContactScreen
+import com.example.smartcitizenclub.presentation.feature.messages.screens.CreateNewGroupScreen
+import com.example.smartcitizenclub.presentation.feature.messages.components.ChatScreen
 import com.example.smartcitizenclub.presentation.feature.myscc.ui.MySCCScreen
 import com.example.smartcitizenclub.presentation.feature.home.ui.HomeScreen
 import com.example.smartcitizenclub.presentation.feature.cashout.ui.CashOutProvider
@@ -41,7 +45,9 @@ import com.example.smartcitizenclub.presentation.feature.loan.ui.*
 import com.example.smartcitizenclub.presentation.feature.payments.ui.*
 import com.example.smartcitizenclub.presentation.feature.sendmoney.ui.Contact
 import com.example.smartcitizenclub.presentation.feature.sendmoney.ui.ConfirmSendMoneyScreen
-import com.example.smartcitizenclub.presentation.feature.sendmoney.ui.SendMoneySuccessScreen
+import com.example.smartcitizenclub.presentation.feature.transaction.ui.TransactionHistoryScreen
+import com.example.smartcitizenclub.presentation.feature.transaction.ui.TransactionDetailsScreen
+import com.example.smartcitizenclub.presentation.shared.components.HorizontalPagingNavigation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +65,12 @@ fun BottomNavigation(
     var showNewGroup by remember { mutableStateOf(false) }
     var showNewContact by remember { mutableStateOf(false) }
     var showChatScreen by remember { mutableStateOf(false) }
-    var selectedChat by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.messages.ui.Chat?>(null) }
+    var selectedChat by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.messages.models.Chat?>(null) }
+    
+    // Transaction History navigation states
+    var showTransactionHistory by remember { mutableStateOf(false) }
+    var showTransactionDetails by remember { mutableStateOf(false) }
+    var selectedTransaction by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.transaction.ui.Transaction?>(null) }
     
     // QR Scan navigation states
     var showQRScan by remember { mutableStateOf(false) }
@@ -92,6 +103,9 @@ fun BottomNavigation(
     
     // Limit Upgrade navigation states
     var showLimitUpgrade by remember { mutableStateOf(false) }
+    var showPackagePurchaseConfirmation by remember { mutableStateOf(false) }
+    var showPackagePurchaseSuccess by remember { mutableStateOf(false) }
+    var selectedPackage by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.limitupgrade.models.Package?>(null) }
     
     // Mobile Recharge navigation states
     var showMobileRecharge by remember { mutableStateOf(false) }
@@ -120,23 +134,14 @@ fun BottomNavigation(
     // Investment navigation states
     var showInvestment by remember { mutableStateOf(false) }
     var showInvestmentAmount by remember { mutableStateOf(false) }
-    var showInvestmentPin by remember { mutableStateOf(false) }
     var showInvestmentSuccess by remember { mutableStateOf(false) }
-    var selectedInvestmentOption by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.investment.ui.InvestmentOption?>(null) }
+    var selectedInvestmentPackage by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.investment.models.InvestmentPackage?>(null) }
     var investmentAmount by remember { mutableStateOf(0.0) }
     
     // Loan navigation states
     var showLoan by remember { mutableStateOf(false) }
-    var showLoanAmount by remember { mutableStateOf(false) }
-    var showLoanConfirm by remember { mutableStateOf(false) }
-    var selectedLoan by remember { mutableStateOf<Loan?>(null) }
+    var showLoanSuccess by remember { mutableStateOf(false) }
     var loanAmount by remember { mutableStateOf(0.0) }
-    var loanTenure by remember { mutableStateOf(0) }
-    
-    // Loan Payment navigation states
-    var showLoanPayment by remember { mutableStateOf(false) }
-    var showLoanPaymentAmount by remember { mutableStateOf(false) }
-    var selectedUserLoan by remember { mutableStateOf<UserLoan?>(null) }
     
     // Generic Payment navigation states
     var showPayment by remember { mutableStateOf(false) }
@@ -145,12 +150,12 @@ fun BottomNavigation(
     
     Scaffold(
         bottomBar = {
-            // Show bottom navigation only on main pages: Home, Finance, Messages, Account, MySCC
+            // Show bottom navigation only on main pages: Home, QRScan, Messages, Account, MySCC
             // Hide when any modal/overlay screens are shown
             if (showBottomNavigation && 
                 selectedScreen in listOf(
                     UserScreen.Home,
-                    UserScreen.Finance,
+                    UserScreen.QRScan,
                     UserScreen.Messages,
                     UserScreen.Account,
                     UserScreen.MySCC
@@ -161,6 +166,8 @@ fun BottomNavigation(
                 !showNewGroup && 
                 !showNewContact && 
                 !showChatScreen && 
+                !showTransactionHistory &&
+                !showTransactionDetails &&
                 !showQRScan &&
                 !showSendMoney && 
                 !showSendMoneyAmount && 
@@ -175,6 +182,8 @@ fun BottomNavigation(
                 !showAddMoney &&
                 !showTransferMoney &&
                 !showLimitUpgrade &&
+                !showPackagePurchaseConfirmation &&
+                !showPackagePurchaseSuccess &&
                 !showMobileRecharge && 
                 !showMobileRechargeAmount && 
                 !showMobileRechargePin &&
@@ -188,13 +197,9 @@ fun BottomNavigation(
                 !showChargeLimit && 
                 !showInvestment && 
                 !showInvestmentAmount && 
-                !showInvestmentPin && 
                 !showInvestmentSuccess && 
                 !showLoan && 
-                !showLoanAmount && 
-                !showLoanConfirm && 
-                !showLoanPayment && 
-                !showLoanPaymentAmount && 
+                !showLoanSuccess && 
                 !showPayment && 
                 !showPaymentAmount) {
                 // Custom Bottom Navigation Bar with rounded corners and shadow
@@ -221,20 +226,20 @@ fun BottomNavigation(
                         onClick = { onScreenSelected(UserScreen.Home) }
                     )
                     
-                    // Finance
-                    CustomNavigationBarItem(
-                        icon = UserScreen.Finance.icon,
-                        label = UserScreen.Finance.title,
-                        selected = selectedScreen == UserScreen.Finance,
-                        onClick = { onScreenSelected(UserScreen.Finance) }
-                    )
-                    
                     // Messages
                     CustomNavigationBarItem(
                         icon = UserScreen.Messages.icon,
                         label = UserScreen.Messages.title,
                         selected = selectedScreen == UserScreen.Messages,
                         onClick = { onScreenSelected(UserScreen.Messages) }
+                    )
+                    
+                    // QR Scan - 3rd item with border styling
+                    QRScanNavigationBarItem(
+                        icon = UserScreen.QRScan.icon,
+                        label = UserScreen.QRScan.title,
+                        selected = selectedScreen == UserScreen.QRScan,
+                        onClick = { onScreenSelected(UserScreen.QRScan) }
                     )
                     
                     // Account
@@ -289,7 +294,7 @@ fun BottomNavigation(
                     )
                 }
                 showSelectContact -> {
-                    com.example.smartcitizenclub.presentation.feature.messages.ui.SelectContactScreen(
+                    ContactSelectionScreen(
                         onBackClick = { showSelectContact = false },
                         onNewGroup = { 
                             showSelectContact = false
@@ -306,7 +311,7 @@ fun BottomNavigation(
                     )
                 }
                 showNewGroup -> {
-                    com.example.smartcitizenclub.presentation.feature.messages.ui.NewGroupScreen(
+                    CreateNewGroupScreen(
                         onBackClick = { showNewGroup = false },
                         onNextClick = { 
                             // TODO: Navigate to group setup screen
@@ -315,7 +320,7 @@ fun BottomNavigation(
                     )
                 }
                 showNewContact -> {
-                    com.example.smartcitizenclub.presentation.feature.messages.ui.NewContactScreen(
+                    AddNewContactScreen(
                         onBackClick = { showNewContact = false },
                         onSaveContact = { firstName, lastName, countryCode, phoneNumber, showQRCode ->
                             // TODO: Save contact to database
@@ -325,15 +330,36 @@ fun BottomNavigation(
                 }
                 showChatScreen -> {
                     selectedChat?.let { chat ->
-                        com.example.smartcitizenclub.presentation.feature.messages.ui.ChatScreen(
+                        ChatScreen(
                             chat = chat,
-                            currentUser = user,
+                            user = user,
                             onBackClick = { 
                                 showChatScreen = false
                                 selectedChat = null
                             }
                         )
                     }
+                }
+                showTransactionDetails -> {
+                    selectedTransaction?.let { transaction ->
+                        TransactionDetailsScreen(
+                            transaction = transaction,
+                            onBackClick = { 
+                                showTransactionDetails = false
+                                selectedTransaction = null
+                            }
+                        )
+                    }
+                }
+                showTransactionHistory -> {
+                    TransactionHistoryScreen(
+                        user = user,
+                        onBackClick = { showTransactionHistory = false },
+                        onTransactionClick = { transaction ->
+                            selectedTransaction = transaction
+                            showTransactionDetails = true
+                        }
+                    )
                 }
                 showQRScan -> {
                         com.example.smartcitizenclub.presentation.feature.qrscan.ui.QRScanScreen(
@@ -557,23 +583,49 @@ fun BottomNavigation(
                 showLimitUpgrade -> {
                     com.example.smartcitizenclub.presentation.feature.limitupgrade.ui.LimitUpgradeScreen(
                         onBackClick = { showLimitUpgrade = false },
-                        onBasicUpgradeClick = { 
-                            // TODO: Handle Basic upgrade
+                        onPackageSelected = { packageItem ->
+                            selectedPackage = packageItem
                             showLimitUpgrade = false
-                        },
-                        onPremiumUpgradeClick = { 
-                            // TODO: Handle Premium upgrade
-                            showLimitUpgrade = false
-                        },
-                        onGoldUpgradeClick = { 
-                            // TODO: Handle Gold upgrade
-                            showLimitUpgrade = false
-                        },
-                        onPlatinumUpgradeClick = { 
-                            // TODO: Handle Platinum upgrade
-                            showLimitUpgrade = false
+                            showPackagePurchaseConfirmation = true
                         }
                     )
+                }
+                showPackagePurchaseConfirmation -> {
+                    selectedPackage?.let { packageItem ->
+                        com.example.smartcitizenclub.presentation.feature.limitupgrade.ui.PackagePurchaseConfirmationScreen(
+                            packageItem = packageItem,
+                            onBackClick = { 
+                                showPackagePurchaseConfirmation = false
+                                showLimitUpgrade = true
+                            },
+                            onConfirmPurchase = {
+                                showPackagePurchaseConfirmation = false
+                                showPackagePurchaseSuccess = true
+                            },
+                            onCancelPurchase = {
+                                showPackagePurchaseConfirmation = false
+                                showLimitUpgrade = true
+                            }
+                        )
+                    }
+                }
+                showPackagePurchaseSuccess -> {
+                    selectedPackage?.let { packageItem ->
+                        com.example.smartcitizenclub.presentation.feature.limitupgrade.ui.PackagePurchaseSuccessScreen(
+                            packageItem = packageItem,
+                            onBackToHome = {
+                                showPackagePurchaseSuccess = false
+                            },
+                            onViewPackages = {
+                                showPackagePurchaseSuccess = false
+                                showLimitUpgrade = true
+                            },
+                            onViewTransactionHistory = {
+                                showPackagePurchaseSuccess = false
+                                showTransactionHistory = true
+                            }
+                        )
+                    }
                 }
                 showMobileRecharge -> {
                     com.example.smartcitizenclub.presentation.feature.recharge.ui.MobileRechargeScreen(
@@ -706,54 +758,34 @@ fun BottomNavigation(
                     com.example.smartcitizenclub.presentation.feature.investment.ui.InvestmentScreen(
                         user = user,
                         onBackClick = { showInvestment = false },
-                        onInvestmentSelected = { option ->
-                            selectedInvestmentOption = option
+                        onInvestmentSelected = { packageItem ->
+                            selectedInvestmentPackage = packageItem
                             showInvestment = false
                             showInvestmentAmount = true
                         }
                     )
                 }
                 showInvestmentAmount -> {
-                    selectedInvestmentOption?.let { option ->
+                    selectedInvestmentPackage?.let { packageItem ->
                         com.example.smartcitizenclub.presentation.feature.investment.ui.InvestmentAmountScreen(
-                            option = option,
+                            investmentPackage = packageItem,
                             onBackClick = { showInvestmentAmount = false },
                             onAmountEntered = { amount ->
                                 investmentAmount = amount
                                 showInvestmentAmount = false
-                                showInvestmentPin = true
-                            }
-                        )
-                    }
-                }
-                showInvestmentPin -> {
-                    selectedInvestmentOption?.let { option ->
-                        com.example.smartcitizenclub.presentation.feature.investment.ui.InvestmentPinScreen(
-                            option = option,
-                            amount = investmentAmount,
-                            onBackClick = { showInvestmentPin = false },
-                            onPinEntered = { pin ->
-                                // TODO: Process the investment transaction
-                                showInvestmentPin = false
                                 showInvestmentSuccess = true
                             }
                         )
                     }
                 }
                 showInvestmentSuccess -> {
-                    selectedInvestmentOption?.let { option ->
+                    selectedInvestmentPackage?.let { packageItem ->
                         com.example.smartcitizenclub.presentation.feature.investment.ui.InvestmentSuccessScreen(
-                            option = option,
+                            investmentPackage = packageItem,
                             amount = investmentAmount,
                             onBackClick = { 
                                 showInvestmentSuccess = false
-                                selectedInvestmentOption = null
-                                investmentAmount = 0.0
-                            },
-                            onViewPortfolioClick = {
-                                // TODO: Navigate to portfolio
-                                showInvestmentSuccess = false
-                                selectedInvestmentOption = null
+                                selectedInvestmentPackage = null
                                 investmentAmount = 0.0
                             }
                         )
@@ -763,85 +795,20 @@ fun BottomNavigation(
                     LoanScreen(
                         onBackClick = { showLoan = false },
                         onLoanClick = { loan ->
-                            selectedLoan = loan
+                            loanAmount = 50000.0 // Default amount from LoanScreen
                             showLoan = false
-                            showLoanAmount = true
+                            showLoanSuccess = true
                         }
                     )
                 }
-                showLoanAmount -> {
-                    selectedLoan?.let { loan ->
-                        LoanAmountScreen(
-                            loan = loan,
-                            onBackClick = { showLoanAmount = false },
-                            onAmountEntered = { amount, tenure ->
-                                loanAmount = amount
-                                loanTenure = tenure
-                                showLoanAmount = false
-                                showLoanConfirm = true
-                            }
-                        )
-                    }
-                }
-                showLoanConfirm -> {
-                    selectedLoan?.let { loan ->
-                        LoanConfirmScreen(
-                            loan = loan,
-                            amount = loanAmount,
-                            tenure = loanTenure,
-                            onBackClick = { showLoanConfirm = false },
-                            onConfirmClick = { pin ->
-                                // TODO: Process the loan application
-                                showLoanConfirm = false
-                                selectedLoan = null
-                                loanAmount = 0.0
-                                loanTenure = 0
-                            }
-                        )
-                    }
-                }
-                showLoanPayment -> {
-                    // Sample user loans for demonstration
-                    val userLoans = listOf(
-                        UserLoan(
-                            id = "1",
-                            userId = user.id,
-                            loanId = "1",
-                            amount = 50000.0,
-                            tenure = 12,
-                            interestRate = 12.5,
-                            processingFee = 2.0,
-                            emiAmount = 4467.89,
-                            totalAmount = 53614.68,
-                            startDate = System.currentTimeMillis() - (3 * 30 * 24 * 60 * 60 * 1000L),
-                            endDate = System.currentTimeMillis() + (9 * 30 * 24 * 60 * 60 * 1000L),
-                            status = LoanStatus.ACTIVE,
-                            remainingAmount = 38000.0,
-                            nextPaymentDate = System.currentTimeMillis() + (15 * 24 * 60 * 60 * 1000L)
-                        )
-                    )
-                    LoanPayScreen(
-                        userLoans = userLoans,
-                        onBackClick = { showLoanPayment = false },
-                        onLoanPayment = { userLoan ->
-                            selectedUserLoan = userLoan
-                            showLoanPayment = false
-                            showLoanPaymentAmount = true
+                showLoanSuccess -> {
+                    LoanSuccessScreen(
+                        loanAmount = loanAmount,
+                        onBackClick = { 
+                            showLoanSuccess = false
+                            loanAmount = 0.0
                         }
                     )
-                }
-                showLoanPaymentAmount -> {
-                    selectedUserLoan?.let { userLoan ->
-                        LoanPaymentAmountScreen(
-                            userLoan = userLoan,
-                            onBackClick = { showLoanPaymentAmount = false },
-                            onAmountEntered = { amount, paymentMethod, pin ->
-                                // TODO: Process the loan payment
-                                showLoanPaymentAmount = false
-                                selectedUserLoan = null
-                            }
-                        )
-                    }
                 }
                 showPayment -> {
                     // Sample payments for demonstration
@@ -888,42 +855,39 @@ fun BottomNavigation(
                     }
                 }
                 else -> {
-                when (selectedScreen) {
-                    UserScreen.Home -> HomeScreen(
+                    // Use HorizontalPagingNavigation for all main screens
+                    HorizontalPagingNavigation(
                         user = user,
-                        onScanQRClick = { showQRScan = true },
-                        onSendMoneyClick = { showSendMoney = true },
-                        onCashOutClick = { showCashOut = true },
-                        onMobileRechargeClick = { showMobileRecharge = true },
-                        onAddMoneyClick = { showAddMoney = true },
-                        onTransferMoneyClick = { showTransferMoney = true },
-                        onLimitUpgradeClick = { showLimitUpgrade = true },
-                        onInvestmentClick = { showInvestment = true },
-                        onLoanClick = { showLoan = true },
-                        onContactUsClick = { showContactUs = true },
-                        onChargeLimitClick = { showChargeLimit = true },
-                        onDonationClick = { showDonation = true }
-                    )
-                    UserScreen.Finance -> FinanceScreen(
-                        user = user,
-                        onLoanPaymentClick = { showPayment = true }
-                    )
-                    UserScreen.Messages -> MessagesScreen(
-                        user = user,
+                        selectedScreen = selectedScreen,
+                        onScreenSelected = onScreenSelected,
+                        onLogout = onLogout,
                         onShowSelectContact = { showSelectContact = true },
                         onChatClick = { chat ->
                             selectedChat = chat
                             showChatScreen = true
-                        }
+                        },
+                        onNavigateToChat = { chat ->
+                            selectedChat = chat
+                            showChatScreen = true
+                        },
+                        onShowNewGroup = { showNewGroup = true },
+                        onShowNewContact = { showNewContact = true },
+                        onShowTransactionHistory = { showTransactionHistory = true },
+                        onShowQRScan = { showQRScan = true },
+                        onShowSendMoney = { showSendMoney = true },
+                        onShowCashOut = { showCashOut = true },
+                        onShowMobileRecharge = { showMobileRecharge = true },
+                        onShowAddMoney = { showAddMoney = true },
+                        onShowTransferMoney = { showTransferMoney = true },
+                        onShowLimitUpgrade = { showLimitUpgrade = true },
+                        onShowInvestment = { showInvestment = true },
+                        onShowLoan = { showLoan = true },
+                        onShowContactUs = { showContactUs = true },
+                        onShowChargeLimit = { showChargeLimit = true },
+                        onShowDonation = { showDonation = true },
+                        onShowChangePassword = { showChangePassword = true },
+                        onShowKYCSubmit = { showKYCSubmit = true }
                     )
-                    UserScreen.Account -> AccountScreen(user, onLogout)
-                    UserScreen.MySCC -> MySCCScreen(
-                        user = user, 
-                        onLogout = onLogout,
-                        onNavigateToChangePassword = { showChangePassword = true },
-                        onNavigateToKYCSubmit = { showKYCSubmit = true }
-                    )
-                }
                 }
             }
         }
@@ -970,6 +934,61 @@ fun CustomNavigationBarItem(
                     contentDescription = label,
                     tint = if (selected) androidx.compose.ui.graphics.Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(24.dp)
+                )
+            }
+            
+            // Label
+            Text(
+                text = label,
+                fontSize = 12.sp,
+                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+@Composable
+fun QRScanNavigationBarItem(
+    icon: ImageVector,
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null // Remove focus/click background
+            ) { onClick() }
+            .padding(vertical = 2.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // QR Scan icon with primary color border
+            Box(
+                modifier = Modifier
+                    .size(48.dp) // Same size as other items
+                    .background(
+                        color = androidx.compose.ui.graphics.Color.Transparent,
+                        shape = androidx.compose.foundation.shape.CircleShape
+                    )
+                    .border(
+                        width = 2.dp,
+                        brush = OrangeGradient,
+                        shape = androidx.compose.foundation.shape.CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(24.dp) // Same size as other items
                 )
             }
             

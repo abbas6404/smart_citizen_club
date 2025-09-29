@@ -1,9 +1,11 @@
-package com.example.smartcitizenclub.presentation.feature.investment.ui
+package com.example.smartcitizenclub.presentation.feature.loan.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -17,15 +19,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.smartcitizenclub.data.User
-import com.example.smartcitizenclub.data.UserType
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InvestmentSuccessScreen(
-    investmentPackage: com.example.smartcitizenclub.presentation.feature.investment.models.InvestmentPackage,
-    amount: Double,
+fun LoanSuccessScreen(
+    loanAmount: Double,
     onBackClick: () -> Unit
 ) {
     Column(
@@ -33,11 +33,11 @@ fun InvestmentSuccessScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Top Bar with Blue Background
+        // Top Bar with Orange Background
         TopAppBar(
             title = {
                 Text(
-                    text = "Investment Success",
+                    text = "Loan Application Success",
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -53,7 +53,7 @@ fun InvestmentSuccessScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
+                containerColor = PrimaryOrangeGradient
             ),
             modifier = Modifier.statusBarsPadding()
         )
@@ -62,16 +62,17 @@ fun InvestmentSuccessScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             
             // Success Icon
             Box(
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(80.dp)
                     .clip(CircleShape)
                     .background(Color(0xFF4CAF50).copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
@@ -80,13 +81,13 @@ fun InvestmentSuccessScreen(
                     Icons.Default.CheckCircle,
                     contentDescription = "Success",
                     tint = Color(0xFF4CAF50),
-                    modifier = Modifier.size(80.dp)
+                    modifier = Modifier.size(50.dp)
                 )
             }
             
             // Success Message
             Text(
-                text = "Investment Successful!",
+                text = "Loan Application Successful!",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
@@ -94,13 +95,13 @@ fun InvestmentSuccessScreen(
             )
             
             Text(
-                text = "Your investment has been processed successfully",
+                text = "Your loan application has been submitted successfully",
                 fontSize = 16.sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center
             )
             
-            // Investment Details Card
+            // Loan Details Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -108,132 +109,108 @@ fun InvestmentSuccessScreen(
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp)
+                    modifier = Modifier.padding(12.dp)
                 ) {
                     Text(
-                        text = "Investment Details",
-                        fontSize = 18.sp,
+                        text = "Loan Application Details",
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
                     
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     
-                    // Investment details rows
+                    // Loan details rows
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Investment Plan:",
+                            text = "Loan Type:",
                             fontSize = 14.sp,
                             color = Color.Gray
                         )
                         Text(
-                            text = investmentPackage.name,
+                            text = "Personal Loan",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.Black
                         )
                     }
                     
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Investment Amount:",
+                            text = "Loan Amount:",
                             fontSize = 14.sp,
                             color = Color.Gray
                         )
                         Text(
-                            text = "৳${String.format("%.2f", amount)}",
+                            text = "৳${String.format("%.2f", loanAmount)}",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color(0xFF2196F3)
                         )
                     }
                     
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Expected Return:",
+                            text = "Interest Rate:",
                             fontSize = 14.sp,
                             color = Color.Gray
                         )
                         Text(
-                            text = "${investmentPackage.returnRate.toInt()}%",
+                            text = "12.5%",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color(0xFF4CAF50)
                         )
                     }
                     
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Duration:",
+                            text = "Processing Fee:",
                             fontSize = 14.sp,
                             color = Color.Gray
                         )
                         Text(
-                            text = "${investmentPackage.durationDays} Days",
+                            text = "2.0%",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.Black
                         )
                     }
                     
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Risk Level:",
+                            text = "Status:",
                             fontSize = 14.sp,
                             color = Color.Gray
                         )
                         Text(
-                            text = "Low Risk",
+                            text = "Under Review",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
-                            color = Color(0xFF4CAF50)
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Divider(color = Color.Gray.copy(alpha = 0.3f))
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Expected Return Amount:",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.Black
-                        )
-                        Text(
-                            text = "৳${String.format("%.2f", amount * (investmentPackage.returnRate / 100))}",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF4CAF50)
+                            color = Color(0xFFFF9800)
                         )
                     }
                     
@@ -249,12 +226,12 @@ fun InvestmentSuccessScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Transaction ID:",
+                            text = "Application ID:",
                             fontSize = 14.sp,
                             color = Color.Gray
                         )
                         Text(
-                            text = "INV${System.currentTimeMillis()}",
+                            text = "LOAN${System.currentTimeMillis()}",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.Black
@@ -263,47 +240,82 @@ fun InvestmentSuccessScreen(
                 }
             }
             
-            Spacer(modifier = Modifier.weight(1f))
+            // What's Next Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(12.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = "Info",
+                            tint = Color(0xFF2196F3),
+                            modifier = Modifier.size(20.dp)
+                        )
+                        
+                        Spacer(modifier = Modifier.width(8.dp))
+                        
+                        Text(
+                            text = "What's Next?",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF2196F3)
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Text(
+                        text = "• Your loan application is under review\n• You will receive a notification within 24-48 hours\n• Once approved, funds will be disbursed to your account\n• You can track your application status in the app",
+                        fontSize = 14.sp,
+                        color = Color(0xFF2196F3),
+                        lineHeight = 20.sp
+                    )
+                }
+            }
             
             // Action Buttons
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                OutlinedButton(
+                Button(
                     onClick = onBackClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = InvestmentColors.Primary
-                    ),
-                    border = androidx.compose.foundation.BorderStroke(
-                        1.dp,
-                        InvestmentColors.Primary
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = PrimaryOrangeGradient
                     ),
                     shape = RoundedCornerShape(25.dp)
                 ) {
                     Text(
                         text = "Back to Home",
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.height(80.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun InvestmentSuccessScreenPreview() {
+fun LoanSuccessScreenPreview() {
     SmartCitizenClubTheme {
-        InvestmentSuccessScreen(
-            investmentPackage = com.example.smartcitizenclub.presentation.feature.investment.models.InvestmentPackageData.packages[0],
-            amount = 10000.0,
+        LoanSuccessScreen(
+            loanAmount = 50000.0,
             onBackClick = {}
         )
     }

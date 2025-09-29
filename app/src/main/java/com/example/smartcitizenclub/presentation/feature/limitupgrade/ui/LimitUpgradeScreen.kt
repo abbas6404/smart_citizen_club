@@ -4,12 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,29 +20,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
+import com.example.smartcitizenclub.presentation.theme.OrangeGradient
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.feature.limitupgrade.models.Package
+import com.example.smartcitizenclub.presentation.feature.limitupgrade.models.PackageData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LimitUpgradeScreen(
     onBackClick: () -> Unit,
-    onBasicUpgradeClick: () -> Unit = {},
-    onPremiumUpgradeClick: () -> Unit = {},
-    onGoldUpgradeClick: () -> Unit = {},
-    onPlatinumUpgradeClick: () -> Unit = {}
+    onPackageSelected: (Package) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color(0xFFF5F5F5))
     ) {
         // Top Bar with Orange Background
         TopAppBar(
             title = {
                 Text(
-                    text = "Limit Upgrade",
+                    text = "Auto Income Packages",
                     color = Color.White,
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
             },
@@ -67,7 +65,7 @@ fun LimitUpgradeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -75,7 +73,7 @@ fun LimitUpgradeScreen(
 
             item {
                 Text(
-                    text = "Upgrade Your Limits",
+                    text = "Choose Your Auto Income Package",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
@@ -86,7 +84,7 @@ fun LimitUpgradeScreen(
 
             item {
                 Text(
-                    text = "Choose a plan to increase your transaction limits and unlock premium features",
+                    text = "Purchase any package to start earning auto income and increase your limits",
                     fontSize = 16.sp,
                     color = Color.Gray,
                     textAlign = TextAlign.Center,
@@ -98,106 +96,11 @@ fun LimitUpgradeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // Current Plan Info
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Current Plan",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.Gray
-                        )
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        Text(
-                            text = "Basic",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = PrimaryOrangeGradient
-                        )
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        Text(
-                            text = "Daily Limit: ৳10,000",
-                            fontSize = 14.sp,
-                            color = Color.Gray
-                        )
-                        
-                        Text(
-                            text = "Monthly Limit: ৳50,000",
-                            fontSize = 14.sp,
-                            color = Color.Gray
-                        )
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Premium Upgrade Option
-            item {
-                UpgradePlanCard(
-                    title = "Premium",
-                    price = "৳299/month",
-                    dailyLimit = "৳25,000",
-                    monthlyLimit = "৳150,000",
-                    features = listOf(
-                        "Higher transaction limits",
-                        "Priority customer support",
-                        "Advanced security features"
-                    ),
-                    iconColor = Color(0xFF4CAF50), // Green
-                    onClick = onPremiumUpgradeClick
-                )
-            }
-
-            // Gold Upgrade Option
-            item {
-                UpgradePlanCard(
-                    title = "Gold",
-                    price = "৳599/month",
-                    dailyLimit = "৳50,000",
-                    monthlyLimit = "৳300,000",
-                    features = listOf(
-                        "Maximum transaction limits",
-                        "24/7 premium support",
-                        "Exclusive features",
-                        "Cashback rewards"
-                    ),
-                    iconColor = Color(0xFFFFD700), // Gold
-                    onClick = onGoldUpgradeClick
-                )
-            }
-
-            // Platinum Upgrade Option
-            item {
-                UpgradePlanCard(
-                    title = "Platinum",
-                    price = "৳999/month",
-                    dailyLimit = "৳100,000",
-                    monthlyLimit = "৳500,000",
-                    features = listOf(
-                        "Unlimited transactions",
-                        "Personal account manager",
-                        "VIP features",
-                        "Highest cashback rates",
-                        "Priority processing"
-                    ),
-                    iconColor = Color(0xFF9C27B0), // Purple
-                    onClick = onPlatinumUpgradeClick
+            // Package List
+            items(PackageData.packages) { packageItem ->
+                PackageCard(
+                    packageItem = packageItem,
+                    onClick = { onPackageSelected(packageItem) }
                 )
             }
 
@@ -209,13 +112,8 @@ fun LimitUpgradeScreen(
 }
 
 @Composable
-private fun UpgradePlanCard(
-    title: String,
-    price: String,
-    dailyLimit: String,
-    monthlyLimit: String,
-    features: List<String>,
-    iconColor: Color,
+private fun PackageCard(
+    packageItem: Package,
     onClick: () -> Unit
 ) {
     Card(
@@ -224,132 +122,171 @@ private fun UpgradePlanCard(
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
         ) {
-            // Header
+            // Header with Package Name and Investment Amount
             Row(
                 modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Icon
-                Box(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(iconColor),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = "Premium",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                // Title and Price
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = title,
+                        text = packageItem.name,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
                     
+                    Spacer(modifier = Modifier.height(4.dp))
+                    
                     Text(
-                        text = price,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = PrimaryOrangeGradient
+                        text = packageItem.description,
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                        lineHeight = 18.sp
                     )
                 }
-
-                // Arrow
-                Icon(
-                    Icons.Default.ArrowForward,
-                    contentDescription = "Upgrade",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(24.dp)
-                )
+                
+                // Package Price Badge
+                Box(
+                    modifier = Modifier
+                        .background(
+                            brush = OrangeGradient,
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "৳${packageItem.amount.toInt()}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // Limits
+            // Benefits Section
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column {
-                    Text(
-                        text = "Daily Limit",
-                        fontSize = 12.sp,
-                        color = Color.Gray
+                // Withdrawal Limit
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        Icons.Default.AttachMoney,
+                        contentDescription = "Withdrawal",
+                        tint = Color(0xFF4CAF50),
+                        modifier = Modifier.size(24.dp)
                     )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
                     Text(
-                        text = dailyLimit,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
+                        text = "Withdrawal Limit",
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                    
+                    Text(
+                        text = "৳${packageItem.withdrawalLimit.toInt()}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF4CAF50),
+                        textAlign = TextAlign.Center
                     )
                 }
-                
-                Column {
-                    Text(
-                        text = "Monthly Limit",
-                        fontSize = 12.sp,
-                        color = Color.Gray
+
+                // Divider
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .height(60.dp)
+                        .background(Color.Gray.copy(alpha = 0.3f))
+                )
+
+                // Loan Limit
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        Icons.Default.AccountBalance,
+                        contentDescription = "Loan",
+                        tint = Color(0xFF2196F3),
+                        modifier = Modifier.size(24.dp)
                     )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
                     Text(
-                        text = monthlyLimit,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
+                        text = "Max Loan Limit",
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                    
+                    Text(
+                        text = "৳${packageItem.maxLoanLimit.toInt()}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF2196F3),
+                        textAlign = TextAlign.Center
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Features
-            Text(
-                text = "Features:",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.Black
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            features.forEach { feature ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+            // Purchase Button
+            Button(
+                onClick = onClick,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            brush = OrangeGradient,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(vertical = 12.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        Icons.Default.CheckCircle,
-                        contentDescription = "Feature",
-                        tint = Color(0xFF4CAF50),
-                        modifier = Modifier.size(16.dp)
-                    )
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
-                    Text(
-                        text = feature,
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-                
-                if (feature != features.last()) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Purchase Package",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        
+                        Spacer(modifier = Modifier.width(8.dp))
+                        
+                        Icon(
+                            Icons.Default.ArrowForward,
+                            contentDescription = "Purchase",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
         }
@@ -362,10 +299,7 @@ fun LimitUpgradeScreenPreview() {
     SmartCitizenClubTheme {
         LimitUpgradeScreen(
             onBackClick = {},
-            onBasicUpgradeClick = {},
-            onPremiumUpgradeClick = {},
-            onGoldUpgradeClick = {},
-            onPlatinumUpgradeClick = {}
+            onPackageSelected = {}
         )
     }
 }

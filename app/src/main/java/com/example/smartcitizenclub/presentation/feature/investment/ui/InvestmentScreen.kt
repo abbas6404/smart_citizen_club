@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,110 +21,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
+import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
+import com.example.smartcitizenclub.presentation.theme.OrangeGradient
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import com.example.smartcitizenclub.presentation.feature.investment.models.InvestmentPackage
+import com.example.smartcitizenclub.presentation.feature.investment.models.InvestmentPackageData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InvestmentScreen(
     user: User,
     onBackClick: () -> Unit,
-    onInvestmentSelected: (InvestmentOption) -> Unit = {}
+    onInvestmentSelected: (InvestmentPackage) -> Unit = {}
 ) {
-    // Sample investment options
-    val investmentOptions = remember {
-        listOf(
-            InvestmentOption(
-                id = "1",
-                name = "SCC Savings Plan",
-                description = "Low-risk savings with guaranteed returns",
-                minAmount = 1000.0,
-                maxAmount = 100000.0,
-                expectedReturn = 8.5,
-                riskLevel = RiskLevel.LOW,
-                duration = "1 year",
-                category = InvestmentCategory.SAVINGS
-            ),
-            InvestmentOption(
-                id = "2",
-                name = "Growth Mutual Fund",
-                description = "Diversified portfolio for steady growth",
-                minAmount = 5000.0,
-                maxAmount = 500000.0,
-                expectedReturn = 12.0,
-                riskLevel = RiskLevel.MEDIUM,
-                duration = "2 years",
-                category = InvestmentCategory.MUTUAL_FUNDS
-            ),
-            InvestmentOption(
-                id = "3",
-                name = "Blue Chip Stocks",
-                description = "Invest in top-performing companies",
-                minAmount = 10000.0,
-                maxAmount = 1000000.0,
-                expectedReturn = 15.0,
-                riskLevel = RiskLevel.HIGH,
-                duration = "3 years",
-                category = InvestmentCategory.STOCKS
-            ),
-            InvestmentOption(
-                id = "4",
-                name = "Government Bonds",
-                description = "Secure government-backed investments",
-                minAmount = 2000.0,
-                maxAmount = 200000.0,
-                expectedReturn = 7.0,
-                riskLevel = RiskLevel.LOW,
-                duration = "5 years",
-                category = InvestmentCategory.BONDS
-            ),
-            InvestmentOption(
-                id = "5",
-                name = "Crypto Portfolio",
-                description = "Digital currency investment portfolio",
-                minAmount = 5000.0,
-                maxAmount = 1000000.0,
-                expectedReturn = 25.0,
-                riskLevel = RiskLevel.HIGH,
-                duration = "1 year",
-                category = InvestmentCategory.CRYPTO
-            ),
-            InvestmentOption(
-                id = "6",
-                name = "Real Estate Fund",
-                description = "Property investment opportunities",
-                minAmount = 50000.0,
-                maxAmount = 5000000.0,
-                expectedReturn = 18.0,
-                riskLevel = RiskLevel.MEDIUM,
-                duration = "5 years",
-                category = InvestmentCategory.REAL_ESTATE
-            ),
-            InvestmentOption(
-                id = "7",
-                name = "Gold Investment",
-                description = "Precious metal investment plan",
-                minAmount = 3000.0,
-                maxAmount = 300000.0,
-                expectedReturn = 10.0,
-                riskLevel = RiskLevel.LOW,
-                duration = "2 years",
-                category = InvestmentCategory.GOLD
-            )
-        )
-    }
-    
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color(0xFFF5F5F5))
     ) {
-        // Top Bar with Blue Background
+        // Top Bar with Orange Background
         TopAppBar(
             title = {
                 Text(
-                    text = "Investment",
+                    text = "Investment Packages",
                     color = Color.White,
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
             },
@@ -139,7 +59,7 @@ fun InvestmentScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = InvestmentColors.Primary
+                containerColor = PrimaryOrangeGradient
             ),
             modifier = Modifier.statusBarsPadding()
         )
@@ -148,71 +68,57 @@ fun InvestmentScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
             
             // Header
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = InvestmentColors.LightGray),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            Icons.Default.TrendingUp,
-                            contentDescription = "Investment",
-                            tint = InvestmentColors.Primary,
-                            modifier = Modifier.size(48.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.height(12.dp))
-                        
-                        Text(
-                            text = "Smart Investment Options",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        Text(
-                            text = "Grow your money with our diverse investment plans",
-                            fontSize = 14.sp,
-                            color = Color.Gray,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
+                Text(
+                    text = "Choose Your Investment Package",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
-            
-            // Investment Options List
-            items(investmentOptions) { option ->
-                InvestmentOptionCard(
-                    option = option,
-                    onClick = { onInvestmentSelected(option) }
+
+            item {
+                Text(
+                    text = "Invest in any package to earn 200% returns with daily tasks",
+                    fontSize = 16.sp,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
             
             item {
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+            
+            // Investment Packages List
+            items(InvestmentPackageData.packages) { packageItem ->
+                InvestmentPackageCard(
+                    packageItem = packageItem,
+                    onClick = { onInvestmentSelected(packageItem) }
+                )
+            }
+            
+            item {
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
 }
 
 @Composable
-fun InvestmentOptionCard(
-    option: InvestmentOption,
+fun InvestmentPackageCard(
+    packageItem: InvestmentPackage,
     onClick: () -> Unit
 ) {
     Card(
@@ -220,164 +126,245 @@ fun InvestmentOptionCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(12.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(12.dp)
         ) {
+            // Header with Package Name and Investment Amount
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(getCategoryColor(option.category).copy(alpha = 0.1f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            getCategoryIcon(option.category),
-                            contentDescription = option.category.name,
-                            tint = getCategoryColor(option.category),
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = packageItem.name,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
                     
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                     
-                    Column {
-                        Text(
-                            text = option.name,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-                        Text(
-                            text = option.description,
-                            fontSize = 12.sp,
-                            color = Color.Gray
-                        )
-                    }
+                    Text(
+                        text = packageItem.description,
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                        lineHeight = 18.sp
+                    )
                 }
                 
-                Column(horizontalAlignment = Alignment.End) {
+                // Package Price Badge
+                Box(
+                    modifier = Modifier
+                        .background(
+                            brush = OrangeGradient,
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
                     Text(
-                        text = "${option.expectedReturn}%",
-                        fontSize = 18.sp,
+                        text = "৳${packageItem.amount.toInt()}",
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = InvestmentColors.Green
-                    )
-                    Text(
-                        text = "Expected Return",
-                        fontSize = 10.sp,
-                        color = Color.Gray
+                        color = Color.White
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(12.dp))
-            
-            // Investment details
+
+            // Investment Details Section
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column {
-                    Text(
-                        text = "Min Amount",
-                        fontSize = 12.sp,
-                        color = Color.Gray
+                // Daily Profit
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        Icons.Default.AttachMoney,
+                        contentDescription = "Daily Profit",
+                        tint = Color(0xFF4CAF50),
+                        modifier = Modifier.size(24.dp)
                     )
+                    
+                    Spacer(modifier = Modifier.height(4.dp))
+                    
                     Text(
-                        text = "৳${String.format("%.0f", option.minAmount)}",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
+                        text = "Daily Profit",
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                    
+                    Text(
+                        text = "৳${packageItem.dailyProfitAmount.toInt()}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF4CAF50),
+                        textAlign = TextAlign.Center
                     )
                 }
-                
-                Column {
-                    Text(
-                        text = "Max Amount",
-                        fontSize = 12.sp,
-                        color = Color.Gray
+
+                // Divider
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .height(60.dp)
+                        .background(Color.Gray.copy(alpha = 0.3f))
+                )
+
+                // Duration
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        Icons.Default.Schedule,
+                        contentDescription = "Duration",
+                        tint = Color(0xFF2196F3),
+                        modifier = Modifier.size(24.dp)
                     )
-                    Text(
-                        text = "৳${String.format("%.0f", option.maxAmount)}",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
-                    )
-                }
-                
-                Column {
+                    
+                    Spacer(modifier = Modifier.height(4.dp))
+                    
                     Text(
                         text = "Duration",
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
                     )
+                    
                     Text(
-                        text = option.duration,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
+                        text = "${packageItem.durationDays} Days",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF2196F3),
+                        textAlign = TextAlign.Center
                     )
                 }
-                
-                Column {
-                    Text(
-                        text = "Risk Level",
-                        fontSize = 12.sp,
-                        color = Color.Gray
+
+                // Divider
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .height(60.dp)
+                        .background(Color.Gray.copy(alpha = 0.3f))
+                )
+
+                // Return Rate
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        Icons.Default.TrendingUp,
+                        contentDescription = "Return Rate",
+                        tint = Color(0xFFFF9800),
+                        modifier = Modifier.size(24.dp)
                     )
+                    
+                    Spacer(modifier = Modifier.height(4.dp))
+                    
                     Text(
-                        text = option.riskLevel.name,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = getRiskColor(option.riskLevel)
+                        text = "Return Rate",
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                    
+                    Text(
+                        text = "${packageItem.returnRate.toInt()}%",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFFF9800),
+                        textAlign = TextAlign.Center
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Tasks Information
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.Work,
+                        contentDescription = "Tasks",
+                        tint = Color(0xFF2196F3),
+                        modifier = Modifier.size(20.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.width(6.dp))
+                    
+                    Text(
+                        text = "Complete ${packageItem.tasksPerDay} tasks daily to earn ৳${packageItem.profitPerTask.toInt()} per task",
+                        fontSize = 12.sp,
+                        color = Color(0xFF2196F3),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Investment Button
+            Button(
+                onClick = onClick,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            brush = OrangeGradient,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Invest Now",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        
+                        Spacer(modifier = Modifier.width(6.dp))
+                        
+                        Icon(
+                            Icons.Default.ArrowForward,
+                            contentDescription = "Invest",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
         }
-    }
-}
-
-@Composable
-fun getCategoryIcon(category: InvestmentCategory): ImageVector {
-    return when (category) {
-        InvestmentCategory.SAVINGS -> Icons.Default.AccountBalance
-        InvestmentCategory.MUTUAL_FUNDS -> Icons.Default.PieChart
-        InvestmentCategory.STOCKS -> Icons.Default.TrendingUp
-        InvestmentCategory.BONDS -> Icons.Default.Security
-        InvestmentCategory.CRYPTO -> Icons.Default.CurrencyBitcoin
-        InvestmentCategory.REAL_ESTATE -> Icons.Default.Home
-        InvestmentCategory.GOLD -> Icons.Default.Star
-    }
-}
-
-@Composable
-fun getCategoryColor(category: InvestmentCategory): Color {
-    return when (category) {
-        InvestmentCategory.SAVINGS -> InvestmentColors.Primary
-        InvestmentCategory.MUTUAL_FUNDS -> InvestmentColors.Purple
-        InvestmentCategory.STOCKS -> InvestmentColors.Green
-        InvestmentCategory.BONDS -> InvestmentColors.Orange
-        InvestmentCategory.CRYPTO -> InvestmentColors.Gold
-        InvestmentCategory.REAL_ESTATE -> InvestmentColors.Red
-        InvestmentCategory.GOLD -> InvestmentColors.Gold
-    }
-}
-
-@Composable
-fun getRiskColor(riskLevel: RiskLevel): Color {
-    return when (riskLevel) {
-        RiskLevel.LOW -> InvestmentColors.Green
-        RiskLevel.MEDIUM -> InvestmentColors.Orange
-        RiskLevel.HIGH -> InvestmentColors.Red
     }
 }
 
