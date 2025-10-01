@@ -82,6 +82,7 @@ fun HomeScreen(
     onLimitUpgradeClick: () -> Unit = {},
     onInvestmentClick: () -> Unit = {},
     onLoanClick: () -> Unit = {},
+    onLoanPayClick: () -> Unit = {},
     onTransactionHistoryClick: () -> Unit = {},
     onContactUsClick: () -> Unit = {},
     onChargeLimitClick: () -> Unit = {},
@@ -295,7 +296,12 @@ fun HomeScreen(
                     paymentServices.forEach { payment ->
                         PaymentItem(
                             payment = payment,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                when (payment.title) {
+                                    "Loan Pay" -> onLoanPayClick()
+                                }
+                            }
                         )
                     }
                 }
@@ -498,12 +504,13 @@ private fun ServiceItem(
 @Composable
 private fun PaymentItem(
     payment: PaymentService,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
             .padding(4.dp)
-            .clickable { /* TODO: Handle payment click */ },
+            .clickable { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(

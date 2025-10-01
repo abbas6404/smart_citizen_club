@@ -42,6 +42,7 @@ import com.example.smartcitizenclub.presentation.feature.contact.ui.SupportTicke
 import com.example.smartcitizenclub.presentation.feature.donation.ui.DonationCampaign
 import com.example.smartcitizenclub.presentation.feature.donation.ui.UserDonation
 import com.example.smartcitizenclub.presentation.feature.loan.ui.*
+import com.example.smartcitizenclub.presentation.feature.loanpay.ui.*
 import com.example.smartcitizenclub.presentation.feature.payments.ui.*
 import com.example.smartcitizenclub.presentation.feature.sendmoney.ui.Contact
 import com.example.smartcitizenclub.presentation.feature.sendmoney.ui.ConfirmSendMoneyScreen
@@ -143,6 +144,12 @@ fun BottomNavigation(
     var showLoanSuccess by remember { mutableStateOf(false) }
     var loanAmount by remember { mutableStateOf(0.0) }
     
+    // Loan Pay navigation states
+    var showLoanPay by remember { mutableStateOf(false) }
+    var showLoanPaymentAmount by remember { mutableStateOf(false) }
+    var showLoanPaymentHistory by remember { mutableStateOf(false) }
+    var selectedUserLoan by remember { mutableStateOf<UserLoan?>(null) }
+    
     // Generic Payment navigation states
     var showPayment by remember { mutableStateOf(false) }
     var showPaymentAmount by remember { mutableStateOf(false) }
@@ -200,6 +207,9 @@ fun BottomNavigation(
                 !showInvestmentSuccess && 
                 !showLoan && 
                 !showLoanSuccess && 
+                !showLoanPay && 
+                !showLoanPaymentAmount && 
+                !showLoanPaymentHistory && 
                 !showPayment && 
                 !showPaymentAmount) {
                 // Custom Bottom Navigation Bar with rounded corners and shadow
@@ -810,6 +820,80 @@ fun BottomNavigation(
                         }
                     )
                 }
+                showLoanPay -> {
+                    // Sample user loans for demonstration
+                    val userLoans = listOf(
+                        UserLoan(
+                            id = "1",
+                            userId = user.id,
+                            loanId = "1",
+                            amount = 50000.0,
+                            tenure = 12,
+                            interestRate = 12.5,
+                            processingFee = 2.0,
+                            emiAmount = 4467.89,
+                            totalAmount = 53614.68,
+                            startDate = System.currentTimeMillis() - (3 * 30 * 24 * 60 * 60 * 1000L),
+                            endDate = System.currentTimeMillis() + (9 * 30 * 24 * 60 * 60 * 1000L),
+                            status = LoanStatus.ACTIVE,
+                            remainingAmount = 38000.0,
+                            nextPaymentDate = System.currentTimeMillis() + (15 * 24 * 60 * 60 * 1000L)
+                        )
+                    )
+                    LoanPayScreen(
+                        userLoans = userLoans,
+                        onBackClick = { showLoanPay = false },
+                        onLoanPayment = { userLoan ->
+                            selectedUserLoan = userLoan
+                            showLoanPay = false
+                            showLoanPaymentAmount = true
+                        },
+                        onPaymentHistory = {
+                            showLoanPay = false
+                            showLoanPaymentHistory = true
+                        }
+                    )
+                }
+                showLoanPaymentAmount -> {
+                    selectedUserLoan?.let { userLoan ->
+                        LoanPaymentAmountScreen(
+                            userLoan = userLoan,
+                            onBackClick = { showLoanPaymentAmount = false },
+                            onAmountEntered = { amount, paymentMethod, pin ->
+                                // TODO: Process the loan payment
+                                showLoanPaymentAmount = false
+                                selectedUserLoan = null
+                            }
+                        )
+                    }
+                }
+                showLoanPaymentHistory -> {
+                    // Sample payment history for demonstration
+                    val payments = listOf(
+                        LoanPayment(
+                            id = "1",
+                            loanId = "1",
+                            amount = 4467.89,
+                            paymentDate = System.currentTimeMillis() - (30 * 24 * 60 * 60 * 1000L),
+                            paymentMethod = "SCC Wallet",
+                            status = "Completed",
+                            transactionId = "TXN${System.currentTimeMillis()}"
+                        ),
+                        LoanPayment(
+                            id = "2",
+                            loanId = "1",
+                            amount = 4467.89,
+                            paymentDate = System.currentTimeMillis() - (60 * 24 * 60 * 60 * 1000L),
+                            paymentMethod = "Credit Card",
+                            status = "Completed",
+                            transactionId = "TXN${System.currentTimeMillis() - 1000}"
+                        )
+                    )
+                    LoanPaymentHistoryScreen(
+                        payments = payments,
+                        onBackClick = { showLoanPaymentHistory = false }
+                    )
+                }
                 showPayment -> {
                     // Sample payments for demonstration
                     val payments = listOf(
@@ -882,6 +966,7 @@ fun BottomNavigation(
                         onShowLimitUpgrade = { showLimitUpgrade = true },
                         onShowInvestment = { showInvestment = true },
                         onShowLoan = { showLoan = true },
+                        onShowLoanPay = { showLoanPay = true },
                         onShowContactUs = { showContactUs = true },
                         onShowChargeLimit = { showChargeLimit = true },
                         onShowDonation = { showDonation = true },
