@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -61,6 +62,7 @@ fun BottomNavigation(
     var showChangePassword by remember { mutableStateOf(false) }
     var showChangePin by remember { mutableStateOf(false) }
     var showKYCSubmit by remember { mutableStateOf(false) }
+    var showProfileEdit by remember { mutableStateOf(false) }
     var showSelectContact by remember { mutableStateOf(false) }
     var showNewGroup by remember { mutableStateOf(false) }
     var showNewContact by remember { mutableStateOf(false) }
@@ -167,6 +169,7 @@ fun BottomNavigation(
                 ) && 
                 !showChangePassword && 
                 !showChangePin && 
+                !showProfileEdit && 
                 !showKYCSubmit && 
                 !showSelectContact && 
                 !showNewGroup && 
@@ -309,6 +312,17 @@ fun BottomNavigation(
                         onKYCSubmitted = { 
                             showKYCSubmit = false
                             // You can add success message or other actions here
+                        }
+                    )
+                }
+                
+                showProfileEdit -> {
+                    com.example.smartcitizenclub.presentation.feature.myscc.ui.ProfileEditScreen(
+                        user = user,
+                        onBackClick = { showProfileEdit = false },
+                        onSaveProfile = { name, phone ->
+                            // Handle profile save - you can update user data here
+                            showProfileEdit = false
                         }
                     )
                 }
@@ -1014,7 +1028,8 @@ fun BottomNavigation(
                         onShowDonation = { showDonation = true },
                         onShowChangePassword = { showChangePassword = true },
                         onShowChangePin = { showChangePin = true },
-                        onShowKYCSubmit = { showKYCSubmit = true }
+                        onShowKYCSubmit = { showKYCSubmit = true },
+                        onShowProfileEdit = { showProfileEdit = true }
                     )
                 }
             }

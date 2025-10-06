@@ -46,7 +46,8 @@ fun HorizontalPagingNavigation(
     onShowDonation: () -> Unit = {},
     onShowChangePassword: () -> Unit = {},
     onShowChangePin: () -> Unit = {},
-    onShowKYCSubmit: () -> Unit = {}
+    onShowKYCSubmit: () -> Unit = {},
+    onShowProfileEdit: () -> Unit = {}
 ) {
     // Define ALL pages that support horizontal paging (all bottom nav screens)
     val pagingScreens = listOf(
@@ -147,7 +148,8 @@ fun HorizontalPagingNavigation(
                         onLogout = onLogout,
                         onNavigateToChangePassword = onShowChangePassword,
                         onNavigateToChangePin = onShowChangePin,
-                        onNavigateToKYCSubmit = onShowKYCSubmit
+                        onNavigateToKYCSubmit = onShowKYCSubmit,
+                        onNavigateToProfileEdit = onShowProfileEdit
                     )
                 }
             }

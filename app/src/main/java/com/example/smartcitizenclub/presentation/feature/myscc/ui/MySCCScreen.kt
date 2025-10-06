@@ -74,7 +74,8 @@ fun MySCCScreen(
     onLogout: () -> Unit,
     onNavigateToChangePassword: () -> Unit = {},
     onNavigateToChangePin: () -> Unit = {},
-    onNavigateToKYCSubmit: () -> Unit = {}
+    onNavigateToKYCSubmit: () -> Unit = {},
+    onNavigateToProfileEdit: () -> Unit = {}
 ) {
     val context = LocalContext.current
     var showLanguageDialog by remember { mutableStateOf(false) }
@@ -172,7 +173,7 @@ fun MySCCScreen(
                     
                     // Edit Button
                     IconButton(
-                        onClick = { /* Handle edit */ }
+                        onClick = { onNavigateToProfileEdit() }
                     ) {
                         Icon(
                             Icons.Default.Edit,
@@ -545,7 +546,8 @@ fun MySCCScreenPreview() {
             onLogout = {},
             onNavigateToChangePassword = {},
             onNavigateToChangePin = {},
-            onNavigateToKYCSubmit = {}
+            onNavigateToKYCSubmit = {},
+            onNavigateToProfileEdit = {}
         )
     }
 }
