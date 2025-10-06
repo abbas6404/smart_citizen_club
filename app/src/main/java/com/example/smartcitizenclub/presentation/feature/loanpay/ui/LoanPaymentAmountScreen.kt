@@ -30,17 +30,15 @@ import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 fun LoanPaymentAmountScreen(
     userLoan: UserLoan,
     onBackClick: () -> Unit,
-    onAmountEntered: (Double, PaymentMethod, String) -> Unit = { _, _, _ -> }
+    onAmountEntered: (Double) -> Unit = { _ -> },
+    onPayLateFees: () -> Unit = {}
 ) {
     var amount by remember { mutableStateOf("") }
-    var selectedPaymentMethod by remember { mutableStateOf(PaymentMethod.WALLET) }
-    var pin by remember { mutableStateOf("") }
-    var showPin by remember { mutableStateOf(false) }
     var amountError by remember { mutableStateOf(false) }
-    var pinError by remember { mutableStateOf(false) }
     
     val amountValue = amount.toDoubleOrNull() ?: 0.0
-    val isValidAmount = amountValue > 0 && amountValue <= userLoan.remainingAmount
+    val maxAmount = userLoan.remainingAmount + userLoan.totalLateFeeAmount
+    val isValidAmount = amountValue > 0 && amountValue <= maxAmount
     
     Column(
         modifier = Modifier
@@ -221,130 +219,14 @@ fun LoanPaymentAmountScreen(
                 }
             }
             
-            // Payment Method
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    Text(
-                        text = "Payment Method",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    // Payment method options
-                    val paymentMethods = PaymentMethod.values()
-                    paymentMethods.forEach { method ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = selectedPaymentMethod == method,
-                                onClick = { selectedPaymentMethod = method },
-                                colors = RadioButtonDefaults.colors(
-                                    selectedColor = PrimaryOrangeGradient
-                                )
-                            )
-                            
-                            Spacer(modifier = Modifier.width(8.dp))
-                            
-                            Text(
-                                text = when (method) {
-                                    PaymentMethod.WALLET -> "SCC Wallet"
-                                    PaymentMethod.CARD -> "Credit/Debit Card"
-                                    PaymentMethod.BANK_TRANSFER -> "Bank Transfer"
-                                },
-                                fontSize = 12.sp,
-                                color = Color.Black
-                            )
-                        }
-                        
-                        if (method != paymentMethods.last()) {
-                            HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f))
-                        }
-                    }
-                }
-            }
-            
-            // PIN Input Section
-            Column {
-                Text(
-                    text = "Enter PIN to Confirm",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Black
-                )
-                
-                Spacer(modifier = Modifier.height(4.dp))
-                
-                OutlinedTextField(
-                    value = pin,
-                    onValueChange = { 
-                        pin = it
-                        pinError = false
-                    },
-                    placeholder = {
-                        Text(
-                            text = "Enter 4-digit PIN",
-                            fontSize = 12.sp,
-                            color = Color.Gray
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    visualTransformation = if (showPin) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = if (pinError) Color.Red else PrimaryOrangeGradient,
-                        unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                    ),
-                    trailingIcon = {
-                        IconButton(onClick = { showPin = !showPin }) {
-                            Icon(
-                                if (showPin) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                contentDescription = if (showPin) "Hide PIN" else "Show PIN",
-                                tint = Color.Gray
-                            )
-                        }
-                    },
-                    isError = pinError
-                )
-                
-                if (pinError) {
-                    Text(
-                        text = "Please enter a valid 4-digit PIN",
-                        fontSize = 10.sp,
-                        color = Color.Red,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-            }
-            
             // Confirm Button
             Button(
                 onClick = {
                     val amountDouble = amount.toDoubleOrNull()
-                    if (amountDouble != null && amountDouble > 0 && amountDouble <= userLoan.remainingAmount &&
-                        pin.length == 4 && pin.all { it.isDigit() }) {
-                        onAmountEntered(amountDouble, selectedPaymentMethod, pin)
+                    if (amountDouble != null && amountDouble > 0 && amountDouble <= maxAmount) {
+                        onAmountEntered(amountDouble)
                     } else {
-                        if (amountDouble == null || amountDouble <= 0 || amountDouble > userLoan.remainingAmount) {
-                            amountError = true
-                        }
-                        if (pin.length != 4 || !pin.all { it.isDigit() }) {
-                            pinError = true
-                        }
+                        amountError = true
                     }
                 },
                 modifier = Modifier
@@ -354,7 +236,7 @@ fun LoanPaymentAmountScreen(
                     containerColor = PrimaryOrangeGradient
                 ),
                 shape = RoundedCornerShape(25.dp),
-                enabled = amount.isNotEmpty() && isValidAmount && pin.length == 4
+                enabled = amount.isNotEmpty() && isValidAmount
             ) {
                 Text(
                     text = "Make Payment",
@@ -403,10 +285,12 @@ private fun getNextPaymentDate(timestamp: Long?): String {
 fun LoanPaymentAmountScreenPreview() {
     SmartCitizenClubTheme {
         LoanPaymentAmountScreen(
-            userLoan = UserLoan(
+            userLoan =             UserLoan(
                 id = "1",
                 userId = "1",
                 loanId = "1",
+                loanNumber = "LN001234",
+                subAccountId = "SUB001",
                 amount = 50000.0,
                 tenure = 12,
                 interestRate = 12.5,
@@ -417,10 +301,13 @@ fun LoanPaymentAmountScreenPreview() {
                 endDate = System.currentTimeMillis() + (9 * 30 * 24 * 60 * 60 * 1000L),
                 status = com.example.smartcitizenclub.presentation.feature.loan.ui.LoanStatus.ACTIVE,
                 remainingAmount = 38000.0,
-                nextPaymentDate = System.currentTimeMillis() + (15 * 24 * 60 * 60 * 1000L)
+                nextPaymentDate = System.currentTimeMillis() + (15 * 24 * 60 * 60 * 1000L),
+                hasOverduePayments = true,
+                totalLateFeeAmount = 500.0
             ),
             onBackClick = {},
-            onAmountEntered = { _, _, _ -> }
+            onAmountEntered = { _ -> },
+            onPayLateFees = {}
         )
     }
 }

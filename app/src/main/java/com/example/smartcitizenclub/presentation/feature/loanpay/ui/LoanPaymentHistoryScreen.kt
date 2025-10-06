@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.smartcitizenclub.presentation.feature.loan.ui.PaymentType
 import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 
@@ -26,7 +27,9 @@ data class LoanPayment(
     val paymentDate: Long,
     val paymentMethod: String,
     val status: String,
-    val transactionId: String
+    val transactionId: String,
+    val paymentType: PaymentType = PaymentType.LOAN_PAYMENT,
+    val description: String? = null
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

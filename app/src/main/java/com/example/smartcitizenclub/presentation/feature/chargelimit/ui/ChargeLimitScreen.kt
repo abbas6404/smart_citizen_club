@@ -1,6 +1,7 @@
 package com.example.smartcitizenclub.presentation.feature.chargelimit.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,39 +28,49 @@ fun ChargeLimitScreen(
     user: User,
     onBackClick: () -> Unit
 ) {
-    // Sample service charges data
-    val serviceCharges = remember {
+    // Sample package data with limits and charges
+    val packages = remember {
         listOf(
-            ServiceCharge("1", "Send Money", ChargeType.FIXED, 5.0, "Fixed charge for sending money"),
-            ServiceCharge("2", "Cash Out", ChargeType.FIXED, 10.0, "Fixed charge for cash out"),
-            ServiceCharge("3", "Mobile Recharge", ChargeType.FIXED, 0.0, "No charge for mobile recharge"),
-            ServiceCharge("4", "Bill Payment", ChargeType.FIXED, 2.0, "Fixed charge for bill payment"),
-            ServiceCharge("5", "Investment", ChargeType.PERCENTAGE, 1.0, "1% charge on investment amount"),
-            ServiceCharge("6", "Loan Processing", ChargeType.PERCENTAGE, 2.5, "2.5% charge on loan amount")
-        )
-    }
-    
-    // Sample transaction limits data
-    val transactionLimits = remember {
-        listOf(
-            TransactionLimit("1", "Send Money", LimitType.MINIMUM, 10.0, LimitPeriod.DAILY, "Minimum amount for sending money"),
-            TransactionLimit("2", "Send Money", LimitType.MAXIMUM, 50000.0, LimitPeriod.DAILY, "Maximum amount for sending money per day"),
-            TransactionLimit("3", "Cash Out", LimitType.MINIMUM, 50.0, LimitPeriod.DAILY, "Minimum amount for cash out"),
-            TransactionLimit("4", "Cash Out", LimitType.MAXIMUM, 100000.0, LimitPeriod.DAILY, "Maximum amount for cash out per day"),
-            TransactionLimit("5", "Mobile Recharge", LimitType.MINIMUM, 10.0, LimitPeriod.DAILY, "Minimum amount for mobile recharge"),
-            TransactionLimit("6", "Mobile Recharge", LimitType.MAXIMUM, 1000.0, LimitPeriod.DAILY, "Maximum amount for mobile recharge per day"),
-            TransactionLimit("7", "Investment", LimitType.MINIMUM, 1000.0, LimitPeriod.DAILY, "Minimum amount for investment"),
-            TransactionLimit("8", "Investment", LimitType.MAXIMUM, 1000000.0, LimitPeriod.DAILY, "Maximum amount for investment per day")
-        )
-    }
-    
-    // Sample user limits data
-    val userLimits = remember {
-        listOf(
-            UserLimit("user1", "Send Money", 25000.0, 50000.0, LimitPeriod.DAILY, System.currentTimeMillis() + 86400000),
-            UserLimit("user1", "Cash Out", 50000.0, 100000.0, LimitPeriod.DAILY, System.currentTimeMillis() + 86400000),
-            UserLimit("user1", "Mobile Recharge", 500.0, 1000.0, LimitPeriod.DAILY, System.currentTimeMillis() + 86400000),
-            UserLimit("user1", "Investment", 25000.0, 100000.0, LimitPeriod.DAILY, System.currentTimeMillis() + 86400000)
+            PackageInfo(
+                id = "1",
+                name = "Basic Package",
+                description = "Standard user package",
+                withdrawalLimit = 25000.0,
+                loanLimit = 50000.0,
+                sendMoneyCharge = 5.0,
+                cashOutCharge = 10.0,
+                isActive = true
+            ),
+            PackageInfo(
+                id = "2",
+                name = "Premium Package",
+                description = "Enhanced limits for premium users",
+                withdrawalLimit = 100000.0,
+                loanLimit = 200000.0,
+                sendMoneyCharge = 3.0,
+                cashOutCharge = 8.0,
+                isActive = true
+            ),
+            PackageInfo(
+                id = "3",
+                name = "VIP Package",
+                description = "Maximum limits for VIP users",
+                withdrawalLimit = 500000.0,
+                loanLimit = 1000000.0,
+                sendMoneyCharge = 1.0,
+                cashOutCharge = 5.0,
+                isActive = true
+            ),
+            PackageInfo(
+                id = "4",
+                name = "Business Package",
+                description = "Special package for business users",
+                withdrawalLimit = 1000000.0,
+                loanLimit = 2000000.0,
+                sendMoneyCharge = 2.0,
+                cashOutCharge = 6.0,
+                isActive = true
+            )
         )
     }
     
@@ -117,7 +128,7 @@ fun ChargeLimitScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
-                            Icons.Default.AccountBalance,
+                            Icons.Default.TableChart,
                             contentDescription = "Charge & Limit",
                             tint = ChargeLimitColors.Primary,
                             modifier = Modifier.size(48.dp)
@@ -126,7 +137,7 @@ fun ChargeLimitScreen(
                         Spacer(modifier = Modifier.height(12.dp))
                         
                         Text(
-                            text = "Service Charges & Transaction Limits",
+                            text = "Package Limits & Charges",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black
@@ -135,7 +146,7 @@ fun ChargeLimitScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         
                         Text(
-                            text = "View your transaction limits and service charges",
+                            text = "Compare different packages and their limits and charges",
                             fontSize = 14.sp,
                             color = Color.Gray,
                             textAlign = TextAlign.Center
@@ -144,11 +155,11 @@ fun ChargeLimitScreen(
                 }
             }
             
-            // User Limits Section
+            // Package Limits & Charges Table
             item {
                 Column {
                     Text(
-                        text = "Your Current Limits",
+                        text = "Package Comparison",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
@@ -156,176 +167,123 @@ fun ChargeLimitScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        userLimits.forEach { limit ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                shape = RoundedCornerShape(12.dp)
+                        Column {
+                            // Table Header
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(ChargeLimitColors.Primary)
+                                    .padding(12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Column(
-                                    modifier = Modifier.padding(16.dp)
+                                Text(
+                                    text = "Package",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.weight(2f)
+                                )
+                                Text(
+                                    text = "Withdrawal Limit",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.weight(1.5f),
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = "Loan Limit",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.weight(1.5f),
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = "Send Money Charge",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.weight(1.5f),
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = "Cash Out Charge",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.weight(1.5f),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                            
+                            // Table Rows
+                            packages.forEachIndexed { index, packageInfo ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(if (index % 2 == 0) Color.White else Color(0xFFF8F9FA))
+                                        .padding(12.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    Column(
+                                        modifier = Modifier.weight(2f)
                                     ) {
                                         Text(
-                                            text = limit.serviceName,
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.Black
-                                        )
-                                        
-                                        Text(
-                                            text = "${String.format("%.0f", limit.currentAmount)}/${String.format("%.0f", limit.limitAmount)} ৳",
+                                            text = packageInfo.name,
                                             fontSize = 14.sp,
-                                            fontWeight = FontWeight.Medium,
+                                            fontWeight = FontWeight.Bold,
                                             color = Color.Black
+                                        )
+                                        Text(
+                                            text = packageInfo.description,
+                                            fontSize = 11.sp,
+                                            color = Color.Gray,
+                                            maxLines = 2
                                         )
                                     }
                                     
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    
-                                    // Progress bar for limit usage
-                                    LinearProgressIndicator(
-                                        progress = (limit.currentAmount / limit.limitAmount).toFloat(),
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(8.dp),
-                                        color = when {
-                                            (limit.currentAmount / limit.limitAmount) < 0.5 -> ChargeLimitColors.Green
-                                            (limit.currentAmount / limit.limitAmount) < 0.8 -> ChargeLimitColors.Orange
-                                            else -> ChargeLimitColors.Red
-                                        },
-                                        trackColor = Color(0xFFE0E0E0)
-                                    )
-                                    
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    
                                     Text(
-                                        text = "Resets on: ${java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault()).format(java.util.Date(limit.resetDate))}",
+                                        text = "${String.format("%.0f", packageInfo.withdrawalLimit)} ৳",
                                         fontSize = 12.sp,
-                                        color = Color.Gray
+                                        fontWeight = FontWeight.Medium,
+                                        color = ChargeLimitColors.Blue,
+                                        modifier = Modifier.weight(1.5f),
+                                        textAlign = TextAlign.Center
                                     )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Service Charges Section
-            item {
-                Column {
-                    Text(
-                        text = "Service Charges",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        serviceCharges.forEach { charge ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Column {
-                                        Text(
-                                            text = charge.serviceName,
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.Black
-                                        )
-                                        Text(
-                                            text = charge.description,
-                                            fontSize = 12.sp,
-                                            color = Color.Gray
-                                        )
-                                    }
                                     
                                     Text(
-                                        text = when (charge.chargeType) {
-                                            ChargeType.FIXED -> if (charge.amount == 0.0) "Free" else "${String.format("%.0f", charge.amount)} ৳"
-                                            ChargeType.PERCENTAGE -> "${String.format("%.1f", charge.amount)}%"
-                                            ChargeType.SLAB -> "Slab Rate"
-                                        },
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (charge.amount == 0.0) ChargeLimitColors.Green else ChargeLimitColors.Primary
+                                        text = "${String.format("%.0f", packageInfo.loanLimit)} ৳",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = ChargeLimitColors.Green,
+                                        modifier = Modifier.weight(1.5f),
+                                        textAlign = TextAlign.Center
                                     )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Transaction Limits Section
-            item {
-                Column {
-                    Text(
-                        text = "Transaction Limits",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        transactionLimits.forEach { limit ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Column {
-                                        Text(
-                                            text = "${limit.serviceName} - ${limit.limitType.name}",
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.Black
-                                        )
-                                        Text(
-                                            text = limit.description,
-                                            fontSize = 12.sp,
-                                            color = Color.Gray
-                                        )
-                                    }
                                     
                                     Text(
-                                        text = "${String.format("%.0f", limit.amount)} ৳",
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = ChargeLimitColors.Primary
+                                        text = "${String.format("%.0f", packageInfo.sendMoneyCharge)} ৳",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = ChargeLimitColors.Orange,
+                                        modifier = Modifier.weight(1.5f),
+                                        textAlign = TextAlign.Center
+                                    )
+                                    
+                                    Text(
+                                        text = "${String.format("%.0f", packageInfo.cashOutCharge)} ৳",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = ChargeLimitColors.Red,
+                                        modifier = Modifier.weight(1.5f),
+                                        textAlign = TextAlign.Center
                                     )
                                 }
                             }

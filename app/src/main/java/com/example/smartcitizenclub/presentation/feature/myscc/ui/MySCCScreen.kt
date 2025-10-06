@@ -3,6 +3,7 @@ package com.example.smartcitizenclub.presentation.feature.myscc.ui
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,10 +22,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.smartcitizenclub.R
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
@@ -70,6 +73,7 @@ fun MySCCScreen(
     user: User,
     onLogout: () -> Unit,
     onNavigateToChangePassword: () -> Unit = {},
+    onNavigateToChangePin: () -> Unit = {},
     onNavigateToKYCSubmit: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -84,6 +88,7 @@ fun MySCCScreen(
             // General Section
             SettingsItem("Language", Icons.Default.Language, currentLanguage, true, "General"),
             SettingsItem("Change Password", Icons.Default.Lock, hasAction = true, category = "General"),
+            SettingsItem("Change PIN", Icons.Default.Pin, hasAction = true, category = "General"),
             SettingsItem("Submit KYC", Icons.Default.Description, hasAction = true, category = "General"),
             
             // More Information Section
@@ -110,16 +115,18 @@ fun MySCCScreen(
             Column {
                 // Title
                 Text(
-                    text = "My SCC",
+                    text = "Smart Citizen Club (SCC)",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color.White,
+                    modifier = Modifier.padding(start = 25.dp)
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 // User Profile Section
                 Row(
+                    modifier = Modifier.padding(start = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Profile Avatar with Primary Color Border
@@ -132,16 +139,15 @@ fun MySCCScreen(
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(50.dp)
+                                .size(70.dp)
                                 .clip(CircleShape)
                                 .background(Color.White.copy(alpha = 0.9f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = "Profile",
-                                modifier = Modifier.size(28.dp),
-                                tint = PrimaryOrangeGradient
+                            Image(
+                                painter = painterResource(id = R.drawable.smart_citizen_logo),
+                                contentDescription = "SCC Logo",
+                                modifier = Modifier.size(60.dp)
                             )
                         }
                     }
@@ -197,6 +203,7 @@ fun MySCCScreen(
                         when (item.title) {
                             "Language" -> showLanguageDialog = true
                             "Change Password" -> onNavigateToChangePassword()
+                            "Change PIN" -> onNavigateToChangePin()
                             "Submit KYC" -> onNavigateToKYCSubmit()
                             // Add other click handlers here as needed
                         }
@@ -220,7 +227,7 @@ fun MySCCScreen(
                             "About" -> showAbout = true
                             "SCC Page" -> {
                                 // Open Facebook page
-                                openExternalUrl(context, "https://facebook.com/smartcitizenclub")
+                                openExternalUrl(context, "https://facebook.com/SmartCitizenClube")
                             }
                             "Website" -> {
                                 // Open website
@@ -535,7 +542,10 @@ fun MySCCScreenPreview() {
                 phone = "01742-184298",
                 type = UserType.USER
             ),
-            onLogout = {}
+            onLogout = {},
+            onNavigateToChangePassword = {},
+            onNavigateToChangePin = {},
+            onNavigateToKYCSubmit = {}
         )
     }
 }

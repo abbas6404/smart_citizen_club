@@ -58,6 +58,18 @@ data class UserLimit(
     val isActive: Boolean = true
 )
 
+// Package information data class
+data class PackageInfo(
+    val id: String,
+    val name: String,
+    val description: String,
+    val withdrawalLimit: Double,
+    val loanLimit: Double,
+    val sendMoneyCharge: Double,
+    val cashOutCharge: Double,
+    val isActive: Boolean = true
+)
+
 // Colors for charge and limit screen
 object ChargeLimitColors {
     val Primary = Color(0xFFE53E3E)

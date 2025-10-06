@@ -1,4 +1,4 @@
-package com.example.smartcitizenclub.presentation.feature.payments.ui
+package com.example.smartcitizenclub.presentation.feature.billpay.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,10 +29,10 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PaymentScreen(
-    payments: List<Payment>,
+fun BillPayScreen(
+    payments: List<BillPayment>,
     onBackClick: () -> Unit,
-    onPaymentSelected: (Payment) -> Unit = {}
+    onPaymentSelected: (BillPayment) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -43,7 +43,7 @@ fun PaymentScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "Make Payment",
+                    text = "Bill Pay",
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -65,179 +65,119 @@ fun PaymentScreen(
         )
         
         // Main Content
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
+            // Coming Soon Icon
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .background(
+                        color = Color(0xFFE53E3E).copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(60.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Default.Construction,
+                    contentDescription = "Coming Soon",
+                    tint = Color(0xFFE53E3E),
+                    modifier = Modifier.size(60.dp)
+                )
             }
             
-            // Header
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            Icons.Default.Payment,
-                            contentDescription = "Payment",
-                            tint = Color(0xFFE53E3E),
-                            modifier = Modifier.size(48.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.height(12.dp))
-                        
-                        Text(
-                            text = "Select Payment",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        Text(
-                            text = "Choose a payment to make",
-                            fontSize = 14.sp,
-                            color = Color.Gray,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
-                    }
-                }
-            }
+            Spacer(modifier = Modifier.height(32.dp))
             
-            // Payments List
-            items(payments) { payment ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onPaymentSelected(payment) },
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    shape = RoundedCornerShape(12.dp)
+            // Coming Soon Text
+            Text(
+                text = "Coming Soon",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFE53E3E),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(
+                text = "Bill Payment Service",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.Black,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "We're working hard to bring you a comprehensive bill payment service. Stay tuned for updates!",
+                fontSize = 16.sp,
+                color = Color.Gray,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                lineHeight = 24.sp
+            )
+            
+            Spacer(modifier = Modifier.height(48.dp))
+            
+            // Features Preview Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
+                    Text(
+                        text = "What to Expect",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Feature list
+                    val features = listOf(
+                        "Utility Bill Payments",
+                        "Mobile & Internet Bills",
+                        "Insurance Premiums",
+                        "Credit Card Payments",
+                        "Easy Payment Tracking"
+                    )
+                    
+                    features.forEach { feature ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column {
-                                Text(
-                                    text = payment.title,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = payment.type.name,
-                                    fontSize = 14.sp,
-                                    color = Color.Gray
-                                )
-                            }
+                            Icon(
+                                Icons.Default.CheckCircle,
+                                contentDescription = "Feature",
+                                tint = Color(0xFF4CAF50),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            
+                            Spacer(modifier = Modifier.width(12.dp))
                             
                             Text(
-                                text = "৳${String.format("%.2f", payment.amount)}",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFE53E3E)
+                                text = feature,
+                                fontSize = 14.sp,
+                                color = Color.Black
                             )
                         }
                         
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        Text(
-                            text = payment.description,
-                            fontSize = 14.sp,
-                            color = Color.Black
-                        )
-                        
-                        Spacer(modifier = Modifier.height(12.dp))
-                        
-                        // Payment details
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    getPaymentTypeIcon(payment.type),
-                                    contentDescription = "Type",
-                                    tint = Color.Gray,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Text(
-                                    text = payment.type.name,
-                                    fontSize = 12.sp,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = "Type",
-                                    fontSize = 10.sp,
-                                    color = Color.Gray
-                                )
-                            }
-                            
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    Icons.Default.Info,
-                                    contentDescription = "Status",
-                                    tint = Color.Gray,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Text(
-                                    text = payment.status.name,
-                                    fontSize = 12.sp,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = "Status",
-                                    fontSize = 10.sp,
-                                    color = Color.Gray
-                                )
-                            }
-                            
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    Icons.Default.CalendarToday,
-                                    contentDescription = "Due Date",
-                                    tint = Color.Gray,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Text(
-                                    text = payment.dueDate?.let { formatDateTime(it) } ?: "N/A",
-                                    fontSize = 12.sp,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = "Due Date",
-                                    fontSize = 10.sp,
-                                    color = Color.Gray
-                                )
-                            }
+                        if (feature != features.last()) {
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
             }
         }
     }
@@ -245,8 +185,8 @@ fun PaymentScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PaymentAmountScreen(
-    payment: Payment,
+fun BillPaymentAmountScreen(
+    payment: BillPayment,
     onBackClick: () -> Unit,
     onAmountEntered: (Double, PaymentMethod, String) -> Unit = { _, _, _ -> }
 ) {
@@ -346,7 +286,7 @@ fun PaymentAmountScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    Divider(color = Color.Gray.copy(alpha = 0.3f))
+                    HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f))
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
@@ -490,7 +430,7 @@ fun PaymentAmountScreen(
                         }
                         
                         if (method != paymentMethods.last()) {
-                            Divider(color = Color.Gray.copy(alpha = 0.3f))
+                            HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f))
                         }
                     }
                 }
@@ -591,14 +531,13 @@ fun PaymentAmountScreen(
 }
 
 // Helper functions
-private fun getPaymentTypeIcon(type: PaymentType): androidx.compose.ui.graphics.vector.ImageVector {
+private fun getBillPaymentTypeIcon(type: BillPaymentType): androidx.compose.ui.graphics.vector.ImageVector {
     return when (type) {
-        PaymentType.LOAN -> Icons.Default.AccountBalance
-        PaymentType.MOBILE_RECHARGE -> Icons.Default.Phone
-        PaymentType.BILL -> Icons.Default.Receipt
-        PaymentType.DONATION -> Icons.Default.Favorite
-        PaymentType.TRANSFER -> Icons.Default.Send
-        PaymentType.OTHER -> Icons.Default.Help
+        BillPaymentType.UTILITY -> Icons.Default.Home
+        BillPaymentType.MOBILE_INTERNET -> Icons.Default.Phone
+        BillPaymentType.INSURANCE -> Icons.Default.Security
+        BillPaymentType.CREDIT_CARD -> Icons.Default.CreditCard
+        BillPaymentType.OTHER -> Icons.Default.Help
     }
 }
 
@@ -620,26 +559,26 @@ private fun formatDateTime(timestamp: Long): String {
 
 @Preview(showBackground = true)
 @Composable
-fun PaymentScreenPreview() {
+fun BillPayScreenPreview() {
     SmartCitizenClubTheme {
-        PaymentScreen(
+        BillPayScreen(
             payments = listOf(
-                Payment(
+                BillPayment(
                     id = "1",
-                    type = PaymentType.LOAN,
-                    title = "Loan Payment",
-                    description = "Monthly loan installment",
-                    amount = 4467.89,
+                    type = BillPaymentType.UTILITY,
+                    title = "Electricity Bill",
+                    description = "Monthly electricity bill",
+                    amount = 2500.0,
                     dueDate = System.currentTimeMillis() + (15 * 24 * 60 * 60 * 1000L),
-                    status = PaymentStatus.PENDING
+                    status = BillPaymentStatus.PENDING
                 ),
-                Payment(
+                BillPayment(
                     id = "2",
-                    type = PaymentType.MOBILE_RECHARGE,
-                    title = "Mobile Recharge",
-                    description = "Prepaid mobile recharge",
-                    amount = 100.0,
-                    status = PaymentStatus.PENDING
+                    type = BillPaymentType.MOBILE_INTERNET,
+                    title = "Internet Bill",
+                    description = "Monthly internet subscription",
+                    amount = 1200.0,
+                    status = BillPaymentStatus.PENDING
                 )
             ),
             onBackClick = {},
@@ -650,17 +589,17 @@ fun PaymentScreenPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun PaymentAmountScreenPreview() {
+fun BillPaymentAmountScreenPreview() {
     SmartCitizenClubTheme {
-        PaymentAmountScreen(
-            payment = Payment(
+        BillPaymentAmountScreen(
+            payment = BillPayment(
                 id = "1",
-                type = PaymentType.LOAN,
-                title = "Loan Payment",
-                description = "Monthly loan installment",
-                amount = 4467.89,
+                type = BillPaymentType.UTILITY,
+                title = "Electricity Bill",
+                description = "Monthly electricity bill",
+                amount = 2500.0,
                 dueDate = System.currentTimeMillis() + (15 * 24 * 60 * 60 * 1000L),
-                status = PaymentStatus.PENDING
+                status = BillPaymentStatus.PENDING
             ),
             onBackClick = {},
             onAmountEntered = { _, _, _ -> }

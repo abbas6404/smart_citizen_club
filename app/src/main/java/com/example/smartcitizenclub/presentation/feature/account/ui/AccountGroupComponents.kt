@@ -61,12 +61,22 @@ fun GroupSelection(
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    Icons.Default.Group,
-                    contentDescription = "No Group",
-                    tint = if (selectedGroupId == null) AccountColors.Green else AccountColors.DarkGray,
-                    modifier = Modifier.size(20.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(
+                            if (selectedGroupId == null) AccountColors.Green.copy(alpha = 0.15f) else Color.Transparent,
+                            RoundedCornerShape(12.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Group,
+                        contentDescription = "No Group",
+                        tint = if (selectedGroupId == null) AccountColors.Green else AccountColors.DarkGray,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = "No Group",
@@ -94,12 +104,22 @@ fun GroupSelection(
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        group.icon,
-                        contentDescription = group.name,
-                        tint = if (selectedGroupId == group.id) group.color else AccountColors.DarkGray,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                if (selectedGroupId == group.id) group.color.copy(alpha = 0.15f) else Color.Transparent,
+                                RoundedCornerShape(12.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            group.icon,
+                            contentDescription = group.name,
+                            tint = if (selectedGroupId == group.id) group.color else AccountColors.DarkGray,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = group.name,
@@ -144,25 +164,6 @@ fun GroupCard(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .background(
-                                group.color.copy(alpha = 0.1f),
-                                RoundedCornerShape(12.dp)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            group.icon,
-                            contentDescription = group.name,
-                            tint = group.color,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.width(16.dp))
-                    
                     Column {
                         Text(
                             text = group.name,

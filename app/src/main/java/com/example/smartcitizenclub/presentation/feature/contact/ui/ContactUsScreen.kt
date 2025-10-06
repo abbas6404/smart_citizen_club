@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -14,26 +13,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcitizenclub.data.User
-import com.example.smartcitizenclub.data.UserType
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContactUsScreen(
     user: User,
-    onBackClick: () -> Unit,
-    onTicketSubmitted: (SupportTicket) -> Unit = {}
+    onBackClick: () -> Unit
 ) {
-    var subject by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf(TicketCategory.GENERAL_INQUIRY) }
-    var selectedPriority by remember { mutableStateOf(TicketPriority.MEDIUM) }
-    
     val scrollState = rememberScrollState()
     
     Column(
@@ -61,7 +52,7 @@ fun ContactUsScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFFE53E3E) // Red color
+                containerColor = Color(0xFFE53E3E)
             ),
             modifier = Modifier.statusBarsPadding()
         )
@@ -76,335 +67,225 @@ fun ContactUsScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             
-            // Contact Header
+            // Contact Information Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp)
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Icon(
-                        Icons.Default.ContactSupport,
-                        contentDescription = "Contact Support",
-                        tint = Color(0xFFE53E3E),
-                        modifier = Modifier.size(48.dp)
-                    )
-                    
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
                     Text(
-                        text = "How can we help you?",
+                        text = "Get in Touch",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
                     
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
                     Text(
-                        text = "Submit a support ticket and our team will get back to you as soon as possible.",
+                        text = "We're here to help! Reach out to us through any of the following channels:",
                         fontSize = 14.sp,
                         color = Color.Gray,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        lineHeight = 20.sp
+                    )
+                    
+                    // Contact Methods
+                    ContactMethod(
+                        icon = Icons.Default.Phone,
+                        title = "Phone Support",
+                        description = "Call us for immediate assistance",
+                        contact = "+1 (555) 123-4567",
+                        color = Color(0xFF4CAF50)
+                    )
+                    
+                    ContactMethod(
+                        icon = Icons.Default.Email,
+                        title = "Email Support",
+                        description = "Send us an email and we'll respond within 24 hours",
+                        contact = "support@smartcitizenclub.com",
+                        color = Color(0xFF2196F3)
+                    )
+                    
+                    ContactMethod(
+                        icon = Icons.Default.Chat,
+                        title = "Live Chat",
+                        description = "Chat with our support team in real-time",
+                        contact = "Available 9 AM - 6 PM (Mon-Fri)",
+                        color = Color(0xFF9C27B0)
+                    )
+                    
+                    ContactMethod(
+                        icon = Icons.Default.LocationOn,
+                        title = "Office Address",
+                        description = "Visit our office for in-person support",
+                        contact = "123 Main Street, City, State 12345",
+                        color = Color(0xFFE91E63)
                     )
                 }
             }
             
-            // User Info
+            // Business Hours Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp)
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Your Information",
-                        fontSize = 16.sp,
+                        text = "Business Hours",
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
                     
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = "Name",
-                            tint = Color.Gray,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
-                        Text(
-                            text = user.name,
-                            fontSize = 14.sp,
-                            color = Color.Black
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    if (user.phone != null) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                Icons.Default.Phone,
-                                contentDescription = "Phone",
-                                tint = Color.Gray,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            
-                            Spacer(modifier = Modifier.width(8.dp))
-                            
-                            Text(
-                                text = user.phone,
-                                fontSize = 14.sp,
-                                color = Color.Black
-                            )
-                        }
-                    }
-                    
-                    if (user.email != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                Icons.Default.Email,
-                                contentDescription = "Email",
-                                tint = Color.Gray,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            
-                            Spacer(modifier = Modifier.width(8.dp))
-                            
-                            Text(
-                                text = user.email,
-                                fontSize = 14.sp,
-                                color = Color.Black
-                            )
-                        }
-                    }
+                    BusinessHourRow("Monday - Friday", "9:00 AM - 6:00 PM")
+                    BusinessHourRow("Saturday", "10:00 AM - 4:00 PM")
+                    BusinessHourRow("Sunday", "Closed")
                 }
             }
             
-            // Ticket Form
+            // FAQ Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp)
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Submit a Ticket",
-                        fontSize = 16.sp,
+                        text = "Frequently Asked Questions",
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
                     
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Subject Field
-                    Text(
-                        text = "Subject",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
+                    FAQItem(
+                        question = "How do I reset my password?",
+                        answer = "Go to Settings > Security > Change Password and follow the instructions."
                     )
                     
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    OutlinedTextField(
-                        value = subject,
-                        onValueChange = { subject = it },
-                        placeholder = {
-                            Text(
-                                text = "Enter subject",
-                                fontSize = 14.sp,
-                                color = Color.Gray
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFFE53E3E),
-                            unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                        )
+                    FAQItem(
+                        question = "How long does it take to process a loan?",
+                        answer = "Loan applications are typically processed within 1-3 business days."
                     )
                     
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Description Field
-                    Text(
-                        text = "Description",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
+                    FAQItem(
+                        question = "What are the transaction fees?",
+                        answer = "Transaction fees vary by service. Check the specific service page for detailed fee information."
                     )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    OutlinedTextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        placeholder = {
-                            Text(
-                                text = "Describe your issue or question in detail",
-                                fontSize = 14.sp,
-                                color = Color.Gray
-                            )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(120.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFFE53E3E),
-                            unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                        )
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Category Dropdown
-                    Text(
-                        text = "Category",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    ExposedDropdownMenuBox(
-                        expanded = false,
-                        onExpandedChange = { /* TODO: Handle dropdown */ }
-                    ) {
-                        OutlinedTextField(
-                            value = selectedCategory.name.replace("_", " "),
-                            onValueChange = { },
-                            readOnly = true,
-                            trailingIcon = {
-                                Icon(
-                                    Icons.Default.ArrowDropDown,
-                                    contentDescription = "Expand",
-                                    tint = Color.Gray
-                                )
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFFE53E3E),
-                                unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                            )
-                        )
-                        ExposedDropdownMenu(
-                            expanded = false,
-                            onDismissRequest = { /* TODO: Handle dismiss */ }
-                        ) {
-                            // TODO: Add category options
-                        }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Priority Dropdown
-                    Text(
-                        text = "Priority",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    ExposedDropdownMenuBox(
-                        expanded = false,
-                        onExpandedChange = { /* TODO: Handle dropdown */ }
-                    ) {
-                        OutlinedTextField(
-                            value = selectedPriority.name,
-                            onValueChange = { },
-                            readOnly = true,
-                            trailingIcon = {
-                                Icon(
-                                    Icons.Default.ArrowDropDown,
-                                    contentDescription = "Expand",
-                                    tint = Color.Gray
-                                )
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFFE53E3E),
-                                unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                            )
-                        )
-                        ExposedDropdownMenu(
-                            expanded = false,
-                            onDismissRequest = { /* TODO: Handle dismiss */ }
-                        ) {
-                            // TODO: Add priority options
-                        }
-                    }
                 }
-            }
-            
-            // Submit Button
-            Button(
-                onClick = {
-                    // TODO: Submit ticket
-                    // For now, we'll just call the callback with a mock ticket
-                    val mockTicket = SupportTicket(
-                        id = "ticket_1",
-                        subject = subject,
-                        description = description,
-                        category = selectedCategory,
-                        priority = selectedPriority,
-                        status = TicketStatus.OPEN,
-                        createdAt = System.currentTimeMillis(),
-                        updatedAt = System.currentTimeMillis(),
-                        userId = user.id,
-                        userName = user.name,
-                        userEmail = user.email,
-                        userPhone = user.phone
-                    )
-                    onTicketSubmitted(mockTicket)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE53E3E)
-                ),
-                shape = RoundedCornerShape(25.dp),
-                enabled = subject.isNotEmpty() && description.isNotEmpty()
-            ) {
-                Text(
-                    text = "Submit Ticket",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
             }
             
             Spacer(modifier = Modifier.height(80.dp))
         }
+    }
+}
+
+@Composable
+private fun ContactMethod(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    description: String,
+    contact: String,
+    color: Color
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f)),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Icon(
+                icon,
+                contentDescription = title,
+                tint = color,
+                modifier = Modifier
+                    .padding(12.dp)
+                    .size(24.dp)
+            )
+        }
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+            
+            Text(
+                text = description,
+                fontSize = 12.sp,
+                color = Color.Gray,
+                lineHeight = 16.sp
+            )
+            
+            Text(
+                text = contact,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = color
+            )
+        }
+    }
+}
+
+@Composable
+private fun BusinessHourRow(day: String, hours: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = day,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.Black
+        )
+        
+        Text(
+            text = hours,
+            fontSize = 14.sp,
+            color = Color.Gray
+        )
+    }
+}
+
+@Composable
+private fun FAQItem(question: String, answer: String) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = question,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.Black
+        )
+        
+        Text(
+            text = answer,
+            fontSize = 12.sp,
+            color = Color.Gray,
+            lineHeight = 16.sp
+        )
     }
 }
 
@@ -415,13 +296,11 @@ fun ContactUsScreenPreview() {
         ContactUsScreen(
             user = User(
                 id = "1",
-                name = "Abbas Uddin",
-                email = "abbas@example.com",
-                phone = "01741736354",
-                type = UserType.USER
+                name = "John Doe",
+                email = "john@example.com",
+                phone = "+1234567890"
             ),
-            onBackClick = {},
-            onTicketSubmitted = {}
+            onBackClick = {}
         )
     }
 }

@@ -40,10 +40,12 @@ fun HorizontalPagingNavigation(
     onShowInvestment: () -> Unit = {},
     onShowLoan: () -> Unit = {},
     onShowLoanPay: () -> Unit = {},
-    onShowContactUs: () -> Unit = {},
+    onShowBillPay: () -> Unit = {},
+    onShowTicketSupport: () -> Unit = {},
     onShowChargeLimit: () -> Unit = {},
     onShowDonation: () -> Unit = {},
     onShowChangePassword: () -> Unit = {},
+    onShowChangePin: () -> Unit = {},
     onShowKYCSubmit: () -> Unit = {}
 ) {
     // Define ALL pages that support horizontal paging (all bottom nav screens)
@@ -104,8 +106,9 @@ fun HorizontalPagingNavigation(
                         onInvestmentClick = onShowInvestment,
                         onLoanClick = onShowLoan,
                         onLoanPayClick = onShowLoanPay,
+                        onBillPayClick = onShowBillPay,
                         onTransactionHistoryClick = onShowTransactionHistory,
-                        onContactUsClick = onShowContactUs,
+                        onTicketSupportClick = onShowTicketSupport,
                         onChargeLimitClick = onShowChargeLimit,
                         onDonationClick = onShowDonation
                     )
@@ -143,6 +146,7 @@ fun HorizontalPagingNavigation(
                         user = user,
                         onLogout = onLogout,
                         onNavigateToChangePassword = onShowChangePassword,
+                        onNavigateToChangePin = onShowChangePin,
                         onNavigateToKYCSubmit = onShowKYCSubmit
                     )
                 }

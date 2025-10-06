@@ -538,6 +538,46 @@ fun QRScanScreen(
                             Text("Cash Out")
                         }
                         
+                        // Save Contact Button
+                        Button(
+                            onClick = { 
+                                // TODO: Implement save contact functionality
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4CAF50) // Green color
+                            ),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                Icons.Default.PersonAdd,
+                                contentDescription = "Save Contact",
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Save Contact")
+                        }
+                        
+                        // Add Chat Button
+                        Button(
+                            onClick = { 
+                                // TODO: Implement add chat functionality
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF2196F3) // Blue color
+                            ),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                Icons.Default.Chat,
+                                contentDescription = "Add Chat",
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Add Chat")
+                        }
+                        
                         // Scan Again Button
                         OutlinedButton(
                             onClick = { 

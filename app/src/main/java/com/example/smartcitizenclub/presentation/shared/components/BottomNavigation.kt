@@ -38,12 +38,10 @@ import com.example.smartcitizenclub.presentation.feature.myscc.ui.MySCCScreen
 import com.example.smartcitizenclub.presentation.feature.home.ui.HomeScreen
 import com.example.smartcitizenclub.presentation.feature.cashout.ui.CashOutProvider
 import com.example.smartcitizenclub.presentation.feature.recharge.ui.MobileOperator
-import com.example.smartcitizenclub.presentation.feature.contact.ui.SupportTicket
-import com.example.smartcitizenclub.presentation.feature.donation.ui.DonationCampaign
-import com.example.smartcitizenclub.presentation.feature.donation.ui.UserDonation
+import com.example.smartcitizenclub.presentation.feature.ticketsupport.ui.*
 import com.example.smartcitizenclub.presentation.feature.loan.ui.*
 import com.example.smartcitizenclub.presentation.feature.loanpay.ui.*
-import com.example.smartcitizenclub.presentation.feature.payments.ui.*
+import com.example.smartcitizenclub.presentation.feature.billpay.ui.*
 import com.example.smartcitizenclub.presentation.feature.sendmoney.ui.Contact
 import com.example.smartcitizenclub.presentation.feature.sendmoney.ui.ConfirmSendMoneyScreen
 import com.example.smartcitizenclub.presentation.feature.transaction.ui.TransactionHistoryScreen
@@ -61,6 +59,7 @@ fun BottomNavigation(
     showBottomNavigation: Boolean = true // Controls whether to show the bottom navigation bar
 ) {
     var showChangePassword by remember { mutableStateOf(false) }
+    var showChangePin by remember { mutableStateOf(false) }
     var showKYCSubmit by remember { mutableStateOf(false) }
     var showSelectContact by remember { mutableStateOf(false) }
     var showNewGroup by remember { mutableStateOf(false) }
@@ -118,16 +117,13 @@ fun BottomNavigation(
     var rechargeAmount by remember { mutableStateOf(0.0) }
     var rechargeReference by remember { mutableStateOf<String?>(null) }
     
-    // Contact Us navigation states
-    var showContactUs by remember { mutableStateOf(false) }
-    var showTicketList by remember { mutableStateOf(false) }
+    // Ticket Support navigation states
+    var showTicketSupport by remember { mutableStateOf(false) }
     var showTicketDetails by remember { mutableStateOf(false) }
-    var selectedTicket by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.contact.ui.SupportTicket?>(null) }
+    var selectedTicket by remember { mutableStateOf<SupportTicket?>(null) }
     
     // Donation navigation states
     var showDonation by remember { mutableStateOf(false) }
-    var showDonationHistory by remember { mutableStateOf(false) }
-    var selectedCampaign by remember { mutableStateOf<com.example.smartcitizenclub.presentation.feature.donation.ui.DonationCampaign?>(null) }
     
     // Charge and Limit navigation states
     var showChargeLimit by remember { mutableStateOf(false) }
@@ -141,6 +137,7 @@ fun BottomNavigation(
     
     // Loan navigation states
     var showLoan by remember { mutableStateOf(false) }
+    var showLoanConfirm by remember { mutableStateOf(false) }
     var showLoanSuccess by remember { mutableStateOf(false) }
     var loanAmount by remember { mutableStateOf(0.0) }
     
@@ -148,12 +145,13 @@ fun BottomNavigation(
     var showLoanPay by remember { mutableStateOf(false) }
     var showLoanPaymentAmount by remember { mutableStateOf(false) }
     var showLoanPaymentHistory by remember { mutableStateOf(false) }
+    var showLateFeePayment by remember { mutableStateOf(false) }
     var selectedUserLoan by remember { mutableStateOf<UserLoan?>(null) }
     
     // Generic Payment navigation states
     var showPayment by remember { mutableStateOf(false) }
     var showPaymentAmount by remember { mutableStateOf(false) }
-    var selectedPayment by remember { mutableStateOf<Payment?>(null) }
+    var selectedPayment by remember { mutableStateOf<BillPayment?>(null) }
     
     Scaffold(
         bottomBar = {
@@ -168,6 +166,7 @@ fun BottomNavigation(
                     UserScreen.MySCC
                 ) && 
                 !showChangePassword && 
+                !showChangePin && 
                 !showKYCSubmit && 
                 !showSelectContact && 
                 !showNewGroup && 
@@ -196,20 +195,20 @@ fun BottomNavigation(
                 !showMobileRechargePin &&
                 !showMobileRechargeConfirm &&
                 !showMobileRechargeSuccess && 
-                !showContactUs && 
-                !showTicketList && 
+                !showTicketSupport &&
                 !showTicketDetails && 
                 !showDonation && 
-                !showDonationHistory && 
                 !showChargeLimit && 
                 !showInvestment && 
                 !showInvestmentAmount && 
                 !showInvestmentSuccess && 
                 !showLoan && 
+                !showLoanConfirm &&
                 !showLoanSuccess && 
                 !showLoanPay && 
                 !showLoanPaymentAmount && 
                 !showLoanPaymentHistory && 
+                !showLateFeePayment &&
                 !showPayment && 
                 !showPaymentAmount) {
                 // Custom Bottom Navigation Bar with rounded corners and shadow
@@ -290,6 +289,16 @@ fun BottomNavigation(
                         onBackClick = { showChangePassword = false },
                         onPasswordChanged = { 
                             showChangePassword = false
+                            // You can add success message or other actions here
+                        }
+                    )
+                }
+                
+                showChangePin -> {
+                    com.example.smartcitizenclub.presentation.feature.myscc.ui.ChangePinScreen(
+                        onBackClick = { showChangePin = false },
+                        onPinChanged = { 
+                            showChangePin = false
                             // You can add success message or other actions here
                         }
                     )
@@ -701,61 +710,22 @@ fun BottomNavigation(
                         }
                     )
                 }
-                showContactUs -> {
-                    com.example.smartcitizenclub.presentation.feature.contact.ui.ContactUsScreen(
+                showTicketSupport -> {
+                    TicketSupportScreen(
                         user = user,
-                        onBackClick = { showContactUs = false },
+                        onBackClick = { showTicketSupport = false },
                         onTicketSubmitted = { ticket ->
                             // TODO: Save ticket to database
-                            showContactUs = false
+                            showTicketSupport = false
                             selectedTicket = ticket
                             showTicketDetails = true
                         }
                     )
-                }
-                showTicketList -> {
-                    com.example.smartcitizenclub.presentation.feature.contact.ui.TicketListScreen(
-                        user = user,
-                        onBackClick = { showTicketList = false },
-                        onTicketSelected = { ticket ->
-                            selectedTicket = ticket
-                            showTicketList = false
-                            showTicketDetails = true
-                        },
-                        onCreateNewTicket = {
-                            showTicketList = false
-                            showContactUs = true
-                        }
-                    )
-                }
-                showTicketDetails -> {
-                    selectedTicket?.let { ticket ->
-                        com.example.smartcitizenclub.presentation.feature.contact.ui.TicketDetailsScreen(
-                            ticket = ticket,
-                            onBackClick = { showTicketDetails = false }
-                        )
-                    }
                 }
                 showDonation -> {
                     com.example.smartcitizenclub.presentation.feature.donation.ui.DonationScreen(
                         user = user,
-                        onBackClick = { showDonation = false },
-                        onDonationSuccess = { donation ->
-                            // TODO: Save donation to database
-                            showDonation = false
-                            showDonationHistory = true
-                        }
-                    )
-                }
-                showDonationHistory -> {
-                    com.example.smartcitizenclub.presentation.feature.donation.ui.DonationHistoryScreen(
-                        user = user,
-                        onBackClick = { showDonationHistory = false },
-                        onDonateAgain = { campaign ->
-                            selectedCampaign = campaign
-                            showDonationHistory = false
-                            showDonation = true
-                        }
+                        onBackClick = { showDonation = false }
                     )
                 }
                 showChargeLimit -> {
@@ -804,9 +774,21 @@ fun BottomNavigation(
                 showLoan -> {
                     LoanScreen(
                         onBackClick = { showLoan = false },
-                        onLoanClick = { loan ->
-                            loanAmount = 50000.0 // Default amount from LoanScreen
+                        onLoanConfirm = { amount ->
+                            loanAmount = amount
                             showLoan = false
+                            showLoanConfirm = true
+                        }
+                    )
+                }
+                showLoanConfirm -> {
+                    LoanConfirmScreen(
+                        loanAmount = loanAmount,
+                        interestRate = 12.5,
+                        tenure = 12,
+                        onBackClick = { showLoanConfirm = false },
+                        onLoanComplete = {
+                            showLoanConfirm = false
                             showLoanSuccess = true
                         }
                     )
@@ -827,6 +809,8 @@ fun BottomNavigation(
                             id = "1",
                             userId = user.id,
                             loanId = "1",
+                            loanNumber = "LN001234",
+                            subAccountId = "SUB001",
                             amount = 50000.0,
                             tenure = 12,
                             interestRate = 12.5,
@@ -837,7 +821,9 @@ fun BottomNavigation(
                             endDate = System.currentTimeMillis() + (9 * 30 * 24 * 60 * 60 * 1000L),
                             status = LoanStatus.ACTIVE,
                             remainingAmount = 38000.0,
-                            nextPaymentDate = System.currentTimeMillis() + (15 * 24 * 60 * 60 * 1000L)
+                            nextPaymentDate = System.currentTimeMillis() + (15 * 24 * 60 * 60 * 1000L),
+                            hasOverduePayments = true,
+                            totalLateFeeAmount = 500.0
                         )
                     )
                     LoanPayScreen(
@@ -851,6 +837,11 @@ fun BottomNavigation(
                         onPaymentHistory = {
                             showLoanPay = false
                             showLoanPaymentHistory = true
+                        },
+                        onLateFeePayment = { userLoan ->
+                            selectedUserLoan = userLoan
+                            showLoanPay = false
+                            showLateFeePayment = true
                         }
                     )
                 }
@@ -859,10 +850,14 @@ fun BottomNavigation(
                         LoanPaymentAmountScreen(
                             userLoan = userLoan,
                             onBackClick = { showLoanPaymentAmount = false },
-                            onAmountEntered = { amount, paymentMethod, pin ->
+                            onAmountEntered = { amount ->
                                 // TODO: Process the loan payment
                                 showLoanPaymentAmount = false
                                 selectedUserLoan = null
+                            },
+                            onPayLateFees = {
+                                showLoanPaymentAmount = false
+                                showLateFeePayment = true
                             }
                         )
                     }
@@ -877,16 +872,20 @@ fun BottomNavigation(
                             paymentDate = System.currentTimeMillis() - (30 * 24 * 60 * 60 * 1000L),
                             paymentMethod = "SCC Wallet",
                             status = "Completed",
-                            transactionId = "TXN${System.currentTimeMillis()}"
+                            transactionId = "TXN${System.currentTimeMillis()}",
+                            paymentType = com.example.smartcitizenclub.presentation.feature.loan.ui.PaymentType.LOAN_PAYMENT,
+                            description = "Monthly EMI payment"
                         ),
                         LoanPayment(
                             id = "2",
                             loanId = "1",
-                            amount = 4467.89,
-                            paymentDate = System.currentTimeMillis() - (60 * 24 * 60 * 60 * 1000L),
-                            paymentMethod = "Credit Card",
+                            amount = 500.0,
+                            paymentDate = System.currentTimeMillis() - (45 * 24 * 60 * 60 * 1000L),
+                            paymentMethod = "SCC Wallet",
                             status = "Completed",
-                            transactionId = "TXN${System.currentTimeMillis() - 1000}"
+                            transactionId = "TXN${System.currentTimeMillis() - 1000}",
+                            paymentType = com.example.smartcitizenclub.presentation.feature.loan.ui.PaymentType.LATE_FEE_PAYMENT,
+                            description = "Late fee for overdue payment"
                         )
                     )
                     LoanPaymentHistoryScreen(
@@ -894,28 +893,70 @@ fun BottomNavigation(
                         onBackClick = { showLoanPaymentHistory = false }
                     )
                 }
+                showLateFeePayment -> {
+                    selectedUserLoan?.let { userLoan ->
+                        // Sample late fees for demonstration
+                        val lateFees = listOf(
+                            LateFee(
+                                id = "LF001",
+                                loanIssuedId = "LI001",
+                                subAccountId = userLoan.subAccountId,
+                                amount = 300.0,
+                                balanceBefore = userLoan.remainingAmount,
+                                balanceAfter = userLoan.remainingAmount,
+                                description = "Late fee for overdue EMI payment",
+                                status = LateFeeStatus.PENDING,
+                                createdDate = System.currentTimeMillis() - (10 * 24 * 60 * 60 * 1000L)
+                            ),
+                            LateFee(
+                                id = "LF002",
+                                loanIssuedId = "LI001",
+                                subAccountId = userLoan.subAccountId,
+                                amount = 200.0,
+                                balanceBefore = userLoan.remainingAmount,
+                                balanceAfter = userLoan.remainingAmount,
+                                description = "Late fee for overdue EMI payment",
+                                status = LateFeeStatus.PENDING,
+                                createdDate = System.currentTimeMillis() - (5 * 24 * 60 * 60 * 1000L)
+                            )
+                        )
+                        LateFeePaymentScreen(
+                            userLoan = userLoan,
+                            lateFees = lateFees,
+                            onBackClick = { 
+                                showLateFeePayment = false
+                                selectedUserLoan = null
+                            },
+                            onPayLateFee = { lateFee, amount ->
+                                // TODO: Process late fee payment
+                                showLateFeePayment = false
+                                selectedUserLoan = null
+                            }
+                        )
+                    }
+                }
                 showPayment -> {
                     // Sample payments for demonstration
                     val payments = listOf(
-                        Payment(
+                        BillPayment(
                             id = "1",
-                            type = PaymentType.LOAN,
+                            type = BillPaymentType.UTILITY,
                             title = "Loan Payment",
                             description = "Monthly loan installment",
                             amount = 4467.89,
                             dueDate = System.currentTimeMillis() + (15 * 24 * 60 * 60 * 1000L),
-                            status = PaymentStatus.PENDING
+                            status = BillPaymentStatus.PENDING
                         ),
-                        Payment(
+                        BillPayment(
                             id = "2",
-                            type = PaymentType.MOBILE_RECHARGE,
+                            type = BillPaymentType.MOBILE_INTERNET,
                             title = "Mobile Recharge",
                             description = "Prepaid mobile recharge",
                             amount = 100.0,
-                            status = PaymentStatus.PENDING
+                            status = BillPaymentStatus.PENDING
                         )
                     )
-                    PaymentScreen(
+                    BillPayScreen(
                         payments = payments,
                         onBackClick = { showPayment = false },
                         onPaymentSelected = { payment ->
@@ -927,7 +968,7 @@ fun BottomNavigation(
                 }
                 showPaymentAmount -> {
                     selectedPayment?.let { payment ->
-                        PaymentAmountScreen(
+                        BillPaymentAmountScreen(
                             payment = payment,
                             onBackClick = { showPaymentAmount = false },
                             onAmountEntered = { amount, paymentMethod, pin ->
@@ -967,10 +1008,12 @@ fun BottomNavigation(
                         onShowInvestment = { showInvestment = true },
                         onShowLoan = { showLoan = true },
                         onShowLoanPay = { showLoanPay = true },
-                        onShowContactUs = { showContactUs = true },
+                        onShowBillPay = { showPayment = true },
+                        onShowTicketSupport = { showTicketSupport = true },
                         onShowChargeLimit = { showChargeLimit = true },
                         onShowDonation = { showDonation = true },
                         onShowChangePassword = { showChangePassword = true },
+                        onShowChangePin = { showChangePin = true },
                         onShowKYCSubmit = { showKYCSubmit = true }
                     )
                 }

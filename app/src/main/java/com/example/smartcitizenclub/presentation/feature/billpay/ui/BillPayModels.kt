@@ -1,32 +1,31 @@
-package com.example.smartcitizenclub.presentation.feature.payments.ui
+package com.example.smartcitizenclub.presentation.feature.billpay.ui
 
 import androidx.compose.ui.graphics.Color
 
-// Generic payment data class
-data class Payment(
+// Bill payment data class
+data class BillPayment(
     val id: String,
-    val type: PaymentType,
+    val type: BillPaymentType,
     val title: String,
     val description: String,
     val amount: Double,
     val dueDate: Long? = null,
-    val status: PaymentStatus = PaymentStatus.PENDING,
+    val status: BillPaymentStatus = BillPaymentStatus.PENDING,
     val reference: String? = null,
     val additionalInfo: Map<String, String> = emptyMap()
 )
 
-// Payment type enum
-enum class PaymentType {
-    LOAN,
-    MOBILE_RECHARGE,
-    BILL,
-    DONATION,
-    TRANSFER,
+// Bill payment type enum
+enum class BillPaymentType {
+    UTILITY,
+    MOBILE_INTERNET,
+    INSURANCE,
+    CREDIT_CARD,
     OTHER
 }
 
-// Payment status enum
-enum class PaymentStatus {
+// Bill payment status enum
+enum class BillPaymentStatus {
     PENDING,
     COMPLETED,
     OVERDUE,
@@ -41,10 +40,10 @@ enum class PaymentMethod {
     MOBILE_RECHARGE
 }
 
-// Generic payment request
-data class PaymentRequest(
+// Bill payment request
+data class BillPaymentRequest(
     val userId: String,
-    val paymentType: PaymentType,
+    val billPaymentType: BillPaymentType,
     val amount: Double,
     val paymentMethod: PaymentMethod,
     val reference: String? = null,
@@ -52,16 +51,16 @@ data class PaymentRequest(
     val pin: String
 )
 
-// Generic payment response
-data class PaymentResponse(
+// Bill payment response
+data class BillPaymentResponse(
     val success: Boolean,
     val transactionId: String? = null,
     val message: String,
     val remainingBalance: Double? = null
 )
 
-// Colors for payment screens
-object PaymentColors {
+// Colors for bill pay screens
+object BillPayColors {
     val Red = Color(0xFFE53E3E)
     val LightGray = Color(0xFFF5F5F5)
     val Gray = Color(0xFF9E9E9E)

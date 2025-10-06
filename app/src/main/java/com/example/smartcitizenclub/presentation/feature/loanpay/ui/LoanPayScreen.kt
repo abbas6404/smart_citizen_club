@@ -30,7 +30,8 @@ fun LoanPayScreen(
     userLoans: List<UserLoan>,
     onBackClick: () -> Unit,
     onLoanPayment: (UserLoan) -> Unit = {},
-    onPaymentHistory: () -> Unit = {}
+    onPaymentHistory: () -> Unit = {},
+    onLateFeePayment: (UserLoan) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -86,7 +87,7 @@ fun LoanPayScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
-                            Icons.Default.Payment,
+                            Icons.Default.CreditCard,
                             contentDescription = "Loan Payment",
                             tint = PrimaryOrangeGradient,
                             modifier = Modifier.size(40.dp)
@@ -130,7 +131,7 @@ fun LoanPayScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            Icons.Default.History,
+                            Icons.Default.Schedule,
                             contentDescription = "Payment History",
                             tint = PrimaryOrangeGradient,
                             modifier = Modifier.size(24.dp)
@@ -159,6 +160,57 @@ fun LoanPayScreen(
                             contentDescription = "Navigate",
                             tint = Color.Gray
                         )
+                    }
+                }
+            }
+            
+            // Late Fee Warning Section (if any loans have overdue payments)
+            val hasOverdueLoans = userLoans.any { it.hasOverduePayments && it.totalLateFeeAmount > 0 }
+            if (hasOverdueLoans) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEBEE)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.Warning,
+                                contentDescription = "Late Fee Warning",
+                                tint = Color(0xFFD32F2F),
+                                modifier = Modifier.size(24.dp)
+                            )
+                            
+                            Spacer(modifier = Modifier.width(12.dp))
+                            
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "Overdue Payments Detected",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFFD32F2F)
+                                )
+                                Text(
+                                    text = "You have late fees that need immediate attention",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFFD32F2F)
+                                )
+                            }
+                            
+                            Icon(
+                                Icons.Default.ChevronRight,
+                                contentDescription = "View Details",
+                                tint = Color(0xFFD32F2F)
+                            )
+                        }
                     }
                 }
             }
@@ -248,7 +300,7 @@ fun LoanPayScreen(
                             // Loan details
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally
@@ -257,17 +309,18 @@ fun LoanPayScreen(
                                         Icons.Default.AttachMoney,
                                         contentDescription = "Outstanding Amount",
                                         tint = Color.Gray,
-                                        modifier = Modifier.size(16.dp)
+                                        modifier = Modifier.size(20.dp)
                                     )
+                                    Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = "৳${String.format("%.0f", userLoan.remainingAmount)}",
-                                        fontSize = 12.sp,
+                                        fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = Color.Black
                                     )
                                     Text(
                                         text = "Outstanding",
-                                        fontSize = 10.sp,
+                                        fontSize = 11.sp,
                                         color = Color.Gray
                                     )
                                 }
@@ -279,16 +332,18 @@ fun LoanPayScreen(
                                         Icons.Default.CalendarToday,
                                         contentDescription = "Next Payment Date",
                                         tint = Color.Gray,
-                                        modifier = Modifier.size(16.dp)
+                                        modifier = Modifier.size(20.dp)
                                     )
+                                    Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = getNextPaymentDate(userLoan.nextPaymentDate),
-                                        fontSize = 12.sp,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
                                         color = Color.Black
                                     )
                                     Text(
                                         text = "Next Payment",
-                                        fontSize = 10.sp,
+                                        fontSize = 11.sp,
                                         color = Color.Gray
                                     )
                                 }
@@ -300,22 +355,85 @@ fun LoanPayScreen(
                                         Icons.Default.AccountBalance,
                                         contentDescription = "EMI Amount",
                                         tint = Color.Gray,
-                                        modifier = Modifier.size(16.dp)
+                                        modifier = Modifier.size(20.dp)
                                     )
+                                    Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = "৳${String.format("%.0f", userLoan.emiAmount)}",
-                                        fontSize = 12.sp,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
                                         color = Color.Black
                                     )
                                     Text(
                                         text = "EMI",
-                                        fontSize = 10.sp,
+                                        fontSize = 11.sp,
                                         color = Color.Gray
                                     )
                                 }
                             }
                             
-                            Spacer(modifier = Modifier.height(8.dp))
+                            // Late Fee Warning (if applicable)
+                            if (userLoan.hasOverduePayments && userLoan.totalLateFeeAmount > 0) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEBEE)),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Warning,
+                                            contentDescription = "Late Fee Warning",
+                                            tint = Color(0xFFD32F2F),
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        
+                                        Column(
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text(
+                                                text = "Late Fee Due",
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color(0xFFD32F2F)
+                                            )
+                                            Text(
+                                                text = "৳${String.format("%.2f", userLoan.totalLateFeeAmount)}",
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color(0xFFD32F2F)
+                                            )
+                                        }
+                                        
+                                        Button(
+                                            onClick = { onLateFeePayment(userLoan) },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color(0xFFD32F2F)
+                                            ),
+                                            shape = RoundedCornerShape(6.dp),
+                                            modifier = Modifier.height(28.dp),
+                                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                                        ) {
+                                            Text(
+                                                text = "Pay Now",
+                                                fontSize = 10.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            Spacer(modifier = Modifier.height(12.dp))
                             
                             LinearProgressIndicator(
                                 progress = {
@@ -326,11 +444,11 @@ fun LoanPayScreen(
                                 trackColor = Color(0xFFE0E0E0),
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(4.dp)
-                                    .clip(RoundedCornerShape(2.dp))
+                                    .height(6.dp)
+                                    .clip(RoundedCornerShape(3.dp))
                             )
                             
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
                             
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -338,12 +456,12 @@ fun LoanPayScreen(
                             ) {
                                 Text(
                                     text = "Progress",
-                                    fontSize = 10.sp,
+                                    fontSize = 11.sp,
                                     color = Color.Gray
                                 )
                                 Text(
                                     text = "${String.format("%.1f", (userLoan.totalAmount - userLoan.remainingAmount) / userLoan.totalAmount * 100)}% Complete",
-                                    fontSize = 10.sp,
+                                    fontSize = 11.sp,
                                     color = Color.Gray
                                 )
                             }
@@ -398,6 +516,8 @@ fun LoanPayScreenPreview() {
                     id = "1",
                     userId = "1",
                     loanId = "1",
+                    loanNumber = "LN001234",
+                    subAccountId = "SUB001",
                     amount = 50000.0,
                     tenure = 12,
                     interestRate = 12.5,
@@ -408,12 +528,15 @@ fun LoanPayScreenPreview() {
                     endDate = System.currentTimeMillis() + (9 * 30 * 24 * 60 * 60 * 1000L),
                     status = LoanStatus.ACTIVE,
                     remainingAmount = 38000.0,
-                    nextPaymentDate = System.currentTimeMillis() + (15 * 24 * 60 * 60 * 1000L)
+                    nextPaymentDate = System.currentTimeMillis() + (15 * 24 * 60 * 60 * 1000L),
+                    hasOverduePayments = true,
+                    totalLateFeeAmount = 500.0
                 )
             ),
             onBackClick = {},
             onLoanPayment = {},
-            onPaymentHistory = {}
+            onPaymentHistory = {},
+            onLateFeePayment = {}
         )
     }
 }

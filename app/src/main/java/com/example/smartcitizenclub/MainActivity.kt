@@ -97,7 +97,7 @@ fun MainActivityPreview() {
                         Image(
                             painter = painterResource(id = R.drawable.smart_citizen_logo),
                             contentDescription = "SCC Logo",
-                            modifier = Modifier.size(140.dp)
+                            modifier = Modifier.size(180.dp)
                         )
                         
                         Spacer(modifier = Modifier.height(8.dp))

@@ -83,8 +83,9 @@ fun HomeScreen(
     onInvestmentClick: () -> Unit = {},
     onLoanClick: () -> Unit = {},
     onLoanPayClick: () -> Unit = {},
+    onBillPayClick: () -> Unit = {},
     onTransactionHistoryClick: () -> Unit = {},
-    onContactUsClick: () -> Unit = {},
+    onTicketSupportClick: () -> Unit = {},
     onChargeLimitClick: () -> Unit = {},
     onDonationClick: () -> Unit = {}
 ) {
@@ -300,6 +301,7 @@ fun HomeScreen(
                             onClick = {
                                 when (payment.title) {
                                     "Loan Pay" -> onLoanPayClick()
+                                    "Bill Pay" -> onBillPayClick()
                                 }
                             }
                         )
@@ -378,7 +380,7 @@ fun HomeScreen(
                                 onClick = {
                                     // Handle service click
                                     when (service.title) {
-                                        "Ticket Support" -> onContactUsClick()
+                                        "Ticket Support" -> onTicketSupportClick()
                                         "Charge and Limit" -> onChargeLimitClick()
                                         "Donation" -> onDonationClick()
                                         // Add other service handlers as needed

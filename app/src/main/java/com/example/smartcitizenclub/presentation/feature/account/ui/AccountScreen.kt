@@ -220,6 +220,9 @@ fun AccountScreen(
                     )
                 }
             }
+            
+            // Extra bottom spacing
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
     

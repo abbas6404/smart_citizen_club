@@ -31,7 +31,7 @@ import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 @Composable
 fun LoanScreen(
     onBackClick: () -> Unit,
-    onLoanClick: (Loan) -> Unit = {}
+    onLoanConfirm: (Double) -> Unit = { _ -> }
 ) {
     var loanAmount by remember { mutableStateOf(50000.0) }
     
@@ -185,35 +185,33 @@ fun LoanScreen(
                         
                         Spacer(modifier = Modifier.height(16.dp))
                         
-                        // Quick Amount Buttons
-                        Text(
-                            text = "Quick Amounts",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.Black
-                        )
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        Row(
+                        // Interest Rate Display
+                        Card(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                            shape = RoundedCornerShape(8.dp)
                         ) {
-                            listOf(10000.0, 50000.0, 100000.0, 500000.0).forEach { amount ->
-                                Button(
-                                    onClick = { loanAmount = amount },
-                                    modifier = Modifier.weight(1f),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (loanAmount == amount) PrimaryOrangeGradient else Color.Gray.copy(alpha = 0.1f)
-                                    ),
-                                    shape = RoundedCornerShape(8.dp)
-                                ) {
-                                    Text(
-                                        text = "৳${String.format("%.0f", amount / 1000)}K",
-                                        fontSize = 12.sp,
-                                        color = if (loanAmount == amount) Color.White else Color.Black
-                                    )
-                                }
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Interest Rate",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.Black
+                                )
+                                
+                                Text(
+                                    text = "12.5% per annum",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = PrimaryOrangeGradient
+                                )
                             }
                         }
                     }
@@ -257,18 +255,7 @@ fun LoanScreen(
             item {
                 Button(
                     onClick = { 
-                        // Create a default loan for the selected amount
-                        val defaultLoan = Loan(
-                            id = "default",
-                            name = "Personal Loan",
-                            description = "Flexible personal loan for your needs",
-                            minAmount = 1000.0,
-                            maxAmount = 1000000.0,
-                            interestRate = 12.5,
-                            tenureOptions = listOf(6, 12, 18, 24, 36),
-                            processingFee = 2.0
-                        )
-                        onLoanClick(defaultLoan)
+                        onLoanConfirm(loanAmount)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
@@ -322,7 +309,7 @@ fun LoanScreenPreview() {
     SmartCitizenClubTheme {
         LoanScreen(
             onBackClick = {},
-            onLoanClick = {}
+            onLoanConfirm = { _ -> }
         )
     }
 }
