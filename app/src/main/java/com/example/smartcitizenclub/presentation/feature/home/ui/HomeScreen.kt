@@ -1,5 +1,8 @@
 package com.example.smartcitizenclub.presentation.feature.home.ui
 
+import android.graphics.Bitmap
+import android.graphics.Color as AndroidColor
+import android.widget.ImageView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +15,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -24,17 +26,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import android.graphics.Bitmap
-import android.graphics.Color as AndroidColor
+import com.example.smartcitizenclub.data.AccountManager
+import com.example.smartcitizenclub.data.SubAccount
+import com.example.smartcitizenclub.data.User
+import com.example.smartcitizenclub.data.UserType
+import com.example.smartcitizenclub.presentation.theme.OrangeGradient
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
-import android.widget.ImageView
-import com.example.smartcitizenclub.data.User
-import com.example.smartcitizenclub.data.UserType
-import com.example.smartcitizenclub.data.SubAccount
-import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
-import com.example.smartcitizenclub.presentation.theme.OrangeGradient
+import kotlinx.coroutines.delay
 
 // Home services data class
 data class HomeService(
@@ -133,6 +134,9 @@ fun HomeScreen(
     // State for current banner index
     var currentBannerIndex by remember { mutableStateOf(0) }
     
+    // Get active account from AccountManager
+    val activeAccount = AccountManager.activeAccount.collectAsState().value
+    
     // Auto-cycle through banners
     LaunchedEffect(Unit) {
         while (true) {
@@ -157,9 +161,9 @@ fun HomeScreen(
                 Column {
                     Spacer(modifier = Modifier.height(20.dp))
                     
-                    // User Name - Highlighted and centered
+                    // Account Name - Highlighted and centered (using active account)
                     Text(
-                        text = user.name,
+                        text = activeAccount?.accountName ?: user.name,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -170,13 +174,13 @@ fun HomeScreen(
                     
                     Spacer(modifier = Modifier.height(10.dp))
                     
-                    // QR Code display with rounded corners - Centered
+                    // QR Code display with rounded corners - Centered (uses active account)
                     Box(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
                         RealQRCode(
-                            data = "SmartCitizenClub:${user.id}:${user.phone}:${user.currentSubAccount?.accountNumber ?: "MAIN"}",
+                            data = "SmartCitizenClub:${user.id}:${user.phone}:${activeAccount?.accountNumber ?: "MAIN"}",
                             size = 200.dp,
                             modifier = Modifier
                                 .size(200.dp)
@@ -696,11 +700,11 @@ fun HomeScreenPreview() {
                 phone = "+8801234567890",
                 type = UserType.USER,
                 subAccounts = listOf(
-                    SubAccount("SUB001", "Personal Account", 1500.0),
-                    SubAccount("SUB002", "Business Account", 2500.0),
-                    SubAccount("SUB003", "Savings Account", 5000.0)
+                    SubAccount("SUB001", "Personal Account", "ACC-001", 1500.0, true, null, null),
+                    SubAccount("SUB002", "Business Account", "ACC-002", 2500.0, true, null, null),
+                    SubAccount("SUB003", "Savings Account", "ACC-003", 5000.0, true, null, null)
                 ),
-                currentSubAccount = SubAccount("SUB001", "Personal Account", 1500.0)
+                currentSubAccount = SubAccount("SUB001", "Personal Account", "ACC-001", 1500.0, true, null, null)
             )
         )
     }

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.example.smartcitizenclub.R
+import com.example.smartcitizenclub.data.AccountManager
 import com.example.smartcitizenclub.presentation.navigation.AppNavigation
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 
@@ -31,6 +32,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // Initialize AccountManager
+        AccountManager.initialize(this)
         
         // Configure window insets to respect system UI
         WindowCompat.setDecorFitsSystemWindows(window, false)

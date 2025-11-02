@@ -3,15 +3,10 @@ package com.example.smartcitizenclub.presentation.feature.account.ui
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import androidx.core.content.FileProvider
-import java.io.File
-import java.io.FileOutputStream
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,25 +15,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import androidx.core.content.FileProvider
+import com.example.smartcitizenclub.data.SubAccount
 import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
-
-// Data class for sub-accounts
-data class SubAccount(
-    val id: String,
-    val name: String,
-    val number: String,
-    val balance: Double,
-    val groupId: String? = null,
-    val referralCode: String? = null
-)
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
+import java.io.File
+import java.io.FileOutputStream
 
 // Color constants for account components
 object AccountColors {
@@ -116,13 +107,13 @@ fun SubAccountCard(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = account.name,
+                    text = account.accountName,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1F2937)
                 )
                 Text(
-                    text = account.number, 
+                    text = account.accountNumber, 
                     fontSize = 14.sp, 
                     color = Color(0xFF6B7280)
                 )
@@ -220,7 +211,7 @@ fun ActiveAccountCard(
 
                 // Account number (like card number)
                 Text(
-                    text = account.number.replace(" ", "").chunked(4).joinToString(" "),
+                    text = account.accountNumber.replace(" ", "").chunked(4).joinToString(" "),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White,
@@ -231,7 +222,7 @@ fun ActiveAccountCard(
 
                 // Account name
                 Text(
-                    text = account.name.uppercase(),
+                    text = account.accountName.uppercase(),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -464,7 +455,7 @@ fun AccountContextMenu(
             }, 
             title = {
                 Text(
-                    text = selectedAccount.name,
+                    text = selectedAccount.accountName,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -514,7 +505,7 @@ fun SubAccountCardPreview() {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             SubAccountCard(
-                account = SubAccount("1", "Personal Savings", "ACC-002", 25000.0, "1", "REF002"),
+                account = SubAccount("1", "Personal Savings", "ACC-002", 25000.0, true, "1", "REF002"),
                 onClick = {},
                 onLongPress = {}
             )
@@ -531,7 +522,7 @@ fun ActiveAccountCardPreview() {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             ActiveAccountCard(
-                account = SubAccount("1", "Main Account", "ACC-001", 15000.0, null, "REF001")
+                account = SubAccount("1", "Main Account", "ACC-001", 15000.0, true, null, "REF001")
             )
         }
     }
@@ -591,13 +582,13 @@ private fun createCardImageBitmap(account: SubAccount): Bitmap {
     // Account number - large and bold (formatted like credit card)
     paint.textSize = 56f
     paint.isFakeBoldText = true
-    val formattedNumber = account.number.replace(" ", "").chunked(4).joinToString(" ")
+    val formattedNumber = account.accountNumber.replace(" ", "").chunked(4).joinToString(" ")
     canvas.drawText(formattedNumber, 48f, 100f, paint)
     
     // Account name - medium size
     paint.textSize = 40f
     paint.isFakeBoldText = true
-    canvas.drawText(account.name.uppercase(), 48f, 140f, paint)
+    canvas.drawText(account.accountName.uppercase(), 48f, 140f, paint)
     
     // Balance label - smaller
     paint.textSize = 28f
@@ -699,8 +690,8 @@ fun shareCardImageToWhatsApp(context: Context, account: SubAccount) {
 fun shareToWhatsApp(context: Context, account: SubAccount) {
     val shareText = buildString {
         appendLine("🏦 *Smart Citizen Club Account*")
-        appendLine("Account: ${account.name}")
-        appendLine("Number: ${account.number}")
+        appendLine("Account: ${account.accountName}")
+        appendLine("Number: ${account.accountNumber}")
         if (!account.referralCode.isNullOrBlank()) {
             appendLine("Ref Code: ${account.referralCode}")
         }
@@ -727,8 +718,8 @@ fun shareToWhatsApp(context: Context, account: SubAccount) {
 fun shareToFacebook(context: Context, account: SubAccount) {
     val shareText = buildString {
         appendLine("🏦 Smart Citizen Club Account")
-        appendLine("Account: ${account.name}")
-        appendLine("Number: ${account.number}")
+        appendLine("Account: ${account.accountName}")
+        appendLine("Number: ${account.accountNumber}")
         if (!account.referralCode.isNullOrBlank()) {
             appendLine("Ref Code: ${account.referralCode}")
         }
@@ -753,8 +744,8 @@ fun shareToFacebook(context: Context, account: SubAccount) {
 fun shareToTelegram(context: Context, account: SubAccount) {
     val shareText = buildString {
         appendLine("🏦 Smart Citizen Club Account")
-        appendLine("Account: ${account.name}")
-        appendLine("Number: ${account.number}")
+        appendLine("Account: ${account.accountName}")
+        appendLine("Number: ${account.accountNumber}")
         if (!account.referralCode.isNullOrBlank()) {
             appendLine("Ref Code: ${account.referralCode}")
         }
@@ -779,8 +770,8 @@ fun shareToTelegram(context: Context, account: SubAccount) {
 fun shareAccountText(context: Context, account: SubAccount) {
     val shareText = buildString {
         appendLine("🏦 Smart Citizen Club Account")
-        appendLine("Account Name: ${account.name}")
-        appendLine("Account Number: ${account.number}")
+        appendLine("Account Name: ${account.accountName}")
+        appendLine("Account Number: ${account.accountNumber}")
         if (!account.referralCode.isNullOrBlank()) {
             appendLine("Referral Code: ${account.referralCode}")
         }

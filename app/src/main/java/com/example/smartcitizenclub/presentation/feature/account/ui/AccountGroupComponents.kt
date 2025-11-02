@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.smartcitizenclub.data.SubAccount
 import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 
 // Data classes for account groups
@@ -287,7 +288,7 @@ fun ChangeGroupDialog(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Select a new group for \"${account.name}\"",
+                    text = "Select a new group for \"${account.accountName}\"",
                     fontSize = 14.sp,
                     color = AccountColors.TextSecondary
                 )
@@ -343,8 +344,8 @@ fun GroupCardPreview() {
             GroupCard(
                 group = sampleAccountGroups[0],
                 accounts = listOf(
-                    SubAccount("1", "Personal Savings", "ACC-002", 25000.0, "1", "REF002"),
-                    SubAccount("2", "Personal Checking", "ACC-006", 15000.0, "1", "REF006")
+                    SubAccount("1", "Personal Savings", "ACC-002", 25000.0, true, "1", "REF002"),
+                    SubAccount("2", "Personal Checking", "ACC-006", 15000.0, true, "1", "REF006")
                 ),
                 isExpanded = true,
                 onToggleExpanded = {},

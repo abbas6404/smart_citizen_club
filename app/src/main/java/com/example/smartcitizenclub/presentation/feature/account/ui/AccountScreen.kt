@@ -1,26 +1,28 @@
 package com.example.smartcitizenclub.presentation.feature.account.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import com.example.smartcitizenclub.data.AccountManager
+import com.example.smartcitizenclub.data.SubAccount
 import com.example.smartcitizenclub.data.User
 import com.example.smartcitizenclub.data.UserType
-import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 import com.example.smartcitizenclub.presentation.theme.PrimaryOrangeGradient
+import com.example.smartcitizenclub.presentation.theme.SmartCitizenClubTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,20 +43,32 @@ fun AccountScreen(
     // Sample data
     val subAccounts = remember {
         listOf(
-            SubAccount("1", "Main Account", "ACC-001", 15000.0, null, "REF001"),
-            SubAccount("2", "Personal Savings", "ACC-002", 25000.0, "1", "REF002"),
-            SubAccount("3", "Business Account", "ACC-003", 50000.0, "2", "REF003"),
-            SubAccount("4", "Emergency Fund", "ACC-004", 30000.0, "5", "REF004"),
-            SubAccount("5", "Investment Portfolio", "ACC-005", 75000.0, "4", "REF005"),
-            SubAccount("6", "Personal Checking", "ACC-006", 15000.0, "1", "REF006"),
-            SubAccount("7", "Business Savings", "ACC-007", 7000.0, "2", "REF007"),
-            SubAccount("8", "Ungrouped Account", "ACC-008", 3000.0, null, null)
+            SubAccount("1", "Main Account", "ACC-001", 15000.0, true, null, "REF001"),
+            SubAccount("2", "Personal Savings", "ACC-002", 25000.0, true, "1", "REF002"),
+            SubAccount("3", "Business Account", "ACC-003", 50000.0, true, "2", "REF003"),
+            SubAccount("4", "Emergency Fund", "ACC-004", 30000.0, true, "5", "REF004"),
+            SubAccount("5", "Investment Portfolio", "ACC-005", 75000.0, true, "4", "REF005"),
+            SubAccount("6", "Personal Checking", "ACC-006", 15000.0, true, "1", "REF006"),
+            SubAccount("7", "Business Savings", "ACC-007", 7000.0, true, "2", "REF007"),
+            SubAccount("8", "Ungrouped Account", "ACC-008", 3000.0, true, null, null)
         )
     }
 
-    val activeAccount = subAccounts.firstOrNull { it.id == "1" } // Main Account as active
+    // Get active account from AccountManager
+    val activeAccount = AccountManager.activeAccount.collectAsState().value 
+        ?: subAccounts.firstOrNull { it.id == "1" }
+    
     val groupedAccounts = subAccounts.groupBy { it.groupId ?: "" }
     val ungroupedAccounts = subAccounts.filter { it.groupId == null && it.id != "1" }
+    
+    // Initialize AccountManager with subaccounts on first load
+    LaunchedEffect(subAccounts) {
+        if (activeAccount == null) {
+            AccountManager.setActiveAccount(subAccounts.first())
+        } else {
+            AccountManager.updateActiveAccountFromList(subAccounts)
+        }
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -192,7 +206,10 @@ fun AccountScreen(
                             expandedGroups + group.id
                         }
                     },
-                    onAccountClick = { /* Handle account click */ },
+                    onAccountClick = { account ->
+                        // Switch to this account as active
+                        AccountManager.setActiveAccount(account)
+                    },
                     onAccountLongPress = { account ->
                         selectedAccount = account
                         showContextMenu = true
@@ -212,7 +229,10 @@ fun AccountScreen(
                 ungroupedAccounts.forEach { account ->
                     SubAccountCard(
                         account = account,
-                        onClick = { /* Handle account click */ },
+                        onClick = { 
+                            // Switch to this account as active
+                            AccountManager.setActiveAccount(account)
+                        },
                         onLongPress = {
                             selectedAccount = account
                             showContextMenu = true
@@ -260,7 +280,7 @@ fun AccountScreen(
             },
             onGroupChanged = { newGroupId ->
                 // Handle group change - in real app, this would update the database
-                println("Changed group for ${selectedAccount?.name} to: $newGroupId")
+                println("Changed group for ${selectedAccount?.accountName} to: $newGroupId")
                 showChangeGroupDialog = false
                 selectedAccount = null
             }

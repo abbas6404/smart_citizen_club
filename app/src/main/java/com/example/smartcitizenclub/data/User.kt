@@ -11,10 +11,13 @@ data class User(
 )
 
 data class SubAccount(
-    val accountNumber: String,
+    val id: String,
     val accountName: String,
+    val accountNumber: String,
     val balance: Double = 0.0,
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
+    val groupId: String? = null,
+    val referralCode: String? = null
 )
 
 enum class UserType {
